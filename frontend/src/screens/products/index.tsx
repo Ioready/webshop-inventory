@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { useState, useEffect } from "react";
 import Breadcrumbs from "../../components/Breadcrumbs";
 import {
@@ -10,15 +10,22 @@ import {
   Dropdown,
   Avatar,
   Menu,
-  Upload
+  Upload,
 } from "antd";
-import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
+import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
 import { LiaProductHunt } from "react-icons/lia";
 import { usePostFile, useFetchByLoad } from "../../contexts";
 import { CiMenuKebab } from "react-icons/ci";
 import { FormData } from "./FormData";
 import { ViewData } from "./ViewData";
-import { CreateDataDrawer, EditDataDrawer, DeleteDataModal, StatusDataModal, ViewDataDrawer } from "../../components/Forms";
+import {
+  CreateDataDrawer,
+  EditDataDrawer,
+  DeleteDataModal,
+  StatusDataModal,
+  ViewDataDrawer,
+} from "../../components/Forms";
+import { CSVLink } from "react-csv";
 const resource = "products";
 
 export default function Lists() {
@@ -27,17 +34,17 @@ export default function Lists() {
 
   const { create, data: file, loading: loadingFile } = usePostFile();
 
-  const [query, setQuery] = useState({ "skip": 0, "take": 10, search: "" })
+  const [query, setQuery] = useState({ skip: 0, take: 10, search: "" });
   const { fetch, data, loading } = useFetchByLoad();
 
   useEffect(() => {
-    fetch({ url: resource, query: JSON.stringify(query) })
-  }, [query, file])
+    fetch({ url: resource, query: JSON.stringify(query) });
+  }, [query, file]);
 
   const refreshData = () => {
-    fetch({ url: resource, query: JSON.stringify(query) })
-    setDetail(null)
-  }
+    fetch({ url: resource, query: JSON.stringify(query) });
+    setDetail(null);
+  };
 
   const calculateTotalQuantity = (data: any) => {
     let totalQuantity = 0;
@@ -49,8 +56,23 @@ export default function Lists() {
     } else {
       return totalQuantity;
     }
-  }
+  };
 
+  const [csvData,setCsvData] = useState([])
+  const downloadCsv = () => {
+      const stockData = data?.data?.filter((item: any) => item.stores.length > 0);
+      if(stockData?.length > 0){
+        setCsvData(stockData)
+      }else{
+        console.log("nodata");
+      }
+  };
+
+  useEffect(()=>{
+    downloadCsv()
+  },[data])
+
+  
   const columns = [
     {
       // title: "Image",
@@ -60,8 +82,12 @@ export default function Lists() {
       dataIndex: "images",
       render: (images: string[]) => {
         const firstImage = images && images.length > 0 ? images[0] : null;
-        return firstImage ? <Avatar shape="square" src={firstImage} /> : <LiaProductHunt size={30} />;
-      }
+        return firstImage ? (
+          <Avatar shape="square" src={firstImage} />
+        ) : (
+          <LiaProductHunt size={30} />
+        );
+      },
     },
     {
       title: "Title",
@@ -76,7 +102,7 @@ export default function Lists() {
     {
       title: "Total Stock",
       dataIndex: "stores",
-      render: (data: any) => calculateTotalQuantity(data)
+      render: (data: any) => calculateTotalQuantity(data),
     },
     {
       title: "Categories",
@@ -87,7 +113,11 @@ export default function Lists() {
       title: "Status",
       dataIndex: "status",
       render(val: any) {
-        return <Tag color={val ? "success" : "error"}>{val ? "ACTIVE" : "INACTIVE"}</Tag>;
+        return (
+          <Tag color={val ? "success" : "error"}>
+            {val ? "ACTIVE" : "INACTIVE"}
+          </Tag>
+        );
       },
     },
     {
@@ -101,7 +131,7 @@ export default function Lists() {
               <Menu.Item key="1">
                 <Button
                   type="link"
-                  onClick={() => setDetail({ ...record, "view": true })}
+                  onClick={() => setDetail({ ...record, view: true })}
                 >
                   VIEW
                 </Button>
@@ -109,7 +139,7 @@ export default function Lists() {
               <Menu.Item key="2">
                 <Button
                   type="link"
-                  onClick={() => setDetail({ ...record, "edit": true })}
+                  onClick={() => setDetail({ ...record, edit: true })}
                 >
                   EDIT
                 </Button>
@@ -117,7 +147,7 @@ export default function Lists() {
               <Menu.Item key="3">
                 <Button
                   type="link"
-                  onClick={() => setDetail({ ...record, "active": true })}
+                  onClick={() => setDetail({ ...record, active: true })}
                 >
                   {record.status ? "INACTIVE" : "ACTIVE"}
                 </Button>
@@ -125,7 +155,7 @@ export default function Lists() {
               <Menu.Item key="4">
                 <Button
                   type="link"
-                  onClick={() => setDetail({ ...record, "delete": true })}
+                  onClick={() => setDetail({ ...record, delete: true })}
                 >
                   DELETE
                 </Button>
@@ -146,40 +176,107 @@ export default function Lists() {
       <Breadcrumbs pageName="Products" />
       <div className="headerRight">
         <Space>
-        <Button type="primary" >Download Stock CSV</Button>
-          
+          <Button type="primary">
+          <CSVLink data={csvData} filename={"stock_product.csv"} >
+            Download Stock CSV
+            </CSVLink>
+          </Button>
+
           <Upload
             showUploadList={false}
-            customRequest={({ file }) => create('products/import_img', file)}>
-            <Button type="primary" icon={loadingFile ? <LoadingOutlined /> : <PlusOutlined />}>Import Images</Button>
+            customRequest={({ file }) => create("products/import_img", file)}
+          >
+            <Button
+              type="primary"
+              icon={loadingFile ? <LoadingOutlined /> : <PlusOutlined />}
+            >
+              Import Images
+            </Button>
           </Upload>
           <Upload
             showUploadList={false}
-            customRequest={({ file }) => create('products/import', file)}>
-            <Button type="primary" icon={loadingFile ? <LoadingOutlined /> : <PlusOutlined />}>Import File</Button>
+            customRequest={({ file }) => create("products/import", file)}
+          >
+            <Button
+              type="primary"
+              icon={loadingFile ? <LoadingOutlined /> : <PlusOutlined />}
+            >
+              Import File
+            </Button>
           </Upload>
         </Space>
       </div>
       <div className="fixed">
-        <Button type="primary" onClick={() => setDetail({ "add": true })} className="addButton">
+        <Button
+          type="primary"
+          onClick={() => setDetail({ add: true })}
+          className="addButton"
+        >
           ADD
         </Button>
       </div>
       <div className="viewDetails">
-        <Input autoFocus placeholder="title / barcode / scancode / supplierref / brand / supplier" value={search} onChange={(obj) => { setSearch(obj.target.value); setQuery({ ...query, search: obj.target.value }); }} />
+        <Input
+          autoFocus
+          placeholder="title / barcode / scancode / supplierref / brand / supplier"
+          value={search}
+          onChange={(obj) => {
+            setSearch(obj.target.value);
+            setQuery({ ...query, search: obj.target.value });
+          }}
+        />
       </div>
-      <Table className="mainTable" loading={loading} dataSource={data?.data ?? []} columns={columns} pagination={{
-        showQuickJumper: true,
-        total: data?.count ?? 0,
-        onChange: (page, pageSize) => {
-          setQuery({ ...query, "skip": ((page - 1) * pageSize), "take": pageSize });
-        },
-      }} />
-      {(detail && detail.add) && (<CreateDataDrawer resource={resource} close={refreshData} FormData={FormData} data={detail} />)}
-      {(detail && detail.edit) && (<EditDataDrawer resource={resource} close={refreshData} FormData={FormData} data={detail} />)}
-      {(detail && detail.delete) && (<DeleteDataModal resource={resource} close={refreshData} data={detail} />)}
-      {(detail && detail.active) && (<StatusDataModal resource={resource} close={refreshData} data={detail} />)}
-      {(detail && detail.view) && (<ViewDataDrawer resource={resource} close={refreshData} ViewData={ViewData} data={detail} />)}
+      <Table
+        className="mainTable"
+        loading={loading}
+        dataSource={data?.data ?? []}
+        columns={columns}
+        pagination={{
+          showQuickJumper: true,
+          total: data?.count ?? 0,
+          onChange: (page, pageSize) => {
+            setQuery({ ...query, skip: (page - 1) * pageSize, take: pageSize });
+          },
+        }}
+      />
+      {detail && detail.add && (
+        <CreateDataDrawer
+          resource={resource}
+          close={refreshData}
+          FormData={FormData}
+          data={detail}
+        />
+      )}
+      {detail && detail.edit && (
+        <EditDataDrawer
+          resource={resource}
+          close={refreshData}
+          FormData={FormData}
+          data={detail}
+        />
+      )}
+      {detail && detail.delete && (
+        <DeleteDataModal
+          resource={resource}
+          close={refreshData}
+          data={detail}
+        />
+      )}
+      {detail && detail.active && (
+        <StatusDataModal
+          resource={resource}
+          close={refreshData}
+          data={detail}
+        />
+      )}
+      {detail && detail.view && (
+        <ViewDataDrawer
+          resource={resource}
+          close={refreshData}
+          ViewData={ViewData}
+          data={detail}
+        />
+      )}
     </>
   );
 }
