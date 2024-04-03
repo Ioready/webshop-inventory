@@ -146,6 +146,8 @@ export default function Lists() {
       <Breadcrumbs pageName="Products" />
       <div className="headerRight">
         <Space>
+        <Button type="primary" >Download Stock CSV</Button>
+          
           <Upload
             showUploadList={false}
             customRequest={({ file }) => create('products/import_img', file)}>
