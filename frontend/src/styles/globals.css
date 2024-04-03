@@ -1,0 +1,109 @@
+::-webkit-scrollbar {
+    width: 5px;
+    height: 7px;
+    cursor: pointer;
+}
+
+::-webkit-scrollbar-track {
+    background: #000;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #ff8a00;
+    border-radius: 3px;
+}
+
+.form-control.red {
+    border: 1px solid #F04F53;
+}
+
+.form-group .danger {
+    color: #F04F53;
+}
+
+.admin-nav ul li a>span {
+    vertical-align: middle;
+}
+
+.admin-nav ul>li>a.active {
+    background-color: #f8f9fb;
+}
+
+.mainTable {
+    padding: 20px;
+}
+
+.addButton {
+    position: fixed;
+    z-index: 999;
+    right: 1rem;
+    border-radius: 20px;
+    bottom: 1rem;
+    box-shadow: 0 13px 35px -12px rgb(61 98 174 / 25%);
+}
+
+.ant-drawer .ant-drawer-footer {
+    flex-shrink: 0;
+    padding: 8px 16px;
+    border-top: 1px solid rgba(5, 5, 5, 0.06);
+}
+
+.ant-drawer .ant-drawer-footer .p-7 {
+    padding: 1.75rem;
+}
+
+.fixedBottom {
+    position: fixed;
+    bottom: 0.75rem;
+    right: 1.25rem;
+    z-index: 999;
+}
+
+.breadcrumbs {
+    float: left;
+}
+
+.headerRight {
+    float: right;
+    padding: 20px;
+}
+
+.viewDetails {
+    margin: 20px;
+}
+
+.mainTable {
+    background: #fff;
+    border: solid 1px #e5e5e5;
+    margin: 10px;
+    padding: 0;
+    border-radius: 10px;
+}
+
+@media only screen and (max-width:991px) {
+    .ant-drawer-content-wrapper {
+        width: 95% !important;
+    }
+
+    #content.active {
+        width: 100% !important;
+    }
+
+    .breadcrumbs,
+    .headerRight {
+        float: none;
+    }
+
+    .mainTable {
+        overflow-x: scroll;
+    }
+}
+
+.ant-modal-body .form-control{padding: 5px;}
+.spnnier{    height: 90vh;
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+}

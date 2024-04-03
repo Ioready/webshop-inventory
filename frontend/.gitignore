@@ -1,0 +1,17 @@
+# node modules
+node_modules/
+
+# dotenv environment variables file
+.env
+
+# vscode
+.vscode/
+
+#development dotenv
+.env.development
+
+# OS-generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
