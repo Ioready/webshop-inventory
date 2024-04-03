@@ -79,23 +79,27 @@ export function FormData({ initialValues, handleUpdate, loading }: any) {
         >
             {({ handleChange, handleBlur, handleSubmit, values, errors }) => (
               <div className="w-full p-3">
-                <div className="mb-4">
-                        <label>
+                <div className="mb-4 d-flex" style={{gap:"1rem"}}>
+                        <div className=" d-flex align-items-center" style={{gap:"6px"}}>
                             <input
                                 type="checkbox"
                                 checked={selectedPlatform === 'amazon'}
                                 onChange={() => handlePlatformChange('amazon')}
                             />
+                            <label className="m-0">
                             Amazon
                         </label>
-                        <label>
+                        </div>
+                        <div className=" d-flex align-items-center" style={{gap:"6px"}}>
                             <input
                                 type="checkbox"
                                 checked={selectedPlatform === 'bol.com'}
                                 onChange={() => handlePlatformChange('bol.com')}
                             />
+                            <label className=" m-0">
                             Bol.com
                         </label>
+                        </div> 
                     </div>
                     <div className="mb-4">
                         <InputBox
@@ -152,12 +156,12 @@ export function FormData({ initialValues, handleUpdate, loading }: any) {
                                 icon={<MdOutlineSubtitles />}
                             />
                             {index === imageFields.length - 1 && (
-                                <button type="button" onClick={handleAddImageField}>
+                                <button type="button" className="btn btn-success" onClick={handleAddImageField}>
                                     + Add Image
                                 </button>
                             )}
                             {index !== 0 && (
-                                <button type="button" onClick={() => handleDeleteImageField(field.id)}>
+                                <button type="button" className="btn btn-danger mx-3" onClick={() => handleDeleteImageField(field.id)}>
                                     Delete
                                 </button>
                             )}
