@@ -4,7 +4,7 @@ import Dashboard from "../components/Layouts/Dashboard";
 import { ProtectedRoute } from './ProtectedRoute'
 import Login from '../screens/auth'
 import Products from '../screens/products'
-
+import Home from '../screens/dashboard'
 const Scanner = lazy(() => import('../screens/scanner'));
  
 
@@ -15,6 +15,7 @@ export const Navigation = () => {
                 <Route element={<ProtectedRoute />}>
                     <Route path="/" element={<Products />} />
                     <Route path="/scanner" element={<Scanner />} />
+                    <Route path="/dashboard" element={<Home/>} />
                     <Route path="/*" element={<Products />} />
                 </Route>
             </Route>
