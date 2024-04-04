@@ -23,6 +23,7 @@ export function FormData({ initialValues, handleUpdate, loading }: any) {
     
     const ref = useRef<any>(null);
     const fieldArrayRef = useRef<any>(null);
+    const useEffectRef = useRef<boolean>(initialValues?.stores && initialValues.stores[0] ? false : true);
     const { userAgent } = window.navigator;
     const isMobile = mobileKeywords.some(keyword => userAgent.includes(keyword));
     const isTablet = tabletKeywords.some(keyword => userAgent.includes(keyword));
@@ -38,11 +39,20 @@ export function FormData({ initialValues, handleUpdate, loading }: any) {
     });
 
     useEffect(() => {
-        if (fieldArrayRef.current) {
+        if (!useEffectRef.current) {
+            useEffectRef.current = true
             fieldArrayRef.current.push(newStore);
         }
-    }, [])
-    
+    }, [fieldArrayRef]);
+
+    useEffect(() => {
+        if (useEffectRef.current) {
+            const inputElement = document.querySelector(`input[name="stores.0.location"]`) as HTMLInputElement;
+            if (inputElement) {
+                inputElement.focus();
+            }
+        }
+    }, [useEffectRef]);
 
     return (
         <>
@@ -62,13 +72,10 @@ export function FormData({ initialValues, handleUpdate, loading }: any) {
                                     {values.stores.length > 0 &&
                                         values?.stores?.map((store: any, index: any) => (
                                             <div className="row" key={index}>
-                                                {/* <div className="col-2 d-flex align-items-center">
-                                                 <Button type="primary" ghost onClick={() => setCode({ index })}><BsQrCode /></Button>
-                                             </div> */}
                                                 <div className="col-4">
                                                     <InputBox
                                                         required
-                                                        autoFocus
+                                                        autoFocus={useEffectRef.current}
                                                         name={`stores.${index}.location`}
                                                         label="Store Location"
                                                         placeholder="Store Location"
