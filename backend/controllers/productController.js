@@ -35,7 +35,8 @@ export const products = {
             { brand: { $regex: new RegExp(search, "i") } },
             { supplier: { $regex: new RegExp(search, "i") } },
             { ean: { $regex: new RegExp(search, "i") } },
-            { sku: searchNumber }, 
+            { sku: searchNumber },
+            { 'stores.location': { $regex: new RegExp(search, "i") } } // Search in stores' locations
           ];
         } else {
           query.$or = [
@@ -46,9 +47,11 @@ export const products = {
             { brand: { $regex: new RegExp(search, "i") } },
             { supplier: { $regex: new RegExp(search, "i") } },
             { ean: { $regex: new RegExp(search, "i") } },
+            { 'stores.location': { $regex: new RegExp(search, "i") } } // Search in stores' locations
           ];
         }
       }
+
       const products = await Product.find(query).skip(skip).limit(take);
 
       const totalCount = await Product.countDocuments(query);
