@@ -1,131 +1,58 @@
-import { useState, useRef, useEffect } from "react";
-import { Modal } from "antd";
-import { InputBox, ButtonBox } from "../../components/RenderFroms";
-import { Formik, FieldArray } from "formik";
-import * as Yup from "yup";
-import { BsQrCode } from "react-icons/bs";
-import { Button } from "antd";
-import { QrReader } from 'react-qr-reader';
-const mobileKeywords = ['Mobi', 'Android', 'iPhone', 'iPad', 'Windows Phone'];
-const tabletKeywords = ['iPad', 'Tablet', 'Android'];
-
-const newStore = {
-    location: "",
-    qty: "1",
-    laps: "0"
-}
-
-const initialData = {
-    stores: [newStore],
-}
+import React, { useState, useRef, useEffect } from "react";
 
 export function FormData({ initialValues, handleUpdate, loading }: any) {
-    const ref = useRef<any>(null);
-    const fieldArrayRef = useRef<any>(null);
-    const { userAgent } = window.navigator;
-    const isMobile = mobileKeywords.some(keyword => userAgent.includes(keyword));
-    const isTablet = tabletKeywords.some(keyword => userAgent.includes(keyword));
-    const [code, setCode] = useState<any>(false);
-    const [activeStoreIndex, setActiveStoreIndex] = useState<number>(0); // State to track the active store index
+  const [items, setItems] = useState([{ id: 1 }]);
+  const firstInputRef = useRef<HTMLInputElement>(null);
 
-    const validationSchema = Yup.object().shape({
-        stores: Yup.array().of(
-            Yup.object().shape({
-                location: Yup.string().required("Location is required"),
-                qty: Yup.string().required("Quantity is required")
-            })
-        )
-    });
+  const handleAdd = () => {
+    setItems(prevItems => [...prevItems, { id: prevItems.length + 1 }]);
+  };
 
-    useEffect(() => {
-        if (fieldArrayRef.current) {
-            fieldArrayRef.current.push(newStore);
-        }
-    }, []);
+  const handleDelete = (idToDelete: number) => {
+    setItems(prevItems => prevItems.filter(item => item.id !== idToDelete));
+  };
 
-    return (
-        <>
-            <Formik
-                initialValues={(initialValues?.stores && initialValues.stores[0]) ? initialValues : initialData}
-                validationSchema={validationSchema}
-                onSubmit={(values) => handleUpdate({ id: initialValues._id, stores: values.stores })}
-            >
-                {({ handleChange, handleBlur, handleSubmit, values, setFieldValue }) => (
-                    <>
-                        <FieldArray name="stores">
-                            {({ remove, push }) => {
-                                fieldArrayRef.current = { remove, push };
-                                return (
-                                    <div>
-                                        {values.stores.map((store: any, index: number) => (
-                                            <div className="row" key={index}>
-                                                <div className="col-4">
-                                                    <InputBox
-                                                        required
-                                                        autoFocus={index === values.stores.length - 2} // Autofocus only on the last added store
-                                                        name={`stores.${index}.location`}
-                                                        label="Store Location"
-                                                        placeholder="Store Location"
-                                                    />
-                                                </div>
-                                                <div className="col-3">
-                                                    <InputBox
-                                                        required
-                                                        type='number'
-                                                        name={`stores.${index}.qty`}
-                                                        label="Quantity"
-                                                        placeholder="Quantity"
-                                                    />
-                                                </div>
-                                                <div className="col-3">
-                                                    <InputBox
-                                                        readOnly
-                                                        name={`stores.${index}.laps`}
-                                                        placeholder="Stock Out"
-                                                        value={store.laps}
-                                                    />
-                                                </div>
-                                                <div className="col-2 d-flex align-items-center">
-                                                    <Button type="primary" danger onClick={() => remove(index)}>X</Button>
-                                                </div>
-                                            </div>
-                                        ))}
-                                        <Button type="primary" onClick={() => {
-                                            push(newStore);
-                                            setActiveStoreIndex(values.stores.length); // Update activeStoreIndex after pushing new store
-                                        }} className="mb-3">
-                                            ADD
-                                        </Button>
-                                    </div>
-                                );
-                            }}
-                        </FieldArray>
-                        <ButtonBox type="submit" value='Update' loading={loading} onClick={handleSubmit} />
-                        {code && (
-                            <Modal
-                                open={true}
-                                onCancel={() => setCode(false)}
-                                footer={null}
-                            >
-                                <QrReader
-                                    scanDelay={false}
-                                    onResult={(result: any) => {
-                                        if (!!result) {
-                                            let stores = values?.stores
-                                            stores[code?.index] = { ...stores[code?.index], location: result?.text }
-                                            setFieldValue('stores', stores);
-                                            setCode(false)
-                                        }
-                                    }}
-                                    style={{ width: "100%" }}
-                                    ref={ref}
-                                    facingMode={isMobile || isTablet ? 'environment' : 'user'}
-                                />
-                            </Modal>
-                        )}
-                    </>
-                )}
-            </Formik>
-        </>
-    );
+  useEffect(() => {
+    // Focus on the first input field when it mounts
+    if (firstInputRef.current) {
+      firstInputRef.current.focus();
+    }
+  }, []); // Run only once after initial render
+
+  return (
+    <div className="container p-0">
+      {items.map((item, index) => (
+        <div className="row align-items-center mb-3" key={item.id}>
+          <div className="col">
+            <label htmlFor={`storeLocation_${item.id}`}>Store Location:</label>
+            <input
+              type="text"
+              className="form-control"
+              id={`storeLocation_${item.id}`}
+              ref={index === 0 ? firstInputRef : null} // reference the first input
+            />
+          </div>
+          <div className="col">
+            <label htmlFor={`quantity_${item.id}`}>Quantity:</label>
+            <input type="number" className="form-control" id={`quantity_${item.id}`} />
+          </div>
+          <div className="col">
+            <label htmlFor={`stockOut_${item.id}`}>Stock Out:</label>
+            <input type="text" className="form-control" id={`stockOut_${item.id}`} />
+          </div>
+          <div className="col">
+            <button type="button" className="btn btn-danger mt-2" onClick={() => handleDelete(item.id)}>X</button>
+          </div>
+        </div>
+      ))}
+      <div className="row">
+        <div className="col">
+          <button type="button" className="btn btn-primary" onClick={handleAdd}>Add</button>
+        </div>
+      </div>
+      <div className=" py-2">
+        <button type="button" className="btn btn-primary p-2" onClick={handleAdd} style={{width:"100%"}}>Update</button>
+      </div>
+    </div>
+  );
 }
