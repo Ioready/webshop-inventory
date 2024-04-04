@@ -57,6 +57,7 @@
     ]
   },
   "devDependencies": {
+    "@types/react-csv": "^1.1.10",
     "serverless-finch": "^4.0.3"
   }
 }

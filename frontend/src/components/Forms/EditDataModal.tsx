@@ -2,7 +2,6 @@ import { Modal } from "antd";
 import { usePatch } from "../../contexts";
 import { toast } from 'react-toastify';
 export const EditDataModal = ({ resource, close, FormData, data }: any) => {
-    console.log(data, "modal");
     
     const { edit, data: respond, loading } = usePatch();
     const handleUpdate = (body: any) => {
