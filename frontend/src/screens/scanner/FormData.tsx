@@ -1,4 +1,23 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
+import { Modal } from "antd";
+import { InputBox, ButtonBox } from "../../components/RenderFroms";
+import { Formik, FieldArray } from "formik";
+import * as Yup from "yup";
+import { BsQrCode } from "react-icons/bs";
+import { Button } from "antd";
+import { QrReader } from 'react-qr-reader';
+const mobileKeywords = ['Mobi', 'Android', 'iPhone', 'iPad', 'Windows Phone'];
+const tabletKeywords = ['iPad', 'Tablet', 'Android'];
+
+const newStore = {
+    location: "",
+    qty: "1",
+    laps: "0"
+}
+
+const initialData = {
+    stores: [newStore],
+}
 
 export function FormData({ initialValues, handleUpdate, loading }: any) {
     
@@ -10,11 +29,15 @@ export function FormData({ initialValues, handleUpdate, loading }: any) {
     const isTablet = tabletKeywords.some(keyword => userAgent.includes(keyword));
     const [code, setCode] = useState<any>(false);
 
+    const validationSchema = Yup.object().shape({
+        stores: Yup.array().of(
+            Yup.object().shape({
+                location: Yup.string().required("Location is required"),
+                qty: Yup.string().required("Quantity is required")
+            })
+        )
+    });
 
-  const handleDelete = (idToDelete: number) => {
-    setItems(prevItems => prevItems.filter(item => item.id !== idToDelete));
-  };
-  
     useEffect(() => {
         if (!useEffectRef.current) {
             useEffectRef.current = true
@@ -112,5 +135,4 @@ export function FormData({ initialValues, handleUpdate, loading }: any) {
             </Formik>
         </>
     );
-
 }
