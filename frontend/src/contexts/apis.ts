@@ -6,8 +6,8 @@ export const getAuthorizationToken = (token: any) => {
 }
 
 export const axiosInstance: any = axios.create({
-    // baseURL: `${process.env.REACT_APP_BASE_URL}/`,
-    baseURL: `http://localhost:5000/`,
+    baseURL: `${process.env.REACT_APP_BASE_URL}/`,
+    // baseURL: `http://localhost:5000/`,
     headers: {
         "Accept": "application/json"
     },

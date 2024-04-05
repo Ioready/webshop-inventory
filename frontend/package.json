@@ -31,7 +31,7 @@
     "yup": "^1.2.0"
   },
   "scripts": {
-    "dev": "react-scripts start",
+    "start": "react-scripts start",
     "build": "react-scripts build",
     "copy-html-entry": "cp -r build/static/js/main.*.js client/accounts.js && cp -r build/static/css/main.*.css client/accounts.css",
     "test": "react-scripts test",
