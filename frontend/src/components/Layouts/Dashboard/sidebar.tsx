@@ -6,12 +6,19 @@ import { LiaProductHunt } from "react-icons/lia";
 import { MainContext } from "../../../contexts/mainProvider";
 import { IoIosSettings } from "react-icons/io";
 import { FaRegUserCircle } from "react-icons/fa";
+import { MdDashboard } from "react-icons/md";
 
 export const Sidebar = () => {
   const navigate = useNavigate();
   const { labels, logout, user, sidebar, setSidebar } = useContext(MainContext)
   
   let menuItems: any = [
+    {
+      icon: <MdDashboard />,
+      label: "Dashboard",
+      value: "dashboard",
+      isShow: true,
+    },
     {
       icon: <LiaProductHunt />,
       label: "PRODUCTS",
