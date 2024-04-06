@@ -36,7 +36,7 @@ export const products = {
             { supplier: { $regex: new RegExp(search, "i") } },
             { ean: { $regex: new RegExp(search, "i") } },
             { sku: searchNumber },
-            { 'stores.location': { $regex: new RegExp(search, "i") } } // Search in stores' locations
+            { 'stores.location': { $regex: new RegExp(search, "i") } }
           ];
         } else {
           query.$or = [
@@ -47,18 +47,24 @@ export const products = {
             { brand: { $regex: new RegExp(search, "i") } },
             { supplier: { $regex: new RegExp(search, "i") } },
             { ean: { $regex: new RegExp(search, "i") } },
-            { 'stores.location': { $regex: new RegExp(search, "i") } } // Search in stores' locations
+            { 'stores.location': { $regex: new RegExp(search, "i") } }
           ];
         }
       }
-
+      const allProducts = await Product.find({ 'stores.0': { $exists: true }});
       const products = await Product.find(query).skip(skip).limit(take);
 
+      const stockedProduct = allProducts.filter(product => {
+        const totalQty = product.stores.reduce((acc, curr) => acc + parseInt(curr.qty), 0);
+        return totalQty > 0;
+      });
+      
       const totalCount = await Product.countDocuments(query);
       res.status(200).send({
         success: true,
-        data: products,
+        data: products, 
         count: totalCount,
+        allProducts:stockedProduct
       });
     } catch (error) {
       console.error(error);

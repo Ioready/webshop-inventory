@@ -14,7 +14,7 @@ const initialData = {
     language: "nl_NL",
     categories: "",
     images: [],
-    tags: "isallowed",
+    tags: " allow webshop",
     weight: "",
     taxValue: 21,
     ean: "",

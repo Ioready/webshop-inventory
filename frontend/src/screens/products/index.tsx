@@ -36,7 +36,7 @@ export default function Lists() {
 
   const [query, setQuery] = useState({ skip: 0, take: 10, search: "" });
   const { fetch, data, loading } = useFetchByLoad();
-
+  
   useEffect(() => {
     fetch({ url: resource, query: JSON.stringify(query) });
   }, [query, file]);
@@ -60,9 +60,9 @@ export default function Lists() {
 
   const [csvData,setCsvData] = useState([])
   const downloadCsv = () => {
-      const stockData = data?.data?.filter((item: any) => item.stores.length > 0);
+      const stockData = data?.allProducts?.filter((item: any) => item.stores.length > 0);
       if(stockData?.length > 0){
-        setCsvData(stockData)
+        setCsvData(data?.allProducts)
       }else{
         console.log("nodata");
       }
@@ -92,6 +92,11 @@ export default function Lists() {
     {
       title: "Title",
       dataIndex: "title",
+      sorter: true,
+    },
+    {
+      title: "Ean Barcode",
+      dataIndex: "ean",
       sorter: true,
     },
     {
@@ -218,7 +223,7 @@ export default function Lists() {
       <div className="viewDetails">
         <Input
           autoFocus
-          placeholder="title / barcode / scancode / supplierref / brand / supplier"
+          placeholder="title / barcode / scancode / supplierref / brand / supplier / location"
           value={search}
           onChange={(obj) => {
             setSearch(obj.target.value);
