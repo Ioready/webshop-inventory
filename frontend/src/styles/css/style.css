@@ -9,6 +9,12 @@
   box-shadow: 0px 0px 12px -3px !important;
 }
 
+@media screen and (max-width: 1000px) {
+  .bottom_dashboard{
+    flex-direction: column;
+  }
+}
+
 /*===GENERAL===*/
 .site-text-primary {
   color: #022279;

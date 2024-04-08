@@ -104,7 +104,7 @@ export default function Lists() {
             
         </div>
 
-        <div className=' d-flex ' style={{gap:"1rem"}}>
+        <div className=' d-flex bottom_dashboard ' style={{gap:"1rem"}}>
             <div className=' d-flex align-items-center justify-content-center p-2' style={{flex:"1"}}>
             <Doughnut
                 data={{
