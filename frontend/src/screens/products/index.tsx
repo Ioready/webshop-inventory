@@ -70,7 +70,7 @@ export default function Lists() {
 
   useEffect(()=>{
     downloadCsv()
-  },[data])
+  },[])
 
   
   const columns = [
@@ -110,21 +110,26 @@ export default function Lists() {
       render: (data: any) => calculateTotalQuantity(data),
     },
     {
-      title: "Categories",
-      dataIndex: "categories",
+      title: "Selling Price",
+      dataIndex: "minSellingPrice",
       sorter: true,
     },
     {
-      title: "Status",
-      dataIndex: "status",
-      render(val: any) {
-        return (
-          <Tag color={val ? "success" : "error"}>
-            {val ? "ACTIVE" : "INACTIVE"}
-          </Tag>
-        );
-      },
+      title: "Platform",
+      dataIndex: "platform",
+      sorter: true,
     },
+    // {
+    //   title: "Status",
+    //   dataIndex: "status",
+    //   render(val: any) {
+    //     return (
+    //       <Tag color={val ? "success" : "error"}>
+    //         {val ? "ACTIVE" : "INACTIVE"}
+    //       </Tag>
+    //     );
+    //   },
+    // },
     {
       title: "Actions",
       dataIndex: "address",

@@ -5,13 +5,19 @@ import { CiShoppingCart } from "react-icons/ci";
 import { CiTrophy } from "react-icons/ci";
 import { FiUserCheck } from "react-icons/fi";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import { useFetchByLoad } from '../../contexts';
+import { useEffect } from 'react';
 ChartJS.register(ArcElement, Tooltip, Legend);
-
-
+const resource = "products";
 
 export default function Lists() {
-
-    const data = [
+    
+    const { fetch, data, loading } = useFetchByLoad();
+    useEffect(() => {
+        fetch({ url: resource });
+      }, []);
+    console.log(data, " data");
+    const datas = [
         {
             "label":"ads",
             "value":200
@@ -31,8 +37,8 @@ export default function Lists() {
         <div className=" d-flex align-items-center justify-content-center flex-wrap p-" style={{gap:"2rem", padding:"2rem"}}>
             <div className=" d-flex align-items-center justify-content-between rounded-3 shadow-lg blocks_cards" style={{padding:"1rem", gap:"1rem"}}>
                <div>
-                <p className=" h1">17</p>
-                <p className=" h5">Total User</p>
+                <p className=" h1">{data?.count}</p>
+                <p className=" h5"> Total Stocked product</p>
                 </div>
                 <div>
                     <LuUsers2 style={{fontSize:"3rem"}}/>
@@ -40,8 +46,8 @@ export default function Lists() {
             </div>
             <div className=" d-flex align-items-center justify-content-between rounded-3 shadow-lg blocks_cards" style={{padding:"1rem", gap:"1rem"}}>
                <div>
-                <p className=" h1">40</p>
-                <p className=" h5">Total Orders</p>
+                <p className=" h1">{data?.platformCount[0].count}</p>
+                <p className=" h5">{data?.platformCount[0]._id}</p>
                 </div>
                 <div>
                     <CiShoppingCart style={{fontSize:"3rem"}}/>
@@ -49,8 +55,8 @@ export default function Lists() {
             </div>
             <div className=" d-flex align-items-center justify-content-between rounded-3 shadow-lg blocks_cards" style={{padding:"1rem", gap:"1rem"}}>
                <div>
-                <p className=" h1">17</p>
-                <p className=" h5">Total Plans</p>
+                <p className=" h1">{data?.platformCount[1].count}</p>
+                <p className=" h5">{data?.platformCount[1]._id}</p>
                 </div>
                 <div>
                     <CiTrophy style={{fontSize:"3rem"}}/>
@@ -108,11 +114,11 @@ export default function Lists() {
             <div className=' d-flex align-items-center justify-content-center p-2' style={{flex:"1"}}>
             <Doughnut
                 data={{
-                    labels: data.map((item)=> item.label),
+                    labels: datas.map((item)=> item.label),
                     datasets: [
                         {
                             label:"counts",
-                            data: data.map((item)=>item.value),
+                            data: datas.map((item)=>item.value),
                             backgroundColor: [
                                 'rgb(255, 99, 132)',
                                 'rgb(54, 162, 235)',
@@ -125,7 +131,7 @@ export default function Lists() {
                 />
             </div>
             <div className='d-flex justify-content-center flex-column p-2' style={{flex:"1"}}>
-    <h3>Recent Search History</h3>
+    <h3> Resend Added product</h3>
 
     <table className="table table-striped table-bordered table-hover">
         <thead className="thead-dark ">
@@ -136,12 +142,14 @@ export default function Lists() {
             </tr>
         </thead>
         <tbody>
+            {data?.data.map((product:any, index:number)=>(
             <tr>
-                <td>1</td>
-                <td>Row 1 Data 1</td>
-                <td>Row 1 Data 2</td>
+                <td>{index + 1}</td>
+                <td>{product?.title}</td>
+                <td>{product?.price}</td>
             </tr>
-            <tr>
+            ))}
+            {/* <tr>
                 <td>2</td>
                 <td>Row 2 Data 1</td>
                 <td>Row 2 Data 2</td>
@@ -180,7 +188,7 @@ export default function Lists() {
                 <td>3</td>
                 <td>Row 3 Data 1</td>
                 <td>Row 3 Data 2</td>
-            </tr>
+            </tr> */}
         </tbody>
     </table>
 </div>

@@ -31,10 +31,11 @@ const ProductSchema = new Schema(
     supplier: String,
     dogJacketSize: String,
     scanCode: String,
-    purchasePrice: String,
+    purchasePrice: Number,
     price: String,
     platform: String,
-    stores: []
+    stores: [],
+    minSellingPrice: Number,
   },
   { timestamps: true }
 );
