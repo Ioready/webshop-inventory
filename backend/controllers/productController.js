@@ -72,13 +72,7 @@ export const products = {
           ];
         }
       }
-      const allProducts = await Product.find({ 'stores.0': { $exists: true }});
       const products = await Product.find(query).skip(skip).limit(take);
-
-      const stockedProduct = allProducts.filter(product => {
-        const totalQty = product.stores.reduce((acc, curr) => acc + parseInt(curr.qty), 0);
-        return totalQty > 0;
-      });
       const platformCount = await Product.aggregate([
         {
           $match: {
@@ -97,8 +91,28 @@ export const products = {
         success: true,
         data: products, 
         count: totalCount,
-        allProducts:stockedProduct,
         platformCount
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({
+        success: false,
+        message: "Server error",
+        error: error.message,
+      });
+    }
+  },
+
+  getAllProduct:async(req,res)=>{
+    try {
+      const allProducts = await Product.find({ 'stores.0': { $exists: true }});
+      const stockedProduct = allProducts.filter(product => {
+        const totalQty = product.stores.reduce((acc, curr) => acc + parseInt(curr.qty), 0);
+        return totalQty > 0;
+      });
+      res.status(200).send({
+        success: true,
+        data: stockedProduct,
       });
     } catch (error) {
       console.error(error);

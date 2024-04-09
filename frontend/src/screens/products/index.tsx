@@ -61,8 +61,9 @@ export default function Lists() {
   const [csvData,setCsvData] = useState([])
 
   const downloadCsv = () => {
-    const stockData = data?.allProducts?.filter((item: any) => item.stores.length > 0);
-    if (stockData?.length > 0) {
+    fetch({ url: "allproduct", query: JSON.stringify("") });
+    const stockData = data?.data?.filter((item: any) => item.stores.length > 0);
+    if (data?.data?.length > 10 && stockData?.length > 0) {
       const csvDataFormatted = stockData.map((item:any) => {
         const storeInfo = item.stores.map((store: any) => {
           return `Location: ${store.location}, Quantity: ${store.qty}, Laps: ${store.laps}`;
@@ -83,10 +84,6 @@ export default function Lists() {
       console.log("No data to export");
     }
   };
-
-  useEffect(()=>{
-    downloadCsv()
-  },[data])
 
   const columns = [
     {
@@ -201,7 +198,7 @@ export default function Lists() {
       <Breadcrumbs pageName="Products" />
       <div className="headerRight">
         <Space>
-          <Button type="primary">
+          <Button onClick={downloadCsv} type="primary">
           <CSVLink data={csvData} filename={"stock_product.csv"} >
             Download Stock CSV
             </CSVLink>

@@ -46,8 +46,8 @@ export default function Lists() {
             </div>
             <div className=" d-flex align-items-center justify-content-between rounded-3 shadow-lg blocks_cards" style={{padding:"1rem", gap:"1rem"}}>
                <div>
-                <p className=" h1">{data?.platformCount[0].count}</p>
-                <p className=" h5">{data?.platformCount[0]._id}</p>
+                <p className=" h1">{data?.platformCount[0]?.count}</p>
+                <p className=" h5">{data?.platformCount[0]?._id}</p>
                 </div>
                 <div>
                     <CiShoppingCart style={{fontSize:"3rem"}}/>
@@ -55,8 +55,8 @@ export default function Lists() {
             </div>
             <div className=" d-flex align-items-center justify-content-between rounded-3 shadow-lg blocks_cards" style={{padding:"1rem", gap:"1rem"}}>
                <div>
-                <p className=" h1">{data?.platformCount[1].count}</p>
-                <p className=" h5">{data?.platformCount[1]._id}</p>
+                <p className=" h1">{data?.platformCount[1]?.count}</p>
+                <p className=" h5">{data?.platformCount[1]?._id}</p>
                 </div>
                 <div>
                     <CiTrophy style={{fontSize:"3rem"}}/>
