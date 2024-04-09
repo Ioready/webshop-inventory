@@ -131,7 +131,7 @@ export default function Lists() {
                 />
             </div>
             <div className='d-flex justify-content-center flex-column p-2' style={{flex:"1"}}>
-    <h3> Resend Added product</h3>
+    <h3> Recently Added product</h3>
 
     <table className="table table-striped table-bordered table-hover">
         <thead className="thead-dark ">

@@ -6,7 +6,7 @@ import userRout from "./routes/user.js";
 import connectDB from "./config/db.js";
 
 const app = express()
-dotenv.config()
+dotenv.config() 
 
 connectDB()
 
@@ -14,7 +14,7 @@ const port = process.env.PORT
 
 app.use(express.json({limit : "10mb"}))
 app.use(cors())
-app.use(morgan("dev"))
+// app.use(morgan("dev"))
 app.use('/',userRout);
 
 app.listen(port, ()=>{

@@ -35,7 +35,7 @@ export default function Lists() {
   const { create, data: file, loading: loadingFile } = usePostFile();
 
   const [query, setQuery] = useState({ skip: 0, take: 10, search: "" });
-  const { fetch, data, loading } = useFetchByLoad();
+  const { fetch, data, loading } = useFetchByLoad();  
   
   useEffect(() => {
     fetch({ url: resource, query: JSON.stringify(query) });
@@ -59,20 +59,35 @@ export default function Lists() {
   };
 
   const [csvData,setCsvData] = useState([])
+
   const downloadCsv = () => {
-      const stockData = data?.allProducts?.filter((item: any) => item.stores.length > 0);
-      if(stockData?.length > 0){
-        setCsvData(data?.allProducts)
-      }else{
-        console.log("nodata");
-      }
+    const stockData = data?.allProducts?.filter((item: any) => item.stores.length > 0);
+    if (stockData?.length > 0) {
+      const csvDataFormatted = stockData.map((item:any) => {
+        const storeInfo = item.stores.map((store: any) => {
+          return `Location: ${store.location}, Quantity: ${store.qty}, Laps: ${store.laps}`;
+        }).join('\n');
+        
+        return {
+          Title: item.title || "",
+          EanBarcode: item.ean || "",
+          Price: item.price || "",
+          TotalStock: calculateTotalQuantity(item.stores) || "",
+          SellingPrice: item.minSellingPrice || "",
+          Platform: item.platform || "",
+          StoreInfo: storeInfo,
+        };
+      });
+      setCsvData(csvDataFormatted);
+    } else {
+      console.log("No data to export");
+    }
   };
 
   useEffect(()=>{
     downloadCsv()
-  },[])
+  },[data])
 
-  
   const columns = [
     {
       // title: "Image",
