@@ -1,5 +1,6 @@
 "use client"
 import { Doughnut } from 'react-chartjs-2'
+import { FaAmazon } from "react-icons/fa";
 import { LuUsers2 } from "react-icons/lu";
 import { CiShoppingCart } from "react-icons/ci";
 import { CiTrophy } from "react-icons/ci";
@@ -34,14 +35,14 @@ export default function Lists() {
 
     return (
         <>
-        <div className=" d-flex align-items-center justify-content-center flex-wrap p-" style={{gap:"2rem", padding:"2rem"}}>
+        <div className="main_caed_block" style={{gap:"2rem", padding:"2rem"}}>
             <div className=" d-flex align-items-center justify-content-between rounded-3 shadow-lg blocks_cards" style={{padding:"1rem", gap:"1rem"}}>
                <div>
                 <p className=" h1">{data?.count}</p>
                 <p className=" h5"> Total Stocked product</p>
                 </div>
                 <div>
-                    <LuUsers2 style={{fontSize:"3rem"}}/>
+                    <CiShoppingCart style={{fontSize:"3rem"}}/>
                 </div>
             </div>
             <div className=" d-flex align-items-center justify-content-between rounded-3 shadow-lg blocks_cards" style={{padding:"1rem", gap:"1rem"}}>
@@ -50,7 +51,7 @@ export default function Lists() {
                 <p className=" h5">{data?.platformCount[0]?._id}</p>
                 </div>
                 <div>
-                    <CiShoppingCart style={{fontSize:"3rem"}}/>
+                    <FaAmazon style={{fontSize:"3rem"}}/>
                 </div>
             </div>
             <div className=" d-flex align-items-center justify-content-between rounded-3 shadow-lg blocks_cards" style={{padding:"1rem", gap:"1rem"}}>
@@ -65,7 +66,7 @@ export default function Lists() {
             <div className=" d-flex align-items-center justify-content-between rounded-3 shadow-lg blocks_cards" style={{padding:"1rem", gap:"1rem"}}>
                <div>
                 <p className=" h1">17</p>
-                <p className=" h5">Total User</p>
+                <p className=" h5">Demo</p>
                 </div>
                 <div>
                     <LuUsers2 style={{fontSize:"3rem"}}/>
@@ -74,7 +75,7 @@ export default function Lists() {
             <div className=" d-flex align-items-center justify-content-between rounded-3 shadow-lg blocks_cards" style={{padding:"1rem", gap:"1rem"}}>
                <div>
                 <p className=" h1">17</p>
-                <p className=" h5">Total Order Amount</p>
+                <p className=" h5">Demo</p>
                 </div>
                 <div>
                     <FiUserCheck style={{fontSize:"3rem"}}/>
@@ -83,7 +84,7 @@ export default function Lists() {
             <div className=" d-flex align-items-center justify-content-between rounded-3 shadow-lg blocks_cards" style={{padding:"1rem", gap:"1rem"}}>
                <div>
                 <p className=" h1">17</p>
-                <p className=" h5">Total User</p>
+                <p className=" h5">Demo</p>
                 </div>
                 <div>
                     <LuUsers2 style={{fontSize:"3rem"}}/>
@@ -92,7 +93,7 @@ export default function Lists() {
             <div className=" d-flex align-items-center justify-content-between rounded-3 shadow-lg blocks_cards" style={{padding:"1rem", gap:"1rem"}}>
                <div>
                 <p className=" h1">17</p>
-                <p className=" h5">Total User</p>
+                <p className=" h5">Demo</p>
                 </div>
                 <div>
                     <LuUsers2 style={{fontSize:"3rem"}}/>
@@ -101,7 +102,7 @@ export default function Lists() {
             <div className=" d-flex align-items-center justify-content-between rounded-3 shadow-lg blocks_cards" style={{padding:"1rem", gap:"1rem"}}>
                <div>
                 <p className=" h1">17</p>
-                <p className=" h5">Total User</p>
+                <p className=" h5">Demo</p>
                 </div>
                 <div>
                     <LuUsers2 style={{fontSize:"3rem"}}/>
@@ -110,8 +111,8 @@ export default function Lists() {
             
         </div>
 
-        <div className=' d-flex bottom_dashboard ' style={{gap:"1rem"}}>
-            <div className=' d-flex align-items-center justify-content-center p-2' style={{flex:"1"}}>
+        <div className=' d-flex bottom_dashboard align-items-center justify-content-center ' style={{gap:"1rem"}}>
+            <div className=' d-flex align-items-center justify-content-center p-2 charts_block1'>
             <Doughnut
                 data={{
                     labels: datas.map((item)=> item.label),
@@ -130,7 +131,7 @@ export default function Lists() {
 
                 />
             </div>
-            <div className='d-flex justify-content-center flex-column p-2' style={{flex:"1"}}>
+            <div className='d-flex justify-content-center flex-column p-2 charts_block'>
     <h3> Recently Added product</h3>
 
     <table className="table table-striped table-bordered table-hover">
