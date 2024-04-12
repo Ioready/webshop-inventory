@@ -68,13 +68,13 @@ export default function Lists() {
         const storeInfo = item.stores.map((store: any) => {
           return `Location: ${store.location}, Quantity: ${store.qty}, Laps: ${store.laps}`;
         }).join('\n');
-        
         return {
           Title: item.title || "",
           EanBarcode: item.ean || "",
           Price: item.price || "",
           TotalStock: calculateTotalQuantity(item.stores) || "",
           SellingPrice: item.minSellingPrice || "",
+          supplierRef:item.supplierRef || "",
           Platform: item.platform || "",
           StoreInfo: storeInfo,
         };
@@ -120,6 +120,11 @@ export default function Lists() {
       title: "Total Stock",
       dataIndex: "stores",
       render: (data: any) => calculateTotalQuantity(data),
+    },
+    {
+      title: "supplierRef",
+      dataIndex: "supplierRef",
+      sorter: true,
     },
     {
       title: "Selling Price",

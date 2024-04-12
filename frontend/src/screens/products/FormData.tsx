@@ -75,7 +75,7 @@ export function FormData({ initialValues, handleUpdate, loading }: any) {
         <Formik
             initialValues={initialValues?.edit ? initialValues : initialData }
             validationSchema={validationSchema}
-            onSubmit={(values) => { console.log(values, "log value") ; handleUpdate({ ...values, sku: +values.sku, weight: +values.weight, taxValue: +values.taxValue, ean: +values.ean, platform: selectedPlatform })}}
+            onSubmit={(values) => { console.log(values, "log value") ; handleUpdate({ ...values, sku: +values.sku, weight: +values.weight, taxValue: +values.taxValue, ean: values.ean, platform: selectedPlatform })}}
         >
             {({ handleChange, handleBlur, handleSubmit, values, errors }) => (
               <div className="w-full p-3">
