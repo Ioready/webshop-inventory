@@ -51,8 +51,8 @@ export default function Lists() {
           <div className="viewDetails" style={{ textAlign: "center", display: 'flex', justifyContent: "flex-start" }}>
           <Form.Item>
         <Checkbox.Group style={{marginLeft:"10px"}}>
-          <Checkbox value="">Amazon</Checkbox>
-          <Checkbox value="">Bol.com</Checkbox>
+          <Checkbox value="amazon">Amazon</Checkbox>
+          <Checkbox value="bol.com">Bol.com</Checkbox>
         </Checkbox.Group>
       </Form.Item>
             <Button type="primary" onClick={() => setDetail({ ...data?.data[0], "edit": true })}>Enter Store Location</Button>
@@ -72,6 +72,7 @@ export default function Lists() {
                       <Option value="option1">Option 1</Option>
                       <Option value="option2">Option 2</Option>
                     </Select>
+                    <Button type="primary" style={{ marginLeft: "10px" }} >Update </Button>
                   </div>
                 </>
               )}
