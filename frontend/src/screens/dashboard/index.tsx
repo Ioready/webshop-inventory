@@ -36,16 +36,16 @@ export default function Lists() {
     return (
         <>
         <div className="main_caed_block" style={{gap:"2rem", padding:"2rem"}}>
-            <div className=" d-flex align-items-center justify-content-between rounded-3 shadow-lg blocks_cards" style={{padding:"1rem", gap:"1rem"}}>
+            <div className=" d-flex align-items-center justify-content-between rounded-3 shadow-lg blocks_cards" style={{padding:"1rem", gap:"3rem"}}>
                <div>
-                <p className=" h1">{data?.count}</p>
-                <p className=" h5"> Total Stocked product</p>
+                <p className="h1">{data?.count}</p>
+                <p className="h5"> Total Stocked product</p>
                 </div>
                 <div>
                     <CiShoppingCart style={{fontSize:"3rem"}}/>
                 </div>
             </div>
-            <div className=" d-flex align-items-center justify-content-between rounded-3 shadow-lg blocks_cards" style={{padding:"1rem", gap:"1rem"}}>
+            <div className=" d-flex align-items-center justify-content-between rounded-3 shadow-lg blocks_cards" style={{padding:"1rem", gap:"3rem"}}>
                <div>
                 <p className=" h1">{data?.platformCount[0]?.count}</p>
                 <p className=" h5">{data?.platformCount[0]?._id}</p>
@@ -54,7 +54,7 @@ export default function Lists() {
                     <FaAmazon style={{fontSize:"3rem"}}/>
                 </div>
             </div>
-            <div className=" d-flex align-items-center justify-content-between rounded-3 shadow-lg blocks_cards" style={{padding:"1rem", gap:"1rem"}}>
+            <div className=" d-flex align-items-center justify-content-between rounded-3 shadow-lg blocks_cards" style={{padding:"1rem", gap:"3rem"}}>
                <div>
                 <p className=" h1">{data?.platformCount[1]?.count}</p>
                 <p className=" h5">{data?.platformCount[1]?._id}</p>
@@ -63,7 +63,7 @@ export default function Lists() {
                     <CiTrophy style={{fontSize:"3rem"}}/>
                 </div>
             </div>
-            <div className=" d-flex align-items-center justify-content-between rounded-3 shadow-lg blocks_cards" style={{padding:"1rem", gap:"1rem"}}>
+            <div className=" d-flex align-items-center justify-content-between rounded-3 shadow-lg blocks_cards" style={{padding:"1rem", gap:"3rem"}}>
                <div>
                 <p className=" h1">17</p>
                 <p className=" h5">Demo</p>

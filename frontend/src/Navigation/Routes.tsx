@@ -6,6 +6,9 @@ import Login from '../screens/auth'
 import Products from '../screens/products'
 import Home from '../screens/dashboard'
 const Scanner = lazy(() => import('../screens/scanner'));
+
+const SalesReport = lazy(() => import('../screens/sales-report'));
+
  
 
 export const Navigation = () => {
@@ -17,6 +20,7 @@ export const Navigation = () => {
                     <Route path="/scanner" element={<Scanner />} />
                     <Route path="/dashboard" element={<Home/>} />
                     <Route path="/*" element={<Products />} />
+                    <Route path="/sales" element={<SalesReport />} />
                 </Route>
             </Route>
             <Route path="/login" element={<Login />} />

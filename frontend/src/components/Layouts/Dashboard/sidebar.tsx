@@ -7,6 +7,10 @@ import { MainContext } from "../../../contexts/mainProvider";
 import { IoIosSettings } from "react-icons/io";
 import { FaRegUserCircle } from "react-icons/fa";
 import { MdDashboard } from "react-icons/md";
+import { FaShoppingCart } from "react-icons/fa";
+import { FaProductHunt } from "react-icons/fa";
+import { MdDocumentScanner } from "react-icons/md";
+
 
 export const Sidebar = () => {
   const navigate = useNavigate();
@@ -20,17 +24,23 @@ export const Sidebar = () => {
       isShow: true,
     },
     {
-      icon: <LiaProductHunt />,
+      icon: <FaProductHunt />,
       label: "PRODUCTS",
       value: "",
       isShow: true,
     },
     {
-      icon: <CiBarcode />,
+      icon: <MdDocumentScanner />,
       label: "SCANNER",
       value: "scanner",
       isShow: true,
     },
+    {
+      icon: <FaShoppingCart />,
+      label: "Sales Return",
+      value: "sales",
+      isShow: true,
+    }
   ];
 
   return (
