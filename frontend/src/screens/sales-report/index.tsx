@@ -99,19 +99,19 @@ export default function ProductList() {
     },
    
     {
-      title: "Brand",
-      dataIndex: "platform",
+      title: "platform",
+      dataIndex: "",
       sorter: true,
     },
     {
       title: "Sold Amount",
-      dataIndex: "supplierRef",
+      dataIndex: "",
       sorter: true,
     },
    
     {
       title: "Sold Qty",
-      dataIndex: "price",
+      dataIndex: "",
       sorter: true,
     },
     {
