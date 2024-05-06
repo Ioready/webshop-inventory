@@ -20,10 +20,10 @@ export const Navigation = () => {
                     <Route path="/scanner" element={<Scanner />} />
                     <Route path="/dashboard" element={<Home/>} />
                     <Route path="/*" element={<Products />} />
-                    <Route path="/sales" element={<SalesReport />} />
+                    {/* <Route path="/sales" element={<SalesReport />} /> */}
                 </Route>
             </Route>
             <Route path="/login" element={<Login />} />
         </Routes>
     )
-}
+} 

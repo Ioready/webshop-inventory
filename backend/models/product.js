@@ -16,6 +16,8 @@ const ProductSchema = new Schema(
     ean: String,
     language: String,
     categories: String,
+    subCategories:String,
+    subSubCategories:String,
     title: String,
     description: String,
     images: [String],
@@ -36,6 +38,7 @@ const ProductSchema = new Schema(
     platform: String,
     stores: [],
     minSellingPrice: Number,
+    stockedOutStatment:String,
   },
   { timestamps: true }
 );

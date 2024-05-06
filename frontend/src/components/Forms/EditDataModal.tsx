@@ -10,6 +10,7 @@ export const EditDataModal = ({ resource, close, FormData, data }: any) => {
     if (respond) {
         toast.success(`${resource} update successfully`);
         close()
+        window.location.reload()
     }
     return (
         <Modal

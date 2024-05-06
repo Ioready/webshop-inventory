@@ -46,8 +46,36 @@ export default function Lists() {
     setDetail(null);
   };
 
+  const createProductData = (data:any) =>{
+    let minSellingPrice = 0;
+    if (data?.purchasePrice) {
+      const purchasePrice = data?.purchasePrice;
+      if(data.platform === "bol.com"){
+        const x = 1.42353 + 8.38459;
+        let y = purchasePrice * x;
+    
+        if (y < 10) {
+            minSellingPrice = parseFloat((y + 1.27).toFixed(2));
+        } else if (y >= 10 && y < 20) {
+            minSellingPrice = parseFloat((y + 1.57).toFixed(2));
+        } else if (y >= 20) {
+            minSellingPrice = parseFloat((y + 2).toFixed(2));
+        } else {
+            minSellingPrice = 0;
+        }
+      }else{
+        minSellingPrice = parseFloat((((purchasePrice * 1.42353)+8.38459)-5.53).toFixed(2))
+      }
+    }
+    console.log('minSellingPrice',minSellingPrice)
+    return minSellingPrice;
+  
+  } 
+
   const calculateTotalQuantity = (data: any) => {
     let totalQuantity = 0;
+    // console.log("data",data)
+
     if (data) {
       for (const item of data) {
         totalQuantity += parseInt(item.qty) - parseInt(item.laps);
@@ -57,6 +85,10 @@ export default function Lists() {
       return totalQuantity;
     }
   };
+
+
+    
+  
 
   const [csvData,setCsvData] = useState([])
 
@@ -128,8 +160,10 @@ export default function Lists() {
     },
     {
       title: "Selling Price",
-      dataIndex: "minSellingPrice",
+      dataIndex: "data",
       sorter: true,
+      render:  (text:any, record:any) => createProductData(record),
+
     },
     {
       title: "Platform",

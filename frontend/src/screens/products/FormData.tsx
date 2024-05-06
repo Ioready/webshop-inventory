@@ -13,6 +13,8 @@ const initialData = {
     sku: "",
     language: "nl_NL",
     categories: "",
+    subCategories:"",
+    subSubCategories:"",
     images: [],
     tags: " allow webshop",
     weight: "",
@@ -29,12 +31,12 @@ const initialData = {
     scanCode: "",
     purchasePrice: "",
     price: "",
-    platform: "",
+    platform: [],
 }
 
 export function FormData({ initialValues, handleUpdate, loading }: any) {
-  const [imageFields, setImageFields] = useState(initialValues?.edit ? initialValues.images.map((image:string, index:any) => ({ id: index + 1, value: image })) : [{ id: 1, value: ""}]);
-    const [selectedPlatform, setSelectedPlatform] = useState(initialValues?.platform || '');
+    const [imageFields, setImageFields] = useState(initialValues?.edit ? initialValues.images.map((image: string, index: any) => ({ id: index + 1, value: image })) : [{ id: 1, value: "" }]);
+    const [selectedPlatform, setSelectedPlatform] = useState(initialValues?.platform?.split(",") || []);
 
     const handleAddImageField = () => {
         const newId = imageFields.length + 1;
@@ -42,14 +44,21 @@ export function FormData({ initialValues, handleUpdate, loading }: any) {
     };
 
     const handleDeleteImageField = (idToRemove: any) => {
-      const updatedImageFields = imageFields.filter((field:any) => field.id !== idToRemove);
-      setImageFields(updatedImageFields);
-  };
-
-
-    const handlePlatformChange = (platform: string) => {
-        setSelectedPlatform(platform);
+        const updatedImageFields = imageFields.filter((field: any) => field.id !== idToRemove);
+        setImageFields(updatedImageFields);
     };
+
+    console.log("selectedPlatform", initialValues);
+    const handlePlatformChange = (platform: string) => {
+        if (selectedPlatform.includes(platform)) {
+            // Remove the platform if it already exists
+            setSelectedPlatform(selectedPlatform?.filter((p: string) => p !== platform));
+        } else {
+            // Add the platform if it doesn't exist
+            setSelectedPlatform([...selectedPlatform, platform]);
+        }
+    };
+
 
     const validationSchema = Yup.object().shape({
         title: Yup.string().required("Title is required"),
@@ -58,6 +67,8 @@ export function FormData({ initialValues, handleUpdate, loading }: any) {
         sku: Yup.number().required("SKU is required"),
         language: Yup.string().required("Language is required"),
         categories: Yup.string().required("Categorie is required"),
+        subCategories: Yup.string().required("sub Categorie is required"),
+        subSubCategories: Yup.string().required("sub sub Categorie is required"),
         tags: Yup.string().required("Tag is required"),
         price: Yup.string().required("Price is required"),
         weight: Yup.number().required("Weight is required"),
@@ -73,33 +84,44 @@ export function FormData({ initialValues, handleUpdate, loading }: any) {
 
     return (
         <Formik
-            initialValues={initialValues?.edit ? initialValues : initialData }
+            initialValues={initialValues?.edit ? initialValues : initialData}
             validationSchema={validationSchema}
-            onSubmit={(values) => { console.log(values, "log value") ; handleUpdate({ ...values, sku: +values.sku, weight: +values.weight, taxValue: +values.taxValue, ean: values.ean, platform: selectedPlatform })}}
+            onSubmit={(values) => { console.log(values, "log value"); handleUpdate({ ...values, sku: +values.sku, weight: +values.weight, taxValue: +values.taxValue, ean: values.ean, platform: selectedPlatform?.join(",") }) }}
         >
             {({ handleChange, handleBlur, handleSubmit, values, errors }) => (
-              <div className="w-full p-3">
-                <div className="mb-4 d-flex" style={{gap:"1rem"}}>
-                        <div className=" d-flex align-items-center" style={{gap:"6px"}}>
+                <div className="w-full p-3">
+                    <div className="mb-4 d-flex" style={{ gap: "1rem" }}>
+                        <div className=" d-flex align-items-center" style={{ gap: "6px" }}>
                             <input
                                 type="checkbox"
-                                checked={selectedPlatform === 'amazon'}
+                                // checked={selectedPlatform === 'amazon'}
                                 onChange={() => handlePlatformChange('amazon')}
                             />
                             <label className="m-0">
-                            Amazon
-                        </label>
+                                Amazon
+                            </label>
                         </div>
-                        <div className=" d-flex align-items-center" style={{gap:"6px"}}>
+                        <div className=" d-flex align-items-center" style={{ gap: "6px" }}>
                             <input
                                 type="checkbox"
-                                checked={selectedPlatform === 'bol.com'}
+                                // checked={selectedPlatform === 'bol.com'}
                                 onChange={() => handlePlatformChange('bol.com')}
                             />
                             <label className=" m-0">
-                            Bol.com
-                        </label>
-                        </div> 
+                                Bol.com
+                            </label>
+                        </div>
+
+                        <div className=" d-flex align-items-center" style={{ gap: "6px" }}>
+                            <input
+                                type="checkbox"
+                                // checked={selectedPlatform === 'amazon'}
+                                onChange={() => handlePlatformChange('webshop')}
+                            />
+                            <label className="m-0">
+                                Webshop
+                            </label>
+                        </div>
                     </div>
                     <div className="mb-4">
                         <InputBox
@@ -146,7 +168,25 @@ export function FormData({ initialValues, handleUpdate, loading }: any) {
                             icon={<MdOutlineSubtitles />}
                         />
                     </div>
-                    {imageFields.map((field:any, index:any) => (
+                    <div className="mb-4">
+                        <InputBox
+                            required={true}
+                            name="subCategories"
+                            label="sub Categorie"
+                            placeholder="Enter Sub Categorie"
+                            icon={<MdOutlineSubtitles />}
+                        />
+                    </div>
+                    <div className="mb-4">
+                        <InputBox
+                            required={true}
+                            name="subSubCategories"
+                            label="sub sub Categorie"
+                            placeholder="Enter Sub Sub Categorie"
+                            icon={<MdOutlineSubtitles />}
+                        />
+                    </div>
+                    {imageFields.map((field: any, index: any) => (
                         <div key={field.id} className="mb-4 flex items-center">
                             <InputBox
                                 name={`images[${index}]`}
@@ -298,7 +338,7 @@ export function FormData({ initialValues, handleUpdate, loading }: any) {
                     </div>
                     <div className="mb-4">
                         <InputBox
-                            required={true}
+                            required={true} 
                             name="price"
                             label="Webshop Price"
                             placeholder="Enter Webshop Price"
@@ -306,7 +346,8 @@ export function FormData({ initialValues, handleUpdate, loading }: any) {
                         />
                     </div>
                     <div className="fixedBottom">
-                        <ButtonBox value={initialValues?.edit ? "Update" : "Add new"} loading={loading} onClick={handleSubmit} />
+                        <ButtonBox value={initialValues?.edit ? "Update" : "Add new"} loading={loading} onClick={() => {console.log(values, "log value");
+                         handleSubmit()}} />
                     </div>
                 </div>
             )}

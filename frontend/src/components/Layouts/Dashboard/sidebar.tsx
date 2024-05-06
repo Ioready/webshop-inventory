@@ -35,12 +35,12 @@ export const Sidebar = () => {
       value: "scanner",
       isShow: true,
     },
-    {
-      icon: <FaShoppingCart />,
-      label: "Sales Return",
-      value: "sales",
-      isShow: true,
-    }
+    // {
+    //   icon: <FaShoppingCart />,
+    //   label: "Sales Return",
+    //   value: "sales",
+    //   isShow: true,
+    // }
   ];
 
   return (
