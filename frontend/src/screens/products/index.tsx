@@ -12,7 +12,7 @@ import {
   Menu,
   Upload,
 } from "antd";
-import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
+import { LoadingOutlined, PlusOutlined, DownOutlined } from "@ant-design/icons";
 import { LiaProductHunt } from "react-icons/lia";
 import { usePostFile, useFetchByLoad } from "../../contexts";
 import { CiMenuKebab } from "react-icons/ci";
@@ -31,9 +31,9 @@ const resource = "products";
 export default function Lists() {
   const [detail, setDetail] = useState<any>(null);
   const [search, setSearch] = useState<any>(null);
+  const [selectedFilter, setSelectedFilter] = useState<string>("Filter Options");
 
   const { create, data: file, loading: loadingFile } = usePostFile();
-
   const [query, setQuery] = useState({ skip: 0, take: 10, search: "" });
   const { fetch, data, loading } = useFetchByLoad();  
   
@@ -74,8 +74,6 @@ export default function Lists() {
 
   const calculateTotalQuantity = (data: any) => {
     let totalQuantity = 0;
-    // console.log("data",data)
-
     if (data) {
       for (const item of data) {
         totalQuantity += parseInt(item.qty) - parseInt(item.laps);
@@ -85,10 +83,6 @@ export default function Lists() {
       return totalQuantity;
     }
   };
-
-
-    
-  
 
   const [csvData,setCsvData] = useState([])
 
@@ -119,9 +113,6 @@ export default function Lists() {
 
   const columns = [
     {
-      // title: "Image",
-      // dataIndex: "images",
-      // render: (text: any) => text ? <Avatar shape="square" src={<img src={text} alt="" />} /> : <LiaProductHunt size={30} />
       title: "Image",
       dataIndex: "images",
       render: (images: string[]) => {
@@ -163,24 +154,12 @@ export default function Lists() {
       dataIndex: "data",
       sorter: true,
       render:  (text:any, record:any) => createProductData(record),
-
     },
     {
       title: "Platform",
       dataIndex: "platform",
       sorter: true,
     },
-    // {
-    //   title: "Status",
-    //   dataIndex: "status",
-    //   render(val: any) {
-    //     return (
-    //       <Tag color={val ? "success" : "error"}>
-    //         {val ? "ACTIVE" : "INACTIVE"}
-    //       </Tag>
-    //     );
-    //   },
-    // },
     {
       title: "Actions",
       dataIndex: "address",
@@ -232,17 +211,32 @@ export default function Lists() {
     },
   ];
 
+  const dropdownMenu = (
+    <Menu onClick={({ key }) => setSelectedFilter(key)}>
+      <Menu.Item key="Product has no image">Product has no image</Menu.Item>
+      <Menu.Item key="Product has no color">Product has no color</Menu.Item>
+      <Menu.Item key="Product has no size">Product has no size</Menu.Item>
+      <Menu.Item key="Product has no category">Product has no category</Menu.Item>
+      <Menu.Item key="Product has no sub category">Product has no sub category</Menu.Item>
+      <Menu.Item key="Product has no sub sub category">Product has no sub sub category</Menu.Item>
+    </Menu>
+  );
+
   return (
     <>
       <Breadcrumbs pageName="Products" />
       <div className="headerRight">
         <Space>
+          <Dropdown overlay={dropdownMenu}>
+            <Button type="primary">
+              {selectedFilter} <DownOutlined />
+            </Button>
+          </Dropdown>
           <Button onClick={downloadCsv} type="primary">
-          <CSVLink data={csvData} filename={"stock_product.csv"} >
-            Download Stock CSV
+            <CSVLink data={csvData} filename={"stock_product.csv"} >
+              Download Stock CSV
             </CSVLink>
           </Button>
-
           <Upload
             showUploadList={false}
             customRequest={({ file }) => create("products/import_img", file)}
