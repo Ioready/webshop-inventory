@@ -128,6 +128,6 @@ app.use(cors())
 // app.use(morgan("dev"))
 app.use('/',userRout);
 
-app.listen(port, ()=>{
+app.listen(port,'0.0.0.0', ()=>{
     console.log(`server connected ${port}`);
 })
