@@ -66,6 +66,7 @@ export default function ProductList() {
           SupplierRef: item.supplierRef || "",
           Platform: item.platform || "",
           StoreInfo: storeInfo,
+          Image:item.images || "",
         };
       });
       setCsvData(csvDataFormatted);

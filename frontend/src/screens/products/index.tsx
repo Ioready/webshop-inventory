@@ -26,15 +26,14 @@ import {
   ViewDataDrawer,
 } from "../../components/Forms";
 import { CSVLink } from "react-csv";
+
 const resource = "products";
 
 export default function Lists() {
   const [detail, setDetail] = useState<any>(null);
   const [search, setSearch] = useState<any>(null);
-  const [selectedFilter, setSelectedFilter] = useState<string>("Filter Options");
-
   const { create, data: file, loading: loadingFile } = usePostFile();
-  const [query, setQuery] = useState({ skip: 0, take: 10, search: "" });
+  const [query, setQuery] = useState({ skip: 0, take: 10, search: "", filterKey: "Filter Options" });
   const { fetch, data, loading } = useFetchByLoad();  
   
   useEffect(() => {
@@ -46,31 +45,32 @@ export default function Lists() {
     setDetail(null);
   };
 
-  const createProductData = (data:any) =>{
+  console.log("query", query);
+
+  const createProductData = (data: any) => {
     let minSellingPrice = 0;
     if (data?.purchasePrice) {
       const purchasePrice = data?.purchasePrice;
-      if(data.platform === "bol.com"){
+      if (data.platform === "bol.com") {
         const x = 1.42353 + 8.38459;
         let y = purchasePrice * x;
-    
+
         if (y < 10) {
-            minSellingPrice = parseFloat((y + 1.27).toFixed(2));
+          minSellingPrice = parseFloat((y + 1.27).toFixed(2));
         } else if (y >= 10 && y < 20) {
-            minSellingPrice = parseFloat((y + 1.57).toFixed(2));
+          minSellingPrice = parseFloat((y + 1.57).toFixed(2));
         } else if (y >= 20) {
-            minSellingPrice = parseFloat((y + 2).toFixed(2));
+          minSellingPrice = parseFloat((y + 2).toFixed(2));
         } else {
-            minSellingPrice = 0;
+          minSellingPrice = 0;
         }
-      }else{
-        minSellingPrice = parseFloat((((purchasePrice * 1.42353)+8.38459)-5.53).toFixed(2))
+      } else {
+        minSellingPrice = parseFloat((((purchasePrice * 1.42353) + 8.38459) - 5.53).toFixed(2));
       }
     }
-    console.log('minSellingPrice',minSellingPrice)
+    console.log('minSellingPrice', minSellingPrice);
     return minSellingPrice;
-  
-  } 
+  };
 
   const calculateTotalQuantity = (data: any) => {
     let totalQuantity = 0;
@@ -84,13 +84,13 @@ export default function Lists() {
     }
   };
 
-  const [csvData,setCsvData] = useState([])
+  const [csvData, setCsvData] = useState([]);
 
   const downloadCsv = () => {
     fetch({ url: "allproduct", query: JSON.stringify("") });
     const stockData = data?.data?.filter((item: any) => item.stores.length > 0);
     if (data?.data?.length > 10 && stockData?.length > 0) {
-      const csvDataFormatted = stockData.map((item:any) => {
+      const csvDataFormatted = stockData.map((item: any) => {
         const storeInfo = item.stores.map((store: any) => {
           return `Location: ${store.location}, Quantity: ${store.qty}, Laps: ${store.laps}`;
         }).join('\n');
@@ -100,9 +100,24 @@ export default function Lists() {
           Price: item.price || "",
           TotalStock: calculateTotalQuantity(item.stores) || "",
           SellingPrice: item.minSellingPrice || "",
-          supplierRef:item.supplierRef || "",
+          SupplierRef: item.supplierRef || "",
           Platform: item.platform || "",
           StoreInfo: storeInfo,
+          Image: item.images || "",
+          Sku: item.sku || "",
+          Language: item.language || "",
+          Categories: item.categories || "",
+          SubCategories: item.subCategories || "",
+          SubSubCategories: item.subSubCategories || "",
+          Tags: item.tags || "",
+          Weight: item.weight || "",
+          TaxValue: item.taxValue || "",
+          Brand: item.brand || "",
+          Supplier: item.supplier || "",
+          ScanCode: item.scanCode || "",
+          PurchasePrice: item.purchasePrice || "",
+          Colors: item.colors || "",
+          Size: item.size || "",
         };
       });
       setCsvData(csvDataFormatted);
@@ -153,7 +168,7 @@ export default function Lists() {
       title: "Selling Price",
       dataIndex: "data",
       sorter: true,
-      render:  (text:any, record:any) => createProductData(record),
+      render: (text: any, record: any) => createProductData(record),
     },
     {
       title: "Platform",
@@ -212,13 +227,20 @@ export default function Lists() {
   ];
 
   const dropdownMenu = (
-    <Menu onClick={({ key }) => setSelectedFilter(key)}>
-      <Menu.Item key="Product has no image">Product has no image</Menu.Item>
-      <Menu.Item key="Product has no color">Product has no color</Menu.Item>
-      <Menu.Item key="Product has no size">Product has no size</Menu.Item>
-      <Menu.Item key="Product has no category">Product has no category</Menu.Item>
-      <Menu.Item key="Product has no sub category">Product has no sub category</Menu.Item>
-      <Menu.Item key="Product has no sub sub category">Product has no sub sub category</Menu.Item>
+    <Menu
+      onClick={({ key }) => {
+        if (key !== "Filter Options") {
+          setQuery((prevQuery) => ({ ...prevQuery, filterKey: key }));
+        }
+      }}
+    >
+      <Menu.Item key="Filter Options">Filter Options</Menu.Item>
+      <Menu.Item key="images">Product has no image</Menu.Item>
+      <Menu.Item key="color">Product has no color</Menu.Item>
+      <Menu.Item key="size">Product has no size</Menu.Item>
+      <Menu.Item key="categories">Product has no category</Menu.Item>
+      <Menu.Item key="subCategories">Product has no sub category</Menu.Item>
+      <Menu.Item key="subSubCategories">Product has no sub sub category</Menu.Item>
     </Menu>
   );
 
@@ -229,11 +251,11 @@ export default function Lists() {
         <Space>
           <Dropdown overlay={dropdownMenu}>
             <Button type="primary">
-              {selectedFilter} <DownOutlined />
+              {query.filterKey !== "Filter Options" ? query.filterKey : "Select Filter"} <DownOutlined />
             </Button>
           </Dropdown>
           <Button onClick={downloadCsv} type="primary">
-            <CSVLink data={csvData} filename={"stock_product.csv"} >
+            <CSVLink data={csvData} filename={"stock_product.csv"}>
               Download Stock CSV
             </CSVLink>
           </Button>

@@ -40,9 +40,10 @@ export const products = {
 
   getProducts: async (req, res) => {
     try {
-      let { skip, take, search } = req.query;
+      let { skip, take, search,filterKey } = req.query;
       skip = parseInt(skip);
       take = parseInt(take);
+      const myFieldDataExists = await Product.exists({ myField: { $exists: true, $ne: null } });
 
       const query = {};
       if (search) {
@@ -71,6 +72,9 @@ export const products = {
             { 'stores.location': { $regex: new RegExp(search, "i") } }
           ];
         }
+      }
+      if (filterKey) {
+        query[filterKey] = { $exists: false };
       }
       const products = await Product.find(query).skip(skip).limit(take);
       const platformCount = await Product.aggregate([
