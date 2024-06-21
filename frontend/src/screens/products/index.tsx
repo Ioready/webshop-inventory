@@ -62,7 +62,8 @@ const [loadingFiles,setLoadingFiles] =useState(false);
         Papa.parse(text, {
           header: true,
           complete: async (results:any) => {
-            const csvData = results.data;
+            let csvData = results.data;
+            csvData=csvData?.filter((data:any)=>data.ean)
             console.log("Parsed CSV Data:", csvData);
             await updateProducts(csvData);
             setLoadingFiles(false);
@@ -79,18 +80,18 @@ const [loadingFiles,setLoadingFiles] =useState(false);
 
 
   const updateProducts = async (csvData: any) => {
-    for (const productData of csvData) {
+    // for (const productData of csvData) {
       const url = `/${resource}/csv`;
       try {
-        if(productData.ean){
-        edit( url,{...productData,id:productData.ean} );
+        // if(productData.ean){
+        edit( url,csvData);
         }
-        } 
+        // } 
         catch (error) {
           console.error("Error updating product:", error);
-          message.error(`Error updating product with EAN ${productData.ean}`);
+          message.error(`Error updating product `);
         }
-      } 
+      // } 
     }
   
 

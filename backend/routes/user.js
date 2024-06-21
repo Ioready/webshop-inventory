@@ -18,7 +18,7 @@ userRout.get("/products", verifyToken , getProducts);
 userRout.get("/allproduct", verifyToken , getAllProduct);
 userRout.patch("/products/undefined", verifyToken , editProduct);
 userRout.patch("/products/:id", verifyToken , setStores);
-userRout.patch("/products/csv/:id", verifyToken , setCsvData);
+userRout.patch("/products/csv/undefined", verifyToken , setCsvData);
 userRout.delete("/products/:id", verifyToken , deleteProduct);
 
 export default userRout;

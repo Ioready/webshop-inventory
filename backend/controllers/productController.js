@@ -172,22 +172,41 @@ export const products = {
   },
 
   setCsvData: async (req, res) => {
-    try {
-      const editProductData = req.body;
-      await Product.updateOne(
-        { ean: req.params.id },
-        {
-          $set: editProductData,
+
+    const editProductData = req.body; // Assuming this is an array of objects
+
+    // Create bulk operations array with preprocessing in the map function
+    const bulkOps = editProductData.map((product) => {
+      // Preprocess the images field
+      if (product.images && typeof product.images === 'string') {
+        product.images = product.images.split(';');
+      }
+
+      return {
+        updateOne: {
+          filter: { ean: product.ean }, // Match the product by its ID
+          update: { $set: product }    // Update the product with the new data
         }
-      );
-      res.status(200).json({ success: true, message: "Product edited" });
+      };
+    });
+
+
+    try {
+      // Execute bulk operations
+      const result = await Product.bulkWrite(bulkOps);
+
+      // Check the result for success and failures
+      if (result.nModified === editProductData.length) {
+        res.status(200).send({ message: 'All products updated successfully' });
+      } else {
+        res.status(207).send({
+          message: 'Some products were not updated',
+          result
+        });
+      }
     } catch (error) {
-      console.log(error);
-      res.status(500).send({
-        success: false,
-        message: "Server error",
-        error,
-      });
+      console.error('Bulk update failed:', error);
+      res.status(500).send({ message: 'Bulk update failed', error });
     }
   },
 
