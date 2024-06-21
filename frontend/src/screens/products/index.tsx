@@ -11,10 +11,11 @@ import {
   Avatar,
   Menu,
   Upload,
+  message,
 } from "antd";
 import { LoadingOutlined, PlusOutlined, DownOutlined } from "@ant-design/icons";
 import { LiaProductHunt } from "react-icons/lia";
-import { usePostFile, useFetchByLoad } from "../../contexts";
+import { usePostFile, useFetchByLoad, usePatch } from "../../contexts";
 import { CiMenuKebab } from "react-icons/ci";
 import { FormData } from "./FormData";
 import { ViewData } from "./ViewData";
@@ -26,7 +27,8 @@ import {
   ViewDataDrawer,
 } from "../../components/Forms";
 import { CSVLink } from "react-csv";
-
+import axios from "axios";
+import Papa from 'papaparse';
 const resource = "products";
 
 export default function Lists() {
@@ -35,6 +37,8 @@ export default function Lists() {
   const { create, data: file, loading: loadingFile } = usePostFile();
   const [query, setQuery] = useState({ skip: 0, take: 10, search: "", filterKey: "Filter Options" });
   const { fetch, data, loading } = useFetchByLoad();  
+  const { edit, data:patchData, loading:patchLoading } =usePatch();
+  console.log("patchData",patchData);
   
   useEffect(() => {
     fetch({ url: resource, query: JSON.stringify(query) });
@@ -46,6 +50,50 @@ export default function Lists() {
   };
 
   console.log("query", query);
+const [loadingFiles,setLoadingFiles] =useState(false);
+
+  const handleFileUpload = ({ file }: any) => {
+    setLoadingFiles(true);
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const text = e.target?.result;
+      if (typeof text === "string") {
+        Papa.parse(text, {
+          header: true,
+          complete: async (results:any) => {
+            const csvData = results.data;
+            console.log("Parsed CSV Data:", csvData);
+            await updateProducts(csvData);
+            setLoadingFiles(false);
+          },
+          error: (error:any) => {
+            console.error("Error parsing CSV:", error);
+            setLoadingFiles(false);
+          },
+        });
+      }
+    };
+    reader.readAsText(file);
+  };
+
+
+  const updateProducts = async (csvData: any) => {
+    for (const productData of csvData) {
+      const url = `/${resource}/csv`;
+      try {
+        if(productData.ean){
+        edit( url,{...productData,id:productData.ean} );
+        }
+        } 
+        catch (error) {
+          console.error("Error updating product:", error);
+          message.error(`Error updating product with EAN ${productData.ean}`);
+        }
+      } 
+    }
+  
+
 
   const createProductData = (data: any) => {
     let minSellingPrice = 0;
@@ -259,7 +307,7 @@ export default function Lists() {
               Download Stock CSV
             </CSVLink>
           </Button>
-          <Upload
+          {/* <Upload
             showUploadList={false}
             customRequest={({ file }) => create("products/import_img", file)}
           >
@@ -269,10 +317,10 @@ export default function Lists() {
             >
               Import Images
             </Button>
-          </Upload>
+          </Upload> */}
           <Upload
             showUploadList={false}
-            customRequest={({ file }) => create("products/import", file)}
+            customRequest={handleFileUpload}
           >
             <Button
               type="primary"

@@ -17,6 +17,7 @@
     "chart.js": "^4.4.2",
     "formik": "^2.4.4",
     "jquery": "^3.7.1",
+    "papaparse": "^5.4.1",
     "react": "^18.2.0",
     "react-chartjs-2": "^5.2.0",
     "react-date-picker": "^10.5.0",
@@ -59,6 +60,7 @@
     ]
   },
   "devDependencies": {
+    "@types/papaparse": "^5.3.14",
     "@types/react-csv": "^1.1.10",
     "serverless-finch": "^4.0.3"
   }

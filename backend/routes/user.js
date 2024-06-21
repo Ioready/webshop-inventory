@@ -7,7 +7,7 @@ import { auth } from "../middlewares/auth.js";
 const upload = multer({ dest: 'uploads/' });
 
 const { userLogin } = user;
-const { createProduct, getProducts, editProduct, setStores, deleteProduct, csvFileUpload, getAllProduct } = products;
+const { createProduct, getProducts, editProduct, setStores,setCsvData, deleteProduct, csvFileUpload, getAllProduct } = products;
 const { verifyToken } = auth
 const userRout = express.Router();
 
@@ -18,6 +18,7 @@ userRout.get("/products", verifyToken , getProducts);
 userRout.get("/allproduct", verifyToken , getAllProduct);
 userRout.patch("/products/undefined", verifyToken , editProduct);
 userRout.patch("/products/:id", verifyToken , setStores);
+userRout.patch("/products/csv/:id", verifyToken , setCsvData);
 userRout.delete("/products/:id", verifyToken , deleteProduct);
 
 export default userRout;

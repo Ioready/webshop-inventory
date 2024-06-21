@@ -35,7 +35,13 @@ const initialData = {
 }
 
 export function FormData({ initialValues, handleUpdate, loading }: any) {
-    const [imageFields, setImageFields] = useState(initialValues?.edit ? initialValues.images.map((image: string, index: any) => ({ id: index + 1, value: image })) : [{ id: 1, value: "" }]);
+    const [imageFields, setImageFields] = useState(
+        initialValues?.edit ? 
+        (initialValues.images.length > 0 ? initialValues.images.map((image: string, index: any) => ({ id: index + 1, value: image })) : [{ id: 1, value: "" }]) 
+        : 
+        [{ id: 1, value: "" }]
+    );
+    
     const [selectedPlatform, setSelectedPlatform] = useState(initialValues?.platform?.split(",") || []);
 
     const handleAddImageField = () => {

@@ -171,6 +171,26 @@ export const products = {
     }
   },
 
+  setCsvData: async (req, res) => {
+    try {
+      const editProductData = req.body;
+      await Product.updateOne(
+        { ean: req.params.id },
+        {
+          $set: editProductData,
+        }
+      );
+      res.status(200).json({ success: true, message: "Product edited" });
+    } catch (error) {
+      console.log(error);
+      res.status(500).send({
+        success: false,
+        message: "Server error",
+        error,
+      });
+    }
+  },
+
   deleteProduct: async (req, res) => {
     try {
       await Product.deleteOne({ _id: req.params.id });
