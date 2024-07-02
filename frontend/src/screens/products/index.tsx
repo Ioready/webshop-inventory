@@ -1,5 +1,3 @@
-"use client";
-import { useState, useEffect } from "react";
 import Breadcrumbs from "../../components/Breadcrumbs";
 import {
   Table,
@@ -29,6 +27,7 @@ import {
 import { CSVLink } from "react-csv";
 import axios from "axios";
 import Papa from 'papaparse';
+import { useEffect, useState } from "react";
 const resource = "products";
 
 export default function Lists() {
@@ -36,10 +35,19 @@ export default function Lists() {
   const [search, setSearch] = useState<any>(null);
   const { create, data: file, loading: loadingFile } = usePostFile();
   const [query, setQuery] = useState({ skip: 0, take: 10, search: "", filterKey: "Filter Options" });
-  const { fetch, data, loading } = useFetchByLoad();  
-  const { edit, data:patchData, loading:patchLoading } =usePatch();
-  console.log("patchData",patchData);
-  
+  const { fetch, data, loading } = useFetchByLoad();
+  const { edit, data: patchData, loading: patchLoading } = usePatch();
+  console.log("patchData", patchData);
+  // Sample Data all code for checkbox starts from here
+
+  const [items, setItems] = useState([
+    { id: 1, title: "title1", price: "price1", stock: 1, supplierRef: "ref1", sellingPrice: "price1", platform: "platform1" },
+    { id: 2, title: "title2", price: "price2", stock: 1, supplierRef: "ref2", sellingPrice: "price2", platform: "platform2" },
+    { id: 3, title: "title3", price: "price3", stock: 1, supplierRef: "ref3", sellingPrice: "price3", platform: "platform3" },
+  ]);
+  const [selectAll, setSelectAll] = useState(false);
+  const [selectedItems, setSelectedItems] = useState<number[]>([]);
+
   useEffect(() => {
     fetch({ url: resource, query: JSON.stringify(query) });
   }, [query, file]);
@@ -50,7 +58,7 @@ export default function Lists() {
   };
 
   console.log("query", query);
-const [loadingFiles,setLoadingFiles] =useState(false);
+  const [loadingFiles, setLoadingFiles] = useState(false);
 
   const handleFileUpload = ({ file }: any) => {
     setLoadingFiles(true);
@@ -61,14 +69,14 @@ const [loadingFiles,setLoadingFiles] =useState(false);
       if (typeof text === "string") {
         Papa.parse(text, {
           header: true,
-          complete: async (results:any) => {
+          complete: async (results: any) => {
             let csvData = results.data;
-            csvData=csvData?.filter((data:any)=>data.ean)
+            csvData = csvData?.filter((data: any) => data.ean)
             console.log("Parsed CSV Data:", csvData);
             await updateProducts(csvData);
             setLoadingFiles(false);
           },
-          error: (error:any) => {
+          error: (error: any) => {
             console.error("Error parsing CSV:", error);
             setLoadingFiles(false);
           },
@@ -80,21 +88,14 @@ const [loadingFiles,setLoadingFiles] =useState(false);
 
 
   const updateProducts = async (csvData: any) => {
-    // for (const productData of csvData) {
-      const url = `/${resource}/csv`;
-      try {
-        // if(productData.ean){
-        edit( url,csvData);
-        }
-        // } 
-        catch (error) {
-          console.error("Error updating product:", error);
-          message.error(`Error updating product `);
-        }
-      // } 
+    const url = `/${resource}/csv`;
+    try {
+      edit(url, csvData);
+    } catch (error) {
+      console.error("Error updating product:", error);
+      message.error(`Error updating product `);
     }
-  
-
+  }
 
   const createProductData = (data: any) => {
     let minSellingPrice = 0;
@@ -293,6 +294,27 @@ const [loadingFiles,setLoadingFiles] =useState(false);
     </Menu>
   );
 
+  const handleSelectAll = () => {
+    setSelectAll(!selectAll);
+    if (!selectAll) {
+      setSelectedItems(items.map(item => item.id));
+    } else {
+      setSelectedItems([]);
+    }
+  };
+
+  const handleCheckboxChange = (id: number) => {
+    setSelectedItems(prevSelected =>
+      prevSelected.includes(id) ? prevSelected.filter(item => item !== id) : [...prevSelected, id]
+    );
+  };
+
+  const handleDelete = () => {
+    setItems(prevItems => prevItems.filter(item => !selectedItems.includes(item.id)));
+    setSelectAll(false);
+    setSelectedItems([]);
+  };
+
   return (
     <>
       <Breadcrumbs pageName="Products" />
@@ -330,6 +352,16 @@ const [loadingFiles,setLoadingFiles] =useState(false);
               Import File
             </Button>
           </Upload>
+          {/* Conditional rendering for the delete button */}
+          {selectedItems.length > 0 && (
+            <Button
+              onClick={handleDelete}
+              className="ml-2 bg-danger"
+              style={{color:"white"}}
+            >
+              Delete Product
+            </Button>
+          )}
         </Space>
       </div>
       <div className="fixed">
@@ -352,19 +384,63 @@ const [loadingFiles,setLoadingFiles] =useState(false);
           }}
         />
       </div>
-      <Table
-        className="mainTable"
-        loading={loading}
-        dataSource={data?.data ?? []}
-        columns={columns}
-        pagination={{
-          showQuickJumper: true,
-          total: data?.count ?? 0,
-          onChange: (page, pageSize) => {
-            setQuery({ ...query, skip: (page - 1) * pageSize, take: pageSize });
-          },
-        }}
-      />
+
+      <div style={{ padding: "1rem" }}>
+        <table className="table table-striped table-bordered table-hover">
+          <thead className="thead-dark">
+            <tr className='bg-info'>
+              <th>
+                <input type="checkbox" checked={selectAll} onChange={handleSelectAll} />
+              </th>
+              <th>Title</th>
+              <th>Price</th>
+              <th>Total Stock</th>
+              <th>SupplierRef</th>
+              <th>Selling Price</th>
+              <th>Platform</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.map(item => (
+              <tr key={item.id}>
+                <td>
+                  <input
+                    type="checkbox"
+                    checked={selectedItems.includes(item.id)}
+                    onChange={() => handleCheckboxChange(item.id)}
+                  />
+                </td>
+                <td>{item.title}</td>
+                <td>{item.price}</td>
+                <td>{item.stock}</td>
+                <td>{item.supplierRef}</td>
+                <td>{item.sellingPrice}</td>
+                <td>{item.platform}</td>
+                <td>Actions</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        <nav aria-label="Page navigation example" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "1rem", width: "100%" }}>
+          <ul className="pagination">
+            <li className="page-item">
+              <a className="page-link" href="#" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+              </a>
+            </li>
+            <li className="page-item"><a className="page-link" href="#">1</a></li>
+            <li className="page-item">
+              <a className="page-link" href="#" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+              </a>
+            </li>
+          </ul>
+          <p>Showing 1 to 2 of entries</p>
+        </nav>
+      </div>
+
       {detail && detail.add && (
         <CreateDataDrawer
           resource={resource}
