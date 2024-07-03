@@ -12,10 +12,11 @@ import {
   Menu,
   Upload,
   message,
+  Modal,
 } from "antd";
-import { LoadingOutlined, PlusOutlined, DownOutlined } from "@ant-design/icons";
+import { LoadingOutlined, PlusOutlined, DownOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
 import { LiaProductHunt } from "react-icons/lia";
-import { usePostFile, useFetchByLoad, usePatch } from "../../contexts";
+import { usePostFile, useFetchByLoad, usePatch, useDelete } from "../../contexts";
 import { CiMenuKebab } from "react-icons/ci";
 import { FormData } from "./FormData";
 import { ViewData } from "./ViewData";
@@ -29,6 +30,7 @@ import {
 import { CSVLink } from "react-csv";
 import axios from "axios";
 import Papa from 'papaparse';
+
 const resource = "products";
 
 export default function Lists() {
@@ -37,20 +39,42 @@ export default function Lists() {
   const { create, data: file, loading: loadingFile } = usePostFile();
   const [query, setQuery] = useState({ skip: 0, take: 10, search: "", filterKey: "Filter Options" });
   const { fetch, data, loading } = useFetchByLoad();  
-  const { edit, data:patchData, loading:patchLoading } =usePatch();
-  console.log("patchData",patchData);
+  const { edit, data: patchData, loading: patchLoading } = usePatch();
+  const { remove: deleteProducts, loading: deleteLoading } = useDelete(); // Updated this line
+  
+  const [selectedRowKeys, setSelectedRowKeys] = useState<any[]>([]);
+
+  console.log("patchData", patchData);
   
   useEffect(() => {
-    fetch({ url: resource, query: JSON.stringify(query) });
+    fetch({ url: resource, query: JSON.stringify(query) })
+      .then(() => {
+        if (data?.data) {
+          // Log the product data and IDs
+          console.log("Fetched Product Data:", data.data);
+          data.data.forEach((item: any) => {
+            console.log("Product ID:", item.id);
+          });
+        }
+      });
   }, [query, file]);
 
   const refreshData = () => {
-    fetch({ url: resource, query: JSON.stringify(query) });
+    fetch({ url: resource, query: JSON.stringify(query) })
+      .then(() => {
+        if (data?.data) {
+          // Log the product data and IDs
+          console.log("Fetched Product Data (refresh):", data.data);
+          data.data.forEach((item: any) => {
+            console.log("Product ID (refresh):", item.id);
+          });
+        }
+      });
     setDetail(null);
+    setSelectedRowKeys([]);
   };
 
-  console.log("query", query);
-const [loadingFiles,setLoadingFiles] =useState(false);
+  const [loadingFiles, setLoadingFiles] = useState(false);
 
   const handleFileUpload = ({ file }: any) => {
     setLoadingFiles(true);
@@ -61,14 +85,14 @@ const [loadingFiles,setLoadingFiles] =useState(false);
       if (typeof text === "string") {
         Papa.parse(text, {
           header: true,
-          complete: async (results:any) => {
+          complete: async (results: any) => {
             let csvData = results.data;
-            csvData=csvData?.filter((data:any)=>data.ean)
+            csvData = csvData?.filter((data: any) => data.ean);
             console.log("Parsed CSV Data:", csvData);
             await updateProducts(csvData);
             setLoadingFiles(false);
           },
-          error: (error:any) => {
+          error: (error: any) => {
             console.error("Error parsing CSV:", error);
             setLoadingFiles(false);
           },
@@ -78,23 +102,15 @@ const [loadingFiles,setLoadingFiles] =useState(false);
     reader.readAsText(file);
   };
 
-
   const updateProducts = async (csvData: any) => {
-    // for (const productData of csvData) {
-      const url = `/${resource}/csv`;
-      try {
-        // if(productData.ean){
-        edit( url,csvData);
-        }
-        // } 
-        catch (error) {
-          console.error("Error updating product:", error);
-          message.error(`Error updating product `);
-        }
-      // } 
+    const url = `/${resource}/csv`;
+    try {
+      await edit(url, csvData);
+    } catch (error) {
+      console.error("Error updating product:", error);
+      message.error(`Error updating product `);
     }
-  
-
+  };
 
   const createProductData = (data: any) => {
     let minSellingPrice = 0;
@@ -117,7 +133,7 @@ const [loadingFiles,setLoadingFiles] =useState(false);
         minSellingPrice = parseFloat((((purchasePrice * 1.42353) + 8.38459) - 5.53).toFixed(2));
       }
     }
-    console.log('minSellingPrice', minSellingPrice);
+    console.log('minSellingPrice', data);
     return minSellingPrice;
   };
 
@@ -136,43 +152,76 @@ const [loadingFiles,setLoadingFiles] =useState(false);
   const [csvData, setCsvData] = useState([]);
 
   const downloadCsv = () => {
-    fetch({ url: "allproduct", query: JSON.stringify("") });
-    const stockData = data?.data?.filter((item: any) => item.stores.length > 0);
-    if (data?.data?.length > 10 && stockData?.length > 0) {
-      const csvDataFormatted = stockData.map((item: any) => {
-        const storeInfo = item.stores.map((store: any) => {
-          return `Location: ${store.location}, Quantity: ${store.qty}, Laps: ${store.laps}`;
-        }).join('\n');
-        return {
-          Title: item.title || "",
-          EanBarcode: item.ean || "",
-          Price: item.price || "",
-          TotalStock: calculateTotalQuantity(item.stores) || "",
-          SellingPrice: item.minSellingPrice || "",
-          SupplierRef: item.supplierRef || "",
-          Platform: item.platform || "",
-          StoreInfo: storeInfo,
-          Image: item.images || "",
-          Sku: item.sku || "",
-          Language: item.language || "",
-          Categories: item.categories || "",
-          SubCategories: item.subCategories || "",
-          SubSubCategories: item.subSubCategories || "",
-          Tags: item.tags || "",
-          Weight: item.weight || "",
-          TaxValue: item.taxValue || "",
-          Brand: item.brand || "",
-          Supplier: item.supplier || "",
-          ScanCode: item.scanCode || "",
-          PurchasePrice: item.purchasePrice || "",
-          Colors: item.colors || "",
-          Size: item.size || "",
-        };
+    fetch({ url: "allproduct", query: JSON.stringify("") })
+      .then(() => {
+        if (data?.data) {
+          console.log("Fetched Product Data for CSV Download:", data.data);
+          data.data.forEach((item: any) => {
+            console.log("Product ID for CSV Download:", item.id);
+          });
+        }
+        const stockData = data?.data?.filter((item: any) => item.stores.length > 0);
+        if (data?.data?.length > 10 && stockData?.length > 0) {
+          const csvDataFormatted = stockData.map((item: any) => {
+            const storeInfo = item.stores.map((store: any) => {
+              return `Location: ${store.location}, Quantity: ${store.qty}, Laps: ${store.laps}`;
+            }).join('\n');
+            return {
+              Title: item.title || "",
+              EanBarcode: item.ean || "",
+              Price: item.price || "",
+              TotalStock: calculateTotalQuantity(item.stores) || "",
+              SellingPrice: item.minSellingPrice || "",
+              SupplierRef: item.supplierRef || "",
+              Platform: item.platform || "",
+              StoreInfo: storeInfo,
+              Image: item.images || "",
+              Sku: item.sku || "",
+              Language: item.language || "",
+              Categories: item.categories || "",
+              SubCategories: item.subCategories || "",
+              SubSubCategories: item.subSubCategories || "",
+              Tags: item.tags || "",
+              Weight: item.weight || "",
+              TaxValue: item.taxValue || "",
+              Brand: item.brand || "",
+              Supplier: item.supplier || "",
+              ScanCode: item.scanCode || "",
+              PurchasePrice: item.purchasePrice || "",
+              Colors: item.colors || "",
+              Size: item.size || "",
+            };
+          });
+          setCsvData(csvDataFormatted);
+        } else {
+          console.log("No data to export");
+        }
       });
-      setCsvData(csvDataFormatted);
-    } else {
-      console.log("No data to export");
-    }
+  };
+
+  const handleDeleteSelected = () => {
+    Modal.confirm({
+      title: "Confirm Delete",
+      icon: <ExclamationCircleOutlined />,
+      content: "Are you sure you want to delete the selected products?",
+      okText: "Yes",
+      cancelText: "No",
+      onOk: async () => {
+        try {
+          await deleteProducts(`${resource}/bulk-delete`, { ids: selectedRowKeys });
+          message.success("Selected products deleted successfully");
+          refreshData();
+        } catch (error) {
+          console.error("Error deleting products:", error);
+          message.error("Error deleting products");
+        }
+      },
+    });
+  };
+
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: (selectedKeys: any[]) => setSelectedRowKeys(selectedKeys),
   };
 
   const columns = [
@@ -308,17 +357,6 @@ const [loadingFiles,setLoadingFiles] =useState(false);
               Download Stock CSV
             </CSVLink>
           </Button>
-          {/* <Upload
-            showUploadList={false}
-            customRequest={({ file }) => create("products/import_img", file)}
-          >
-            <Button
-              type="primary"
-              icon={loadingFile ? <LoadingOutlined /> : <PlusOutlined />}
-            >
-              Import Images
-            </Button>
-          </Upload> */}
           <Upload
             showUploadList={false}
             customRequest={handleFileUpload}
@@ -330,6 +368,16 @@ const [loadingFiles,setLoadingFiles] =useState(false);
               Import File
             </Button>
           </Upload>
+          {selectedRowKeys.length > 0 && (
+            <Button
+              type="primary"
+              danger
+              onClick={handleDeleteSelected}
+              loading={deleteLoading}
+            >
+              Delete Selected
+            </Button>
+          )}
         </Space>
       </div>
       <div className="fixed">
@@ -353,6 +401,7 @@ const [loadingFiles,setLoadingFiles] =useState(false);
         />
       </div>
       <Table
+        rowSelection={rowSelection}
         className="mainTable"
         loading={loading}
         dataSource={data?.data ?? []}
