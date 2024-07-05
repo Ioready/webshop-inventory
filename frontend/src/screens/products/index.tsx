@@ -221,7 +221,7 @@ export default function Lists() {
 
   const rowSelection = {
     selectedRowKeys,
-    onChange: (selectedKeys: any[]) => setSelectedRowKeys(selectedKeys),
+    onChange: (selectedKeys: any[]) =>{console.log("keys",selectedKeys); setSelectedRowKeys(selectedKeys)},
   };
 
   const columns = [
@@ -341,7 +341,7 @@ export default function Lists() {
       <Menu.Item key="subSubCategories">Product has no sub sub category</Menu.Item>
     </Menu>
   );
-
+console.log("rowSelection",rowSelection)
   return (
     <>
       <Breadcrumbs pageName="Products" />
@@ -404,7 +404,10 @@ export default function Lists() {
         rowSelection={rowSelection}
         className="mainTable"
         loading={loading}
-        dataSource={data?.data ?? []}
+        dataSource={data?.data.map((item: any) => ({
+          ...item,
+          key: item._id, // Ensure each item has a unique key
+        })) ?? []}
         columns={columns}
         pagination={{
           showQuickJumper: true,
