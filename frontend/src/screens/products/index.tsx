@@ -1,64 +1,95 @@
+"use client";
+import { useState, useEffect } from "react";
 import Breadcrumbs from "../../components/Breadcrumbs";
 import {
-  Table,
   Space,
   Input,
-  Tag,
   Button,
   Dropdown,
-  Avatar,
   Menu,
   Upload,
   message,
 } from "antd";
 import { LoadingOutlined, PlusOutlined, DownOutlined } from "@ant-design/icons";
-import { LiaProductHunt } from "react-icons/lia";
-import { usePostFile, useFetchByLoad, usePatch } from "../../contexts";
 import { CiMenuKebab } from "react-icons/ci";
-import { FormData } from "./FormData";
-import { ViewData } from "./ViewData";
-import {
-  CreateDataDrawer,
-  EditDataDrawer,
-  DeleteDataModal,
-  StatusDataModal,
-  ViewDataDrawer,
-} from "../../components/Forms";
+import { ViewDataDrawer, EditDataDrawer, DeleteDataModal, StatusDataModal } from "../../components/Forms";
 import { CSVLink } from "react-csv";
-import axios from "axios";
 import Papa from 'papaparse';
-import { useEffect, useState } from "react";
+
 const resource = "products";
 
 export default function Lists() {
   const [detail, setDetail] = useState<any>(null);
-  const [search, setSearch] = useState<any>(null);
-  const { create, data: file, loading: loadingFile } = usePostFile();
+  const [search, setSearch] = useState<string>('');
   const [query, setQuery] = useState({ skip: 0, take: 10, search: "", filterKey: "Filter Options" });
-  const { fetch, data, loading } = useFetchByLoad();
-  const { edit, data: patchData, loading: patchLoading } = usePatch();
-  console.log("patchData", patchData);
-  // Sample Data all code for checkbox starts from here
-
-  const [items, setItems] = useState([
-    { id: 1, title: "title1", price: "price1", stock: 1, supplierRef: "ref1", sellingPrice: "price1", platform: "platform1" },
-    { id: 2, title: "title2", price: "price2", stock: 1, supplierRef: "ref2", sellingPrice: "price2", platform: "platform2" },
-    { id: 3, title: "title3", price: "price3", stock: 1, supplierRef: "ref3", sellingPrice: "price3", platform: "platform3" },
-  ]);
+  const [loadingFiles, setLoadingFiles] = useState(false);
+  const [csvData, setCsvData] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
 
-  useEffect(() => {
-    fetch({ url: resource, query: JSON.stringify(query) });
-  }, [query, file]);
+  // Sample JSON Data
+  const [data, setData] = useState<any>({
+    data: [
+      {
+        id: 1,
+        title: "Product 1",
+        price: 25.99,
+        ean: "1234567890123",
+        stores: [{ location: "Location 1", qty: 10, laps: 2 }],
+        supplierRef: "Supplier 1",
+        minSellingPrice: 30.00,
+        platform: "bol.com",
+        images: "https://example.com/image1.jpg",
+        sku: "SKU1234",
+        language: "EN",
+        categories: "Category 1",
+        subCategories: "SubCategory 1",
+        subSubCategories: "SubSubCategory 1",
+        tags: "Tag 1",
+        weight: "1kg",
+        taxValue: "21%",
+        brand: "Brand 1",
+        supplier: "Supplier 1",
+        scanCode: "SCAN1234",
+        purchasePrice: 20.00,
+        colors: "Red",
+        size: "M"
+      },
+      {
+        id: 2,
+        title: "Product 2",
+        price: 15.99,
+        ean: "1234567890124",
+        stores: [{ location: "Location 2", qty: 5, laps: 1 }],
+        supplierRef: "Supplier 2",
+        minSellingPrice: 20.00,
+        platform: "bol.com",
+        images: "https://example.com/image2.jpg",
+        sku: "SKU5678",
+        language: "EN",
+        categories: "Category 2",
+        subCategories: "SubCategory 2",
+        subSubCategories: "SubSubCategory 2",
+        tags: "Tag 2",
+        weight: "500g",
+        taxValue: "21%",
+        brand: "Brand 2",
+        supplier: "Supplier 2",
+        scanCode: "SCAN5678",
+        purchasePrice: 12.00,
+        colors: "Blue",
+        size: "L"
+      }
+    ],
+    total: 2
+  });
 
   const refreshData = () => {
-    fetch({ url: resource, query: JSON.stringify(query) });
+    // Fetch or refresh data here
     setDetail(null);
   };
-
-  console.log("query", query);
-  const [loadingFiles, setLoadingFiles] = useState(false);
 
   const handleFileUpload = ({ file }: any) => {
     setLoadingFiles(true);
@@ -71,7 +102,7 @@ export default function Lists() {
           header: true,
           complete: async (results: any) => {
             let csvData = results.data;
-            csvData = csvData?.filter((data: any) => data.ean)
+            csvData = csvData?.filter((data: any) => data.ean);
             console.log("Parsed CSV Data:", csvData);
             await updateProducts(csvData);
             setLoadingFiles(false);
@@ -86,16 +117,16 @@ export default function Lists() {
     reader.readAsText(file);
   };
 
-
   const updateProducts = async (csvData: any) => {
     const url = `/${resource}/csv`;
     try {
-      edit(url, csvData);
+      // Simulate API call
+      console.log("Updating products with data:", csvData);
     } catch (error) {
       console.error("Error updating product:", error);
-      message.error(`Error updating product `);
+      message.error(`Error updating product`);
     }
-  }
+  };
 
   const createProductData = (data: any) => {
     let minSellingPrice = 0;
@@ -118,7 +149,6 @@ export default function Lists() {
         minSellingPrice = parseFloat((((purchasePrice * 1.42353) + 8.38459) - 5.53).toFixed(2));
       }
     }
-    console.log('minSellingPrice', minSellingPrice);
     return minSellingPrice;
   };
 
@@ -134,10 +164,7 @@ export default function Lists() {
     }
   };
 
-  const [csvData, setCsvData] = useState([]);
-
   const downloadCsv = () => {
-    fetch({ url: "allproduct", query: JSON.stringify("") });
     const stockData = data?.data?.filter((item: any) => item.stores.length > 0);
     if (data?.data?.length > 10 && stockData?.length > 0) {
       const csvDataFormatted = stockData.map((item: any) => {
@@ -176,106 +203,6 @@ export default function Lists() {
     }
   };
 
-  const columns = [
-    {
-      title: "Image",
-      dataIndex: "images",
-      render: (images: string[]) => {
-        const firstImage = images && images.length > 0 ? images[0] : null;
-        return firstImage ? (
-          <Avatar shape="square" src={firstImage} />
-        ) : (
-          <LiaProductHunt size={30} />
-        );
-      },
-    },
-    {
-      title: "Title",
-      dataIndex: "title",
-      sorter: true,
-    },
-    {
-      title: "Ean Barcode",
-      dataIndex: "ean",
-      sorter: true,
-    },
-    {
-      title: "Price",
-      dataIndex: "price",
-      sorter: true,
-    },
-    {
-      title: "Total Stock",
-      dataIndex: "stores",
-      render: (data: any) => calculateTotalQuantity(data),
-    },
-    {
-      title: "supplierRef",
-      dataIndex: "supplierRef",
-      sorter: true,
-    },
-    {
-      title: "Selling Price",
-      dataIndex: "data",
-      sorter: true,
-      render: (text: any, record: any) => createProductData(record),
-    },
-    {
-      title: "Platform",
-      dataIndex: "platform",
-      sorter: true,
-    },
-    {
-      title: "Actions",
-      dataIndex: "address",
-      key: "address",
-      render: (_value: any, record: any) => (
-        <Dropdown
-          overlay={
-            <Menu>
-              <Menu.Item key="1">
-                <Button
-                  type="link"
-                  onClick={() => setDetail({ ...record, view: true })}
-                >
-                  VIEW
-                </Button>
-              </Menu.Item>
-              <Menu.Item key="2">
-                <Button
-                  type="link"
-                  onClick={() => setDetail({ ...record, edit: true })}
-                >
-                  EDIT
-                </Button>
-              </Menu.Item>
-              <Menu.Item key="3">
-                <Button
-                  type="link"
-                  onClick={() => setDetail({ ...record, active: true })}
-                >
-                  {record.status ? "INACTIVE" : "ACTIVE"}
-                </Button>
-              </Menu.Item>
-              <Menu.Item key="4">
-                <Button
-                  type="link"
-                  onClick={() => setDetail({ ...record, delete: true })}
-                >
-                  DELETE
-                </Button>
-              </Menu.Item>
-            </Menu>
-          }
-        >
-          <Button type="text" onClick={(e) => e.preventDefault()}>
-            <CiMenuKebab />
-          </Button>
-        </Dropdown>
-      ),
-    },
-  ];
-
   const dropdownMenu = (
     <Menu
       onClick={({ key }) => {
@@ -288,38 +215,50 @@ export default function Lists() {
       <Menu.Item key="images">Product has no image</Menu.Item>
       <Menu.Item key="color">Product has no color</Menu.Item>
       <Menu.Item key="size">Product has no size</Menu.Item>
-      <Menu.Item key="categories">Product has no category</Menu.Item>
-      <Menu.Item key="subCategories">Product has no sub category</Menu.Item>
-      <Menu.Item key="subSubCategories">Product has no sub sub category</Menu.Item>
     </Menu>
   );
 
   const handleSelectAll = () => {
-    setSelectAll(!selectAll);
-    if (!selectAll) {
-      setSelectedItems(items.map(item => item.id));
-    } else {
+    if (selectAll) {
       setSelectedItems([]);
+    } else {
+      setSelectedItems(data?.data.map((item: any) => item.id) || []);
     }
+    setSelectAll(!selectAll);
   };
 
   const handleCheckboxChange = (id: number) => {
-    setSelectedItems(prevSelected =>
-      prevSelected.includes(id) ? prevSelected.filter(item => item !== id) : [...prevSelected, id]
-    );
+    if (selectedItems.includes(id)) {
+      setSelectedItems(selectedItems.filter((item) => item !== id));
+    } else {
+      setSelectedItems([...selectedItems, id]);
+    }
   };
 
-  const handleDelete = () => {
-    setItems(prevItems => prevItems.filter(item => !selectedItems.includes(item.id)));
-    setSelectAll(false);
-    setSelectedItems([]);
+  const handlePageChange = (page: number) => {
+    setQuery({ ...query, skip: (page - 1) * query.take, take: query.take });
+    setCurrentPage(page);
   };
+
+  useEffect(() => {
+    if (data?.data) {
+      setTotalPages(Math.ceil(data.total / query.take));
+    }
+  }, [data, query.take]);
 
   return (
     <>
       <Breadcrumbs pageName="Products" />
       <div className="headerRight">
         <Space>
+          {selectedItems.length > 0 && (
+            <Button
+              onClick={() => setDetail({ delete: { ids: selectedItems } })}
+              style={{ backgroundColor: "red", color:"white" }}
+            >
+              Delete Selected
+            </Button>
+          )}
           <Dropdown overlay={dropdownMenu}>
             <Button type="primary">
               {query.filterKey !== "Filter Options" ? query.filterKey : "Select Filter"} <DownOutlined />
@@ -330,38 +269,18 @@ export default function Lists() {
               Download Stock CSV
             </CSVLink>
           </Button>
-          {/* <Upload
-            showUploadList={false}
-            customRequest={({ file }) => create("products/import_img", file)}
-          >
-            <Button
-              type="primary"
-              icon={loadingFile ? <LoadingOutlined /> : <PlusOutlined />}
-            >
-              Import Images
-            </Button>
-          </Upload> */}
           <Upload
             showUploadList={false}
             customRequest={handleFileUpload}
           >
             <Button
               type="primary"
-              icon={loadingFile ? <LoadingOutlined /> : <PlusOutlined />}
+              icon={loadingFiles ? <LoadingOutlined /> : <PlusOutlined />}
             >
               Import File
             </Button>
           </Upload>
-          {/* Conditional rendering for the delete button */}
-          {selectedItems.length > 0 && (
-            <Button
-              onClick={handleDelete}
-              className="ml-2 bg-danger"
-              style={{color:"white"}}
-            >
-              Delete Product
-            </Button>
-          )}
+
         </Space>
       </div>
       <div className="fixed">
@@ -384,7 +303,6 @@ export default function Lists() {
           }}
         />
       </div>
-
       <div style={{ padding: "1rem" }}>
         <table className="table table-striped table-bordered table-hover">
           <thead className="thead-dark">
@@ -402,7 +320,7 @@ export default function Lists() {
             </tr>
           </thead>
           <tbody>
-            {items.map(item => (
+            {data?.data.map((item: any) => (
               <tr key={item.id}>
                 <td>
                   <input
@@ -413,11 +331,53 @@ export default function Lists() {
                 </td>
                 <td>{item.title}</td>
                 <td>{item.price}</td>
-                <td>{item.stock}</td>
+                <td>{calculateTotalQuantity(item.stores)}</td>
                 <td>{item.supplierRef}</td>
-                <td>{item.sellingPrice}</td>
+                <td>{createProductData(item)}</td>
                 <td>{item.platform}</td>
-                <td>Actions</td>
+                <td>
+                  <Dropdown
+                    overlay={
+                      <Menu>
+                        <Menu.Item key="1">
+                          <Button
+                            type="link"
+                            onClick={() => setDetail({ view: item })}
+                          >
+                            View
+                          </Button>
+                        </Menu.Item>
+                        <Menu.Item key="2">
+                          <Button
+                            type="link"
+                            onClick={() => setDetail({ edit: item })}
+                          >
+                            Edit
+                          </Button>
+                        </Menu.Item>
+                        <Menu.Item key="3">
+                          <Button
+                            type="link"
+                            onClick={() => setDetail({ delete: item })}
+                          >
+                            Delete
+                          </Button>
+                        </Menu.Item>
+                        <Menu.Item key="4">
+                          <Button
+                            type="link"
+                            onClick={() => setDetail({ active: item })}
+                          >
+                            Active
+                          </Button>
+                        </Menu.Item>
+                      </Menu>
+                    }
+                    trigger={['click']}
+                  >
+                    <CiMenuKebab />
+                  </Dropdown>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -426,57 +386,58 @@ export default function Lists() {
         <nav aria-label="Page navigation example" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "1rem", width: "100%" }}>
           <ul className="pagination">
             <li className="page-item">
-              <a className="page-link" href="#" aria-label="Previous">
+              <a className="page-link" onClick={() => handlePageChange(currentPage - 1)} aria-label="Previous" style={{ cursor: "pointer" }} >
                 <span aria-hidden="true">&laquo;</span>
               </a>
             </li>
-            <li className="page-item"><a className="page-link" href="#">1</a></li>
+            <li className={`page-item`}>
+              <a className="page-link" style={{ cursor: "pointer" }}>
+                1
+              </a>
+            </li>
             <li className="page-item">
-              <a className="page-link" href="#" aria-label="Next">
+              <a className="page-link" onClick={() => handlePageChange(currentPage + 1)} aria-label="Next" style={{ cursor: "pointer" }}>
                 <span aria-hidden="true">&raquo;</span>
               </a>
             </li>
           </ul>
-          <p>Showing 1 to 2 of entries</p>
+          <p>Showing {query.skip + 1} to {Math.min(query.skip + query.take, data?.total || 0)} of {data?.total || 0} entries</p>
         </nav>
       </div>
 
-      {detail && detail.add && (
-        <CreateDataDrawer
-          resource={resource}
-          close={refreshData}
-          FormData={FormData}
-          data={detail}
-        />
-      )}
-      {detail && detail.edit && (
-        <EditDataDrawer
-          resource={resource}
-          close={refreshData}
-          FormData={FormData}
-          data={detail}
-        />
-      )}
-      {detail && detail.delete && (
-        <DeleteDataModal
-          resource={resource}
-          close={refreshData}
-          data={detail}
-        />
-      )}
-      {detail && detail.active && (
-        <StatusDataModal
-          resource={resource}
-          close={refreshData}
-          data={detail}
-        />
-      )}
-      {detail && detail.view && (
+      {detail?.view && (
         <ViewDataDrawer
+          open={detail?.view}
+          onClose={() => setDetail(null)}
+          detail={detail}
           resource={resource}
-          close={refreshData}
-          ViewData={ViewData}
-          data={detail}
+        />
+      )}
+      {detail?.edit && (
+        <EditDataDrawer
+          open={detail?.edit}
+          onClose={() => setDetail(null)}
+          detail={detail}
+          resource={resource}
+          refreshData={refreshData}
+        />
+      )}
+      {detail?.delete && (
+        <DeleteDataModal
+          open={detail?.delete}
+          onClose={() => setDetail(null)}
+          detail={detail}
+          resource={resource}
+          refreshData={refreshData}
+        />
+      )}
+      {detail?.active && (
+        <StatusDataModal
+          open={detail?.active}
+          onClose={() => setDetail(null)}
+          detail={detail}
+          resource={resource}
+          refreshData={refreshData}
         />
       )}
     </>
