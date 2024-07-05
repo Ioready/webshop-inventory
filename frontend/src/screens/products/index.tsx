@@ -335,14 +335,13 @@ export default function Lists() {
                 <td>{item.supplierRef}</td>
                 <td>{createProductData(item)}</td>
                 <td>{item.platform}</td>
-                <td>
+                <td style={{cursor:"pointer"}}>
                   <Dropdown
                     overlay={
                       <Menu>
                         <Menu.Item key="1">
                           <Button
                             type="link"
-                            onClick={() => setDetail({ view: item })}
                           >
                             View
                           </Button>
@@ -350,7 +349,6 @@ export default function Lists() {
                         <Menu.Item key="2">
                           <Button
                             type="link"
-                            onClick={() => setDetail({ edit: item })}
                           >
                             Edit
                           </Button>
@@ -358,7 +356,6 @@ export default function Lists() {
                         <Menu.Item key="3">
                           <Button
                             type="link"
-                            onClick={() => setDetail({ delete: item })}
                           >
                             Delete
                           </Button>
@@ -366,7 +363,6 @@ export default function Lists() {
                         <Menu.Item key="4">
                           <Button
                             type="link"
-                            onClick={() => setDetail({ active: item })}
                           >
                             Active
                           </Button>
