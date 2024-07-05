@@ -212,8 +212,11 @@ export const products = {
 
   deleteProduct: async (req, res) => {
     try {
-      await Product.deleteOne({ _id: req.params.id });
-      res.status(200).json({ success: true, message: "Product Deleted" });
+      
+      const idsArray = req.body.body._id;
+      console.log("id",req.body.body,idsArray)
+            await Product.deleteMany({ _id: { $in: idsArray } });      
+            res.status(200).json({ success: true, message: "Product Deleted" });
     } catch (error) {
       console.log(error);
       res.status(500).send({

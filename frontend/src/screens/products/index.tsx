@@ -40,10 +40,9 @@ export default function Lists() {
   const [query, setQuery] = useState({ skip: 0, take: 10, search: "", filterKey: "Filter Options" });
   const { fetch, data, loading } = useFetchByLoad();  
   const { edit, data: patchData, loading: patchLoading } = usePatch();
-  const { remove: deleteProducts, loading: deleteLoading } = useDelete(); // Updated this line
+  const { remove, loading: deleteLoading } = useDelete(); // Updated this line
   
   const [selectedRowKeys, setSelectedRowKeys] = useState<any[]>([]);
-
   console.log("patchData", patchData);
   
   useEffect(() => {
@@ -208,7 +207,7 @@ export default function Lists() {
       cancelText: "No",
       onOk: async () => {
         try {
-          await deleteProducts(`${resource}/bulk-delete`, { ids: selectedRowKeys });
+          remove(`${resource}`, { _id: selectedRowKeys })
           message.success("Selected products deleted successfully");
           refreshData();
         } catch (error) {
@@ -221,7 +220,7 @@ export default function Lists() {
 
   const rowSelection = {
     selectedRowKeys,
-    onChange: (selectedKeys: any[]) =>{console.log("keys",selectedKeys); setSelectedRowKeys(selectedKeys)},
+    onChange: (selectedKeys: any[]) =>{setSelectedRowKeys(selectedKeys)},
   };
 
   const columns = [
