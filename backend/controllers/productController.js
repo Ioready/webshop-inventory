@@ -2,34 +2,49 @@ import csvtojson from "csvtojson";
 import Product from "../models/product.js";
 
 export const products = {
-  createProduct: async (req, res) => {
+
+  
+ createProduct : async (req, res) => {
     try {
       const createProductData = req.body;
       let minSellingPrice = 0;
       if (createProductData.purchasePrice) {
         const purchasePrice = createProductData.purchasePrice;
-        if(createProductData.platform === "bol.com"){
+        if (createProductData.platform === "bol.com") {
           const x = 1.42353 + 8.38459;
           let y = purchasePrice * x;
-      
+  
           if (y < 10) {
-              minSellingPrice = (y + 1.27).toFixed(2);
+            minSellingPrice = (y + 1.27).toFixed(2);
           } else if (y >= 10 && y < 20) {
-              minSellingPrice = (y + 1.57).toFixed(2);
+            minSellingPrice = (y + 1.57).toFixed(2);
           } else if (y >= 20) {
-              minSellingPrice = (y + 2).toFixed(2);
+            minSellingPrice = (y + 2).toFixed(2);
           } else {
-              minSellingPrice = 0;
+            minSellingPrice = 0;
           }
-        }else{
-          minSellingPrice = (((purchasePrice * 1.42353)+8.38459)-5.53).toFixed(2)
+        } else {
+          minSellingPrice = (((purchasePrice * 1.42353) + 8.38459) - 5.53).toFixed(2);
         }
       }
-      const productDetail = { ...createProductData,minSellingPrice}
+      const calculateTotalQuantity = (data) => {
+        let totalQuantity = 0;
+        if (data) {
+          for (const item of data) {
+            totalQuantity += parseInt(item.qty) - parseInt(item.laps);
+          }
+        }
+        return totalQuantity;
+      };
+      // Calculate totalStock based on stores data
+      const totalStock = calculateTotalQuantity(createProductData.stores);
+  
+      const productDetail = { ...createProductData, minSellingPrice, totalStock };
+  
       const product = await Product.create(productDetail);
       res.status(200).json(product);
     } catch (error) {
-      console.log(error);
+      console.error(error);
       res.status(500).send({
         success: false,
         message: "Server error",
@@ -37,7 +52,7 @@ export const products = {
       });
     }
   },
-
+  
   getProducts: async (req, res) => {
     try {
       let { skip, take, search,filterKey } = req.query;

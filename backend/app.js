@@ -10,40 +10,6 @@ import connectDB from "./config/db.js";
 const app = express()
 dotenv.config() 
 
-
-// const callback = async () => {
-//     try {
-//       const oldData = await Product.find();
-      
-//       // Map through oldData and create an array of update promises
-//       const updatePromises = oldData.map((d) => {
-//         const g = data.find((e) => d.ean === e.ean);
-//         if (g) {
-//           return Product.findOneAndUpdate(
-//             { ean: d.ean },
-//             { categories: g.mainCategory, subCategories: g.subCategory, subSubCategories: g.subSubCategory },
-//             { new: true } // This option returns the updated document
-//           ).exec(); // Ensure exec is called to return a promise
-//         }
-//         return null;
-//       }).filter(promise => promise !== null); // Filter out null promises
-  
-//       // Use Promise.all to run update operations concurrently
-//       const results = await Promise.all(updatePromises);
-//       console.log('Update results:', results);
-  
-//     } catch (error) {
-//       console.error('Error updating data:', error);
-//     }
-//   };
-
-// const suppliers = [
-//     'oase', 'trixie', 'laroy', 'beeztees', 'adc', 'velda', 'malanico', 'tijssen', 'scp', 'nagels', 'karlie', 'smartchim', 'nobleza', 'koopman', 'jbl', 'edgard_cooper', 'beduco', 'out', 'gutsy', 'kolombo', 'ferplast', 'royal_canin', 'mars', 'versele_laga', 'nestle'
-//   ];
-  
-
-
-
 // const callback = async () => {
 //     try {
 //       // Find products where the supplier is in the list and the stores array exists and is not empty
@@ -118,9 +84,9 @@ dotenv.config()
 //       console.error('Error deleting products:', error);
 //     }
 //   };
-  
-connectDB();
 
+
+connectDB();
 const port = process.env.PORT 
 
 app.use(express.json({limit : "10mb"}))
