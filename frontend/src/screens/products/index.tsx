@@ -38,13 +38,13 @@ export default function Lists() {
   const [search, setSearch] = useState<any>(null);
   const { create, data: file, loading: loadingFile } = usePostFile();
   const [query, setQuery] = useState({ skip: 0, take: 10, search: "", filterKey: "Filter Options" });
-  const { fetch, data, loading } = useFetchByLoad();  
+  const { fetch, data, loading } = useFetchByLoad();
   const { edit, data: patchData, loading: patchLoading } = usePatch();
   const { remove, loading: deleteLoading } = useDelete(); // Updated this line
-  
+
   const [selectedRowKeys, setSelectedRowKeys] = useState<any[]>([]);
   console.log("patchData", patchData);
-  
+
   useEffect(() => {
     fetch({ url: resource, query: JSON.stringify(query) })
       .then(() => {
@@ -220,7 +220,7 @@ export default function Lists() {
 
   const rowSelection = {
     selectedRowKeys,
-    onChange: (selectedKeys: any[]) =>{setSelectedRowKeys(selectedKeys)},
+    onChange: (selectedKeys: any[]) => { setSelectedRowKeys(selectedKeys) },
   };
 
   const columns = [
@@ -340,7 +340,7 @@ export default function Lists() {
       <Menu.Item key="subSubCategories">Product has no sub sub category</Menu.Item>
     </Menu>
   );
-console.log("rowSelection",rowSelection)
+  console.log("rowSelection", rowSelection)
   return (
     <>
       <Breadcrumbs pageName="Products" />
@@ -368,6 +368,7 @@ console.log("rowSelection",rowSelection)
             </Button>
           </Upload>
           {selectedRowKeys.length > 0 && (
+            <>
             <Button
               type="primary"
               danger
@@ -376,6 +377,14 @@ console.log("rowSelection",rowSelection)
             >
               Delete Selected
             </Button>
+
+           <Button
+            onClick={handleDeleteSelected}
+            style={{backgroundColor:"#1677ff",  color:"white"}}
+            >
+             Post To Webshop
+            </Button>
+            </>
           )}
         </Space>
       </div>

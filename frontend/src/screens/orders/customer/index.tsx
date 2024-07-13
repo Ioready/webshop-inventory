@@ -1,5 +1,6 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { useNavigate } from 'react-router-dom';
 
 interface CustomerDetails {
   name: string;
@@ -16,6 +17,8 @@ interface CustomerDetails {
 }
 
 const CustomerDetailsPage: React.FC = () => {
+  const history = useNavigate();
+
   const customer: CustomerDetails = {
     name: "Mark Hyman",
     location: "Austin TX, United States",
@@ -28,6 +31,10 @@ const CustomerDetailsPage: React.FC = () => {
     orderDate: "July 10, 2024 at 7:16 pm from Draft Orders",
     orderAmount: "$6,420.00",
     orderItem: "Round Dream Lounger Upholstered Movie Bed"
+  };
+
+  const handleViewAllOrders = () => {
+    history('/all-orders');
   };
 
   return (
@@ -55,24 +62,23 @@ const CustomerDetailsPage: React.FC = () => {
               </div>
               <div>
                 <h5>Last order placed</h5>
-                <hr/>
-                <div className=' d-flex justify-content-between align-items-center'>
-                <div>
-                <p><a href="#">#{customer.orderId}</a> <span className="badge bg-success">{customer.orderStatus}</span> <span className="badge bg-warning">{customer.fulfillmentStatus}</span></p>
-                <p>{customer.orderDate}</p>
+                <hr />
+                <div className="d-flex justify-content-between align-items-center">
+                  <div>
+                    <p><a href="#">#{customer.orderId}</a> <span className="badge bg-success">{customer.orderStatus}</span> <span className="badge bg-warning">{customer.fulfillmentStatus}</span></p>
+                    <p>{customer.orderDate}</p>
+                  </div>
+                  <p>{customer.orderAmount}</p>
                 </div>
-                <p>{customer.orderAmount}</p>
-                </div>
-
-                <div className="d-flex">
-                  <img src="/path/to/image" alt="Product" className="img-thumbnail me-3" style={{width: '100px'}} />
-                  <div className=' d-flex justify-content-between w-100'>
+                <div className="d-flex align-items-center">
+                  <img src="https://images.rawpixel.com/image_800/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIyLTExL3BmLXMxMDgtcG0tNDExMy1tb2NrdXAuanBn.jpg" alt="Product" className="img-thumbnail me-3" style={{ width: '100px' }} />
+                  <div className="d-flex justify-content-between w-100">
                     <p>{customer.orderItem}</p>
                     <p>x1</p>
                     <p>{customer.orderAmount}</p>
                   </div>
                 </div>
-                <button className="btn btn-primary mt-3">View all orders</button>
+                <button className="btn btn-primary mt-3" onClick={handleViewAllOrders}>View all orders</button>
                 <button className="btn btn-secondary mt-3 ms-3">Create order</button>
               </div>
             </div>
