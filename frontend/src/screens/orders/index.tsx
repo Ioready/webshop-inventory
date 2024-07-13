@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Popup from './popup';  // Import the Popup component
+import { useNavigate } from 'react-router-dom';
 
 interface Order {
   id: string;
@@ -158,6 +159,12 @@ const OrderTable: React.FC = () => {
     setPopupCustomer(null);
   };
 
+  const Navigate = useNavigate();
+
+  const handleviewallpage = () => {
+    Navigate("/all-orders");
+  }
+
   return (
     <div className="container mt-4">
       <h2>Orders</h2>
@@ -207,21 +214,21 @@ const OrderTable: React.FC = () => {
                     onChange={() => handleCheckboxChange(order.id)}
                   />
                 </td>
-                <td className="text-nowrap">{order.id}</td>
-                <td className="text-nowrap">{order.date}</td>
+                <td className="text-nowrap" onClick={handleviewallpage} style={{cursor:"pointer"}}>{order.id}</td>
+                <td className="text-nowrap" onClick={handleviewallpage} style={{cursor:"pointer"}}>{order.date}</td>
                 <td className="text-nowrap">
                   <span onClick={() => handleCustomerClick(order.customer)} style={{ cursor: 'pointer', color: 'blue' }}>
                     {order.customer}
                   </span>
                 </td>
-                <td className="text-nowrap">{order.channel}</td>
-                <td className="text-nowrap">{order.total}</td>
-                <td className="text-nowrap">{order.paymentStatus}</td>
-                <td className="text-nowrap">{order.fulfillmentStatus}</td>
-                <td className="text-nowrap">{order.items}</td>
-                <td className="text-nowrap">{order.deliveryStatus}</td>
-                <td className="text-nowrap">{order.deliveryMethod}</td>
-                <td className="text-nowrap">{order.tags}</td>
+                <td className="text-nowrap" onClick={handleviewallpage} style={{cursor:"pointer"}}>{order.channel}</td>
+                <td className="text-nowrap" onClick={handleviewallpage} style={{cursor:"pointer"}}>{order.total}</td>
+                <td className="text-nowrap" onClick={handleviewallpage} style={{cursor:"pointer"}}>{order.paymentStatus}</td>
+                <td className="text-nowrap" onClick={handleviewallpage} style={{cursor:"pointer"}}>{order.fulfillmentStatus}</td>
+                <td className="text-nowrap" onClick={handleviewallpage} style={{cursor:"pointer"}}>{order.items}</td>
+                <td className="text-nowrap" onClick={handleviewallpage} style={{cursor:"pointer"}}>{order.deliveryStatus}</td>
+                <td className="text-nowrap" onClick={handleviewallpage} style={{cursor:"pointer"}}>{order.deliveryMethod}</td>
+                <td className="text-nowrap" onClick={handleviewallpage} style={{cursor:"pointer"}}>{order.tags}</td>
               </tr>
             ))}
           </tbody>

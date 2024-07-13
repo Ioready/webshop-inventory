@@ -33,42 +33,59 @@ import Papa from 'papaparse';
 
 const resource = "products";
 
+const sampleProducts = [
+  {
+    id: '1',
+    title: 'Product A',
+    ean: '1234567890123',
+    price: 100,
+    stores: [{ quantity: 10 }],
+    supplierRef: 'SUPP001',
+    minSellingPrice: 150,
+    platform: 'platform1',
+    status: 'active',
+    images: ['https://via.placeholder.com/50']
+  },
+  {
+    id: '2',
+    title: 'Product B',
+    ean: '2345678901234',
+    price: 200,
+    stores: [{ quantity: 20 }],
+    supplierRef: 'SUPP002',
+    minSellingPrice: 250,
+    platform: 'platform2',
+    status: 'inactive',
+    images: ['https://via.placeholder.com/50']
+  },
+  {
+    id: '3',
+    title: 'Product C',
+    ean: '3456789012345',
+    price: 300,
+    stores: [{ quantity: 30 }],
+    supplierRef: 'SUPP003',
+    minSellingPrice: 350,
+    platform: 'platform3',
+    status: 'active',
+    images: ['https://via.placeholder.com/50']
+  },
+];
+
 export default function Lists() {
   const [detail, setDetail] = useState<any>(null);
   const [search, setSearch] = useState<any>(null);
   const { create, data: file, loading: loadingFile } = usePostFile();
   const [query, setQuery] = useState({ skip: 0, take: 10, search: "", filterKey: "Filter Options" });
-  const { fetch, data, loading } = useFetchByLoad();  
+  const { fetch, data, loading } = useFetchByLoad();
   const { edit, data: patchData, loading: patchLoading } = usePatch();
-  const { remove, loading: deleteLoading } = useDelete(); // Updated this line
-  
+  const { remove, loading: deleteLoading } = useDelete();
+
   const [selectedRowKeys, setSelectedRowKeys] = useState<any[]>([]);
-  console.log("patchData", patchData);
-  
-  useEffect(() => {
-    fetch({ url: resource, query: JSON.stringify(query) })
-      .then(() => {
-        if (data?.data) {
-          // Log the product data and IDs
-          console.log("Fetched Product Data:", data.data);
-          data.data.forEach((item: any) => {
-            console.log("Product ID:", item.id);
-          });
-        }
-      });
-  }, [query, file]);
+
+  const [products, setProducts] = useState(sampleProducts);
 
   const refreshData = () => {
-    fetch({ url: resource, query: JSON.stringify(query) })
-      .then(() => {
-        if (data?.data) {
-          // Log the product data and IDs
-          console.log("Fetched Product Data (refresh):", data.data);
-          data.data.forEach((item: any) => {
-            console.log("Product ID (refresh):", item.id);
-          });
-        }
-      });
     setDetail(null);
     setSelectedRowKeys([]);
   };
@@ -140,7 +157,7 @@ export default function Lists() {
     let totalQuantity = 0;
     if (data) {
       for (const item of data) {
-        totalQuantity += parseInt(item.qty) - parseInt(item.laps);
+        totalQuantity += item.quantity;
       }
       return totalQuantity;
     } else {
@@ -151,51 +168,42 @@ export default function Lists() {
   const [csvData, setCsvData] = useState([]);
 
   const downloadCsv = () => {
-    fetch({ url: "allproduct", query: JSON.stringify("") })
-      .then(() => {
-        if (data?.data) {
-          console.log("Fetched Product Data for CSV Download:", data.data);
-          data.data.forEach((item: any) => {
-            console.log("Product ID for CSV Download:", item.id);
-          });
-        }
-        const stockData = data?.data?.filter((item: any) => item.stores.length > 0);
-        if (data?.data?.length > 10 && stockData?.length > 0) {
-          const csvDataFormatted = stockData.map((item: any) => {
-            const storeInfo = item.stores.map((store: any) => {
-              return `Location: ${store.location}, Quantity: ${store.qty}, Laps: ${store.laps}`;
-            }).join('\n');
-            return {
-              Title: item.title || "",
-              EanBarcode: item.ean || "",
-              Price: item.price || "",
-              TotalStock: calculateTotalQuantity(item.stores) || "",
-              SellingPrice: item.minSellingPrice || "",
-              SupplierRef: item.supplierRef || "",
-              Platform: item.platform || "",
-              StoreInfo: storeInfo,
-              Image: item.images || "",
-              Sku: item.sku || "",
-              Language: item.language || "",
-              Categories: item.categories || "",
-              SubCategories: item.subCategories || "",
-              SubSubCategories: item.subSubCategories || "",
-              Tags: item.tags || "",
-              Weight: item.weight || "",
-              TaxValue: item.taxValue || "",
-              Brand: item.brand || "",
-              Supplier: item.supplier || "",
-              ScanCode: item.scanCode || "",
-              PurchasePrice: item.purchasePrice || "",
-              Colors: item.colors || "",
-              Size: item.size || "",
-            };
-          });
-          setCsvData(csvDataFormatted);
-        } else {
-          console.log("No data to export");
-        }
+    const stockData = products.filter((item: any) => item.stores.length > 0);
+    if (stockData.length > 0) {
+      const csvDataFormatted = stockData.map((item: any) => {
+        const storeInfo = item.stores.map((store: any) => {
+          return `Location: ${store.location}, Quantity: ${store.qty}, Laps: ${store.laps}`;
+        }).join('\n');
+        return {
+          Title: item.title || "",
+          EanBarcode: item.ean || "",
+          Price: item.price || "",
+          TotalStock: calculateTotalQuantity(item.stores) || "",
+          SellingPrice: item.minSellingPrice || "",
+          SupplierRef: item.supplierRef || "",
+          Platform: item.platform || "",
+          StoreInfo: storeInfo,
+          Image: item.images || "",
+          Sku: item.sku || "",
+          Language: item.language || "",
+          Categories: item.categories || "",
+          SubCategories: item.subCategories || "",
+          SubSubCategories: item.subSubCategories || "",
+          Tags: item.tags || "",
+          Weight: item.weight || "",
+          TaxValue: item.taxValue || "",
+          Brand: item.brand || "",
+          Supplier: item.supplier || "",
+          ScanCode: item.scanCode || "",
+          PurchasePrice: item.purchasePrice || "",
+          Colors: item.colors || "",
+          Size: item.size || "",
+        };
       });
+    //   setCsvData(csvDataFormatted);
+    } else {
+      console.log("No data to export");
+    }
   };
 
   const handleDeleteSelected = () => {
@@ -207,7 +215,7 @@ export default function Lists() {
       cancelText: "No",
       onOk: async () => {
         try {
-          remove(`${resource}`, { _id: selectedRowKeys })
+          setProducts(products.filter(product => !selectedRowKeys.includes(product.id)));
           message.success("Selected products deleted successfully");
           refreshData();
         } catch (error) {
@@ -218,9 +226,16 @@ export default function Lists() {
     });
   };
 
+  const handleStatusChange = (record: any, key: string) => {
+    setProducts(products.map(product =>
+      product.id === record.id ? { ...product, status: key } : product
+    ));
+    message.success(`Product status changed to ${key}`);
+  };
+
   const rowSelection = {
     selectedRowKeys,
-    onChange: (selectedKeys: any[]) =>{setSelectedRowKeys(selectedKeys)},
+    onChange: (selectedKeys: any[]) => { setSelectedRowKeys(selectedKeys) },
   };
 
   const columns = [
@@ -257,7 +272,7 @@ export default function Lists() {
       render: (data: any) => calculateTotalQuantity(data),
     },
     {
-      title: "supplierRef",
+      title: "Supplier Ref",
       dataIndex: "supplierRef",
       sorter: true,
     },
@@ -271,6 +286,24 @@ export default function Lists() {
       title: "Platform",
       dataIndex: "platform",
       sorter: true,
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      render: (text: any, record: any) => (
+        <Dropdown
+          overlay={
+            <Menu onClick={({ key }) => handleStatusChange(record, key)}>
+              <Menu.Item key="active">Active</Menu.Item>
+              <Menu.Item key="inactive">Inactive</Menu.Item>
+            </Menu>
+          }
+        >
+          <Button>
+            {record.status} <DownOutlined />
+          </Button>
+        </Dropdown>
+      ),
     },
     {
       title: "Actions",
@@ -294,14 +327,6 @@ export default function Lists() {
                   onClick={() => setDetail({ ...record, edit: true })}
                 >
                   EDIT
-                </Button>
-              </Menu.Item>
-              <Menu.Item key="3">
-                <Button
-                  type="link"
-                  onClick={() => setDetail({ ...record, active: true })}
-                >
-                  {record.status ? "INACTIVE" : "ACTIVE"}
                 </Button>
               </Menu.Item>
               <Menu.Item key="4">
@@ -340,10 +365,10 @@ export default function Lists() {
       <Menu.Item key="subSubCategories">Product has no sub sub category</Menu.Item>
     </Menu>
   );
-console.log("rowSelection",rowSelection)
+
   return (
     <>
-      <Breadcrumbs pageName="Webshop Products" />
+      <Breadcrumbs pageName="Products" />
       <div className="headerRight">
         <Space>
           <Dropdown overlay={dropdownMenu}>
@@ -356,26 +381,17 @@ console.log("rowSelection",rowSelection)
               Download Stock CSV
             </CSVLink>
           </Button>
-          <Upload
-            showUploadList={false}
-            customRequest={handleFileUpload}
-          >
-            <Button
-              type="primary"
-              icon={loadingFile ? <LoadingOutlined /> : <PlusOutlined />}
-            >
-              Import File
-            </Button>
-          </Upload>
           {selectedRowKeys.length > 0 && (
-            <Button
-              type="primary"
-              danger
-              onClick={handleDeleteSelected}
-              loading={deleteLoading}
-            >
-              Delete Selected
-            </Button>
+            <>
+              <Button
+                type="primary"
+                danger
+                onClick={handleDeleteSelected}
+                loading={deleteLoading}
+              >
+                Delete Selected
+              </Button>
+            </>
           )}
         </Space>
       </div>
@@ -403,18 +419,19 @@ console.log("rowSelection",rowSelection)
         rowSelection={rowSelection}
         className="mainTable"
         loading={loading}
-        dataSource={data?.data.map((item: any) => ({
+        dataSource={products.map((item: any) => ({
           ...item,
-          key: item._id, // Ensure each item has a unique key
-        })) ?? []}
+          key: item.id,
+        }))}
         columns={columns}
         pagination={{
           showQuickJumper: true,
-          total: data?.count ?? 0,
+          total: products.length,
           onChange: (page, pageSize) => {
             setQuery({ ...query, skip: (page - 1) * pageSize, take: pageSize });
           },
         }}
+        scroll={{ x: 'max-content' }}
       />
       {detail && detail.add && (
         <CreateDataDrawer
