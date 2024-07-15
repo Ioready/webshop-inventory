@@ -5,6 +5,10 @@ import { ProtectedRoute } from './ProtectedRoute'
 import Login from '../screens/auth'
 import Products from '../screens/products'
 import Home from '../screens/dashboard'
+import Order from '../screens/orders';
+import Webshopproduct from '../screens/webshopproduct';
+import AllOrdersPage from '../screens/orders/allorders';
+import CustomerDetailsPage from '../screens/orders/customer';
 const Scanner = lazy(() => import('../screens/scanner'));
 
 const SalesReport = lazy(() => import('../screens/sales-report'));
@@ -20,6 +24,10 @@ export const Navigation = () => {
                     <Route path="/scanner" element={<Scanner />} />
                     <Route path="/dashboard" element={<Home/>} />
                     <Route path="/*" element={<Products />} />
+                    <Route path="/order" element={<Order />} />
+                    <Route path="/all-orders" element={<AllOrdersPage />} />
+                    <Route path="/customer-details" element={<CustomerDetailsPage />} />
+                    <Route path="/webshop-product" element={<Webshopproduct/>} />
                     {/* <Route path="/sales" element={<SalesReport />} /> */}
                 </Route>
             </Route>

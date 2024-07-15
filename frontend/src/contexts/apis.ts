@@ -113,8 +113,9 @@ const apis = {
     },
     deleteDataApi: async (url: any, body: any, token: any) => {
         getAuthorizationToken(token)
+        console.log('body',body)
         return axiosInstance
-            .delete(`${url}/${body._id}`, { withCredentials: false })
+            .post(`${url}/${body._id}`,body, { withCredentials: false })
             .then((response: any) => {
                 if (response?.status == 200 || response?.status == 201 || response?.status == 202) {
                     return response.data

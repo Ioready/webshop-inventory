@@ -280,7 +280,6 @@ export default function Lists() {
               Import File
             </Button>
           </Upload>
-
         </Space>
       </div>
       <div className="fixed">

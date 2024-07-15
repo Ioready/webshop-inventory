@@ -3,6 +3,8 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { CiBarcode } from "react-icons/ci";
 import { Popconfirm } from 'antd';
 import { LiaProductHunt } from "react-icons/lia";
+import { FiPackage } from "react-icons/fi";
+import { FaCartFlatbed } from "react-icons/fa6";
 import { MainContext } from "../../../contexts/mainProvider";
 import { IoIosSettings } from "react-icons/io";
 import { FaRegUserCircle } from "react-icons/fa";
@@ -33,6 +35,18 @@ export const Sidebar = () => {
       icon: <MdDocumentScanner />,
       label: "SCANNER",
       value: "scanner",
+      isShow: true,
+    },
+    {
+      icon: <FiPackage />,
+      label: "ORDERS",
+      value: "order",
+      isShow: true,
+    },
+    {
+      icon: <FaCartFlatbed />,
+      label: "WEBSHOP PRODUCTS",
+      value: "webshop-product",
       isShow: true,
     },
     // {

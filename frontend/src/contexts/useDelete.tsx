@@ -9,7 +9,7 @@ export function useDelete() {
     const remove = async (url: any, body: any) => {
         try {
             setLoading(true);
-            const response: any = await apis.deleteDataApi(url, body, token);
+            const response: any = await apis.deleteDataApi(url, {body}, token);
             if (response) {
                 setData(response);
             }
