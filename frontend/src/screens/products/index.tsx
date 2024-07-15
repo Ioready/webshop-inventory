@@ -2,78 +2,94 @@
 import { useState, useEffect } from "react";
 import Breadcrumbs from "../../components/Breadcrumbs";
 import {
-  Table,
   Space,
   Input,
-  Tag,
   Button,
   Dropdown,
-  Avatar,
   Menu,
   Upload,
   message,
-  Modal,
 } from "antd";
-import { LoadingOutlined, PlusOutlined, DownOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
-import { LiaProductHunt } from "react-icons/lia";
-import { usePostFile, useFetchByLoad, usePatch, useDelete } from "../../contexts";
+import { LoadingOutlined, PlusOutlined, DownOutlined } from "@ant-design/icons";
 import { CiMenuKebab } from "react-icons/ci";
-import { FormData } from "./FormData";
-import { ViewData } from "./ViewData";
-import {
-  CreateDataDrawer,
-  EditDataDrawer,
-  DeleteDataModal,
-  StatusDataModal,
-  ViewDataDrawer,
-} from "../../components/Forms";
+import { ViewDataDrawer, EditDataDrawer, DeleteDataModal, StatusDataModal } from "../../components/Forms";
 import { CSVLink } from "react-csv";
-import axios from "axios";
 import Papa from 'papaparse';
 
 const resource = "products";
 
 export default function Lists() {
   const [detail, setDetail] = useState<any>(null);
-  const [search, setSearch] = useState<any>(null);
-  const { create, data: file, loading: loadingFile } = usePostFile();
+  const [search, setSearch] = useState<string>('');
   const [query, setQuery] = useState({ skip: 0, take: 10, search: "", filterKey: "Filter Options" });
-  const { fetch, data, loading } = useFetchByLoad();
-  const { edit, data: patchData, loading: patchLoading } = usePatch();
-  const { remove, loading: deleteLoading } = useDelete(); // Updated this line
+  const [loadingFiles, setLoadingFiles] = useState(false);
+  const [csvData, setCsvData] = useState([]);
+  const [selectAll, setSelectAll] = useState(false);
+  const [selectedItems, setSelectedItems] = useState<number[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
 
-  const [selectedRowKeys, setSelectedRowKeys] = useState<any[]>([]);
-  console.log("patchData", patchData);
-
-  useEffect(() => {
-    fetch({ url: resource, query: JSON.stringify(query) })
-      .then(() => {
-        if (data?.data) {
-          // Log the product data and IDs
-          console.log("Fetched Product Data:", data.data);
-          data.data.forEach((item: any) => {
-            console.log("Product ID:", item.id);
-          });
-        }
-      });
-  }, [query, file]);
+  // Sample JSON Data
+  const [data, setData] = useState<any>({
+    data: [
+      {
+        id: 1,
+        title: "Product 1",
+        price: 25.99,
+        ean: "1234567890123",
+        stores: [{ location: "Location 1", qty: 10, laps: 2 }],
+        supplierRef: "Supplier 1",
+        minSellingPrice: 30.00,
+        platform: "bol.com",
+        images: "https://example.com/image1.jpg",
+        sku: "SKU1234",
+        language: "EN",
+        categories: "Category 1",
+        subCategories: "SubCategory 1",
+        subSubCategories: "SubSubCategory 1",
+        tags: "Tag 1",
+        weight: "1kg",
+        taxValue: "21%",
+        brand: "Brand 1",
+        supplier: "Supplier 1",
+        scanCode: "SCAN1234",
+        purchasePrice: 20.00,
+        colors: "Red",
+        size: "M"
+      },
+      {
+        id: 2,
+        title: "Product 2",
+        price: 15.99,
+        ean: "1234567890124",
+        stores: [{ location: "Location 2", qty: 5, laps: 1 }],
+        supplierRef: "Supplier 2",
+        minSellingPrice: 20.00,
+        platform: "bol.com",
+        images: "https://example.com/image2.jpg",
+        sku: "SKU5678",
+        language: "EN",
+        categories: "Category 2",
+        subCategories: "SubCategory 2",
+        subSubCategories: "SubSubCategory 2",
+        tags: "Tag 2",
+        weight: "500g",
+        taxValue: "21%",
+        brand: "Brand 2",
+        supplier: "Supplier 2",
+        scanCode: "SCAN5678",
+        purchasePrice: 12.00,
+        colors: "Blue",
+        size: "L"
+      }
+    ],
+    total: 2
+  });
 
   const refreshData = () => {
-    fetch({ url: resource, query: JSON.stringify(query) })
-      .then(() => {
-        if (data?.data) {
-          // Log the product data and IDs
-          console.log("Fetched Product Data (refresh):", data.data);
-          data.data.forEach((item: any) => {
-            console.log("Product ID (refresh):", item.id);
-          });
-        }
-      });
+    // Fetch or refresh data here
     setDetail(null);
-    setSelectedRowKeys([]);
   };
-
-  const [loadingFiles, setLoadingFiles] = useState(false);
 
   const handleFileUpload = ({ file }: any) => {
     setLoadingFiles(true);
@@ -104,10 +120,11 @@ export default function Lists() {
   const updateProducts = async (csvData: any) => {
     const url = `/${resource}/csv`;
     try {
-      await edit(url, csvData);
+      // Simulate API call
+      console.log("Updating products with data:", csvData);
     } catch (error) {
       console.error("Error updating product:", error);
-      message.error(`Error updating product `);
+      message.error(`Error updating product`);
     }
   };
 
@@ -132,7 +149,6 @@ export default function Lists() {
         minSellingPrice = parseFloat((((purchasePrice * 1.42353) + 8.38459) - 5.53).toFixed(2));
       }
     }
-    console.log('minSellingPrice', data);
     return minSellingPrice;
   };
 
@@ -148,180 +164,44 @@ export default function Lists() {
     }
   };
 
-  const [csvData, setCsvData] = useState([]);
-
   const downloadCsv = () => {
-    fetch({ url: "allproduct", query: JSON.stringify("") })
-      .then(() => {
-        if (data?.data) {
-          console.log("Fetched Product Data for CSV Download:", data.data);
-          data.data.forEach((item: any) => {
-            console.log("Product ID for CSV Download:", item.id);
-          });
-        }
-        const stockData = data?.data?.filter((item: any) => item.stores.length > 0);
-        if (data?.data?.length > 10 && stockData?.length > 0) {
-          const csvDataFormatted = stockData.map((item: any) => {
-            const storeInfo = item.stores.map((store: any) => {
-              return `Location: ${store.location}, Quantity: ${store.qty}, Laps: ${store.laps}`;
-            }).join('\n');
-            return {
-              Title: item.title || "",
-              EanBarcode: item.ean || "",
-              Price: item.price || "",
-              TotalStock: calculateTotalQuantity(item.stores) || "",
-              SellingPrice: item.minSellingPrice || "",
-              SupplierRef: item.supplierRef || "",
-              Platform: item.platform || "",
-              StoreInfo: storeInfo,
-              Image: item.images || "",
-              Sku: item.sku || "",
-              Language: item.language || "",
-              Categories: item.categories || "",
-              SubCategories: item.subCategories || "",
-              SubSubCategories: item.subSubCategories || "",
-              Tags: item.tags || "",
-              Weight: item.weight || "",
-              TaxValue: item.taxValue || "",
-              Brand: item.brand || "",
-              Supplier: item.supplier || "",
-              ScanCode: item.scanCode || "",
-              PurchasePrice: item.purchasePrice || "",
-              Colors: item.colors || "",
-              Size: item.size || "",
-            };
-          });
-          setCsvData(csvDataFormatted);
-        } else {
-          console.log("No data to export");
-        }
+    const stockData = data?.data?.filter((item: any) => item.stores.length > 0);
+    if (data?.data?.length > 10 && stockData?.length > 0) {
+      const csvDataFormatted = stockData.map((item: any) => {
+        const storeInfo = item.stores.map((store: any) => {
+          return `Location: ${store.location}, Quantity: ${store.qty}, Laps: ${store.laps}`;
+        }).join('\n');
+        return {
+          Title: item.title || "",
+          EanBarcode: item.ean || "",
+          Price: item.price || "",
+          TotalStock: calculateTotalQuantity(item.stores) || "",
+          SellingPrice: item.minSellingPrice || "",
+          SupplierRef: item.supplierRef || "",
+          Platform: item.platform || "",
+          StoreInfo: storeInfo,
+          Image: item.images || "",
+          Sku: item.sku || "",
+          Language: item.language || "",
+          Categories: item.categories || "",
+          SubCategories: item.subCategories || "",
+          SubSubCategories: item.subSubCategories || "",
+          Tags: item.tags || "",
+          Weight: item.weight || "",
+          TaxValue: item.taxValue || "",
+          Brand: item.brand || "",
+          Supplier: item.supplier || "",
+          ScanCode: item.scanCode || "",
+          PurchasePrice: item.purchasePrice || "",
+          Colors: item.colors || "",
+          Size: item.size || "",
+        };
       });
+      setCsvData(csvDataFormatted);
+    } else {
+      console.log("No data to export");
+    }
   };
-
-  const handleDeleteSelected = () => {
-    Modal.confirm({
-      title: "Confirm Delete",
-      icon: <ExclamationCircleOutlined />,
-      content: "Are you sure you want to delete the selected products?",
-      okText: "Yes",
-      cancelText: "No",
-      onOk: async () => {
-        try {
-          remove(`${resource}`, { _id: selectedRowKeys })
-          message.success("Selected products deleted successfully");
-          refreshData();
-        } catch (error) {
-          console.error("Error deleting products:", error);
-          message.error("Error deleting products");
-        }
-      },
-    });
-  };
-
-  const rowSelection = {
-    selectedRowKeys,
-    onChange: (selectedKeys: any[]) => { setSelectedRowKeys(selectedKeys) },
-  };
-
-  const columns = [
-    {
-      title: "Image",
-      dataIndex: "images",
-      render: (images: string[]) => {
-        const firstImage = images && images.length > 0 ? images[0] : null;
-        return firstImage ? (
-          <Avatar shape="square" src={firstImage} />
-        ) : (
-          <LiaProductHunt size={30} />
-        );
-      },
-    },
-    {
-      title: "Title",
-      dataIndex: "title",
-      sorter: true,
-    },
-    {
-      title: "Ean Barcode",
-      dataIndex: "ean",
-      sorter: true,
-    },
-    {
-      title: "Price",
-      dataIndex: "price",
-      sorter: true,
-    },
-    {
-      title: "Total Stock",
-      dataIndex: "stores",
-      render: (data: any) => calculateTotalQuantity(data),
-    },
-    {
-      title: "supplierRef",
-      dataIndex: "supplierRef",
-      sorter: true,
-    },
-    {
-      title: "Selling Price",
-      dataIndex: "data",
-      sorter: true,
-      render: (text: any, record: any) => createProductData(record),
-    },
-    {
-      title: "Platform",
-      dataIndex: "platform",
-      sorter: true,
-    },
-    {
-      title: "Actions",
-      dataIndex: "address",
-      key: "address",
-      render: (_value: any, record: any) => (
-        <Dropdown
-          overlay={
-            <Menu>
-              <Menu.Item key="1">
-                <Button
-                  type="link"
-                  onClick={() => setDetail({ ...record, view: true })}
-                >
-                  VIEW
-                </Button>
-              </Menu.Item>
-              <Menu.Item key="2">
-                <Button
-                  type="link"
-                  onClick={() => setDetail({ ...record, edit: true })}
-                >
-                  EDIT
-                </Button>
-              </Menu.Item>
-              <Menu.Item key="3">
-                <Button
-                  type="link"
-                  onClick={() => setDetail({ ...record, active: true })}
-                >
-                  {record.status ? "INACTIVE" : "ACTIVE"}
-                </Button>
-              </Menu.Item>
-              <Menu.Item key="4">
-                <Button
-                  type="link"
-                  onClick={() => setDetail({ ...record, delete: true })}
-                >
-                  DELETE
-                </Button>
-              </Menu.Item>
-            </Menu>
-          }
-        >
-          <Button type="text" onClick={(e) => e.preventDefault()}>
-            <CiMenuKebab />
-          </Button>
-        </Dropdown>
-      ),
-    },
-  ];
 
   const dropdownMenu = (
     <Menu
@@ -335,17 +215,50 @@ export default function Lists() {
       <Menu.Item key="images">Product has no image</Menu.Item>
       <Menu.Item key="color">Product has no color</Menu.Item>
       <Menu.Item key="size">Product has no size</Menu.Item>
-      <Menu.Item key="categories">Product has no category</Menu.Item>
-      <Menu.Item key="subCategories">Product has no sub category</Menu.Item>
-      <Menu.Item key="subSubCategories">Product has no sub sub category</Menu.Item>
     </Menu>
   );
-  console.log("rowSelection", rowSelection)
+
+  const handleSelectAll = () => {
+    if (selectAll) {
+      setSelectedItems([]);
+    } else {
+      setSelectedItems(data?.data.map((item: any) => item.id) || []);
+    }
+    setSelectAll(!selectAll);
+  };
+
+  const handleCheckboxChange = (id: number) => {
+    if (selectedItems.includes(id)) {
+      setSelectedItems(selectedItems.filter((item) => item !== id));
+    } else {
+      setSelectedItems([...selectedItems, id]);
+    }
+  };
+
+  const handlePageChange = (page: number) => {
+    setQuery({ ...query, skip: (page - 1) * query.take, take: query.take });
+    setCurrentPage(page);
+  };
+
+  useEffect(() => {
+    if (data?.data) {
+      setTotalPages(Math.ceil(data.total / query.take));
+    }
+  }, [data, query.take]);
+
   return (
     <>
       <Breadcrumbs pageName="Products" />
       <div className="headerRight">
         <Space>
+          {selectedItems.length > 0 && (
+            <Button
+              onClick={() => setDetail({ delete: { ids: selectedItems } })}
+              style={{ backgroundColor: "red", color:"white" }}
+            >
+              Delete Selected
+            </Button>
+          )}
           <Dropdown overlay={dropdownMenu}>
             <Button type="primary">
               {query.filterKey !== "Filter Options" ? query.filterKey : "Select Filter"} <DownOutlined />
@@ -362,30 +275,11 @@ export default function Lists() {
           >
             <Button
               type="primary"
-              icon={loadingFile ? <LoadingOutlined /> : <PlusOutlined />}
+              icon={loadingFiles ? <LoadingOutlined /> : <PlusOutlined />}
             >
               Import File
             </Button>
           </Upload>
-          {selectedRowKeys.length > 0 && (
-            <>
-            <Button
-              type="primary"
-              danger
-              onClick={handleDeleteSelected}
-              loading={deleteLoading}
-            >
-              Delete Selected
-            </Button>
-
-           <Button
-            onClick={handleDeleteSelected}
-            style={{backgroundColor:"#1677ff",  color:"white"}}
-            >
-             Post To Webshop
-            </Button>
-            </>
-          )}
         </Space>
       </div>
       <div className="fixed">
@@ -408,59 +302,137 @@ export default function Lists() {
           }}
         />
       </div>
-      <Table
-        rowSelection={rowSelection}
-        className="mainTable"
-        loading={loading}
-        dataSource={data?.data.map((item: any) => ({
-          ...item,
-          key: item._id, // Ensure each item has a unique key
-        })) ?? []}
-        columns={columns}
-        pagination={{
-          showQuickJumper: true,
-          total: data?.count ?? 0,
-          onChange: (page, pageSize) => {
-            setQuery({ ...query, skip: (page - 1) * pageSize, take: pageSize });
-          },
-        }}
-      />
-      {detail && detail.add && (
-        <CreateDataDrawer
-          resource={resource}
-          close={refreshData}
-          FormData={FormData}
-          data={detail}
-        />
-      )}
-      {detail && detail.edit && (
-        <EditDataDrawer
-          resource={resource}
-          close={refreshData}
-          FormData={FormData}
-          data={detail}
-        />
-      )}
-      {detail && detail.delete && (
-        <DeleteDataModal
-          resource={resource}
-          close={refreshData}
-          data={detail}
-        />
-      )}
-      {detail && detail.active && (
-        <StatusDataModal
-          resource={resource}
-          close={refreshData}
-          data={detail}
-        />
-      )}
-      {detail && detail.view && (
+      <div style={{ padding: "1rem" }}>
+        <table className="table table-striped table-bordered table-hover">
+          <thead className="thead-dark">
+            <tr className='bg-info'>
+              <th>
+                <input type="checkbox" checked={selectAll} onChange={handleSelectAll} />
+              </th>
+              <th>Title</th>
+              <th>Price</th>
+              <th>Total Stock</th>
+              <th>SupplierRef</th>
+              <th>Selling Price</th>
+              <th>Platform</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data?.data.map((item: any) => (
+              <tr key={item.id}>
+                <td>
+                  <input
+                    type="checkbox"
+                    checked={selectedItems.includes(item.id)}
+                    onChange={() => handleCheckboxChange(item.id)}
+                  />
+                </td>
+                <td>{item.title}</td>
+                <td>{item.price}</td>
+                <td>{calculateTotalQuantity(item.stores)}</td>
+                <td>{item.supplierRef}</td>
+                <td>{createProductData(item)}</td>
+                <td>{item.platform}</td>
+                <td style={{cursor:"pointer"}}>
+                  <Dropdown
+                    overlay={
+                      <Menu>
+                        <Menu.Item key="1">
+                          <Button
+                            type="link"
+                          >
+                            View
+                          </Button>
+                        </Menu.Item>
+                        <Menu.Item key="2">
+                          <Button
+                            type="link"
+                          >
+                            Edit
+                          </Button>
+                        </Menu.Item>
+                        <Menu.Item key="3">
+                          <Button
+                            type="link"
+                          >
+                            Delete
+                          </Button>
+                        </Menu.Item>
+                        <Menu.Item key="4">
+                          <Button
+                            type="link"
+                          >
+                            Active
+                          </Button>
+                        </Menu.Item>
+                      </Menu>
+                    }
+                    trigger={['click']}
+                  >
+                    <CiMenuKebab />
+                  </Dropdown>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        <nav aria-label="Page navigation example" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "1rem", width: "100%" }}>
+          <ul className="pagination">
+            <li className="page-item">
+              <a className="page-link" onClick={() => handlePageChange(currentPage - 1)} aria-label="Previous" style={{ cursor: "pointer" }} >
+                <span aria-hidden="true">&laquo;</span>
+              </a>
+            </li>
+            <li className={`page-item`}>
+              <a className="page-link" style={{ cursor: "pointer" }}>
+                1
+              </a>
+            </li>
+            <li className="page-item">
+              <a className="page-link" onClick={() => handlePageChange(currentPage + 1)} aria-label="Next" style={{ cursor: "pointer" }}>
+                <span aria-hidden="true">&raquo;</span>
+              </a>
+            </li>
+          </ul>
+          <p>Showing {query.skip + 1} to {Math.min(query.skip + query.take, data?.total || 0)} of {data?.total || 0} entries</p>
+        </nav>
+      </div>
+
+      {detail?.view && (
         <ViewDataDrawer
+          open={detail?.view}
+          onClose={() => setDetail(null)}
+          detail={detail}
           resource={resource}
-          close={refreshData}
-          ViewData={ViewData}
-          data={detail}
+        />
+      )}
+      {detail?.edit && (
+        <EditDataDrawer
+          open={detail?.edit}
+          onClose={() => setDetail(null)}
+          detail={detail}
+          resource={resource}
+          refreshData={refreshData}
+        />
+      )}
+      {detail?.delete && (
+        <DeleteDataModal
+          open={detail?.delete}
+          onClose={() => setDetail(null)}
+          detail={detail}
+          resource={resource}
+          refreshData={refreshData}
+        />
+      )}
+      {detail?.active && (
+        <StatusDataModal
+          open={detail?.active}
+          onClose={() => setDetail(null)}
+          detail={detail}
+          resource={resource}
+          refreshData={refreshData}
         />
       )}
     </>
