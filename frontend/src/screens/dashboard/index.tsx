@@ -1,14 +1,17 @@
 "use client"
-import { Doughnut } from 'react-chartjs-2'
+import { Doughnut, Line } from 'react-chartjs-2'
 import { FaAmazon } from "react-icons/fa";
 import { LuUsers2 } from "react-icons/lu";
 import { CiShoppingCart } from "react-icons/ci";
 import { CiTrophy } from "react-icons/ci";
 import { FiUserCheck } from "react-icons/fi";
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement } from "chart.js";
 import { useFetchByLoad } from '../../contexts';
 import { useEffect } from 'react';
-ChartJS.register(ArcElement, Tooltip, Legend);
+
+// Register the required components
+ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement);
+
 const resource = "products";
 
 export default function Lists() {
@@ -38,7 +41,7 @@ export default function Lists() {
             <div className="main_caed_block" style={{ gap: "2rem", padding: "2rem" }}>
                 <div className=" d-flex align-items-center justify-content-between rounded-3 shadow-lg blocks_cards" style={{ padding: "1rem", gap: "3rem" }}>
                     <div>
-                        <p className="h1">{data?.count}</p>
+                        <p className="h1">17</p>
                         <p className="h5"> Total Stocked product</p>
                     </div>
                     <div>
@@ -47,8 +50,8 @@ export default function Lists() {
                 </div>
                 <div className=" d-flex align-items-center justify-content-between rounded-3 shadow-lg blocks_cards" style={{ padding: "1rem", gap: "3rem" }}>
                     <div>
-                        <p className=" h1">{data?.platformCount[0]?.count}</p>
-                        <p className=" h5">{data?.platformCount[0]?._id}</p>
+                        <p className=" h1">32</p>
+                        <p className=" h5">Amazon</p>
                     </div>
                     <div>
                         <FaAmazon style={{ fontSize: "3rem" }} />
@@ -56,8 +59,8 @@ export default function Lists() {
                 </div>
                 <div className=" d-flex align-items-center justify-content-between rounded-3 shadow-lg blocks_cards" style={{ padding: "1rem", gap: "3rem" }}>
                     <div>
-                        <p className=" h1">{data?.platformCount[1]?.count}</p>
-                        <p className=" h5">{data?.platformCount[1]?._id}</p>
+                        <p className=" h1">23</p>
+                        <p className=" h5">Bol.com</p>
                     </div>
                     <div>
                         <CiTrophy style={{ fontSize: "3rem" }} />
@@ -111,26 +114,23 @@ export default function Lists() {
 
             </div>
 
-            <div className=' d-flex bottom_dashboard justify-content-center ' style={{ gap: "1rem", alignItems:"flex-start" }}>
-                <div className=' d-flex align-items-center justify-content-center p-2 charts_block1'>
-                    <Doughnut
-                        data={{
-                            labels: datas.map((item) => item.label),
-                            datasets: [
-                                {
-                                    label: "counts",
-                                    data: datas.map((item) => item.value),
-                                    backgroundColor: [
-                                        'rgb(255, 99, 132)',
-                                        'rgb(54, 162, 235)',
-                                        'rgb(255, 205, 86)'
-                                    ],
-                                }
-                            ]
-                        }}
+            <div className=' d-flex align-items-center justify-content-center p-2' style={{width:"100%", height:"70vh"}}>
+                <Line
+                    data={{
+                        labels: ['jan','feb','mar','apr','may','june','july','aug','sept'],
+                                datasets: [{
+                                  label: 'Webshop Revenue',
+                                  data: [0, 0, 20, 0, 0, 0, 0, 0, 50],
+                                  borderColor: 'rgb(75, 192, 192)',
+                                  tension: 0.5,
+                                }]
+                            }
+                    }
 
-                    />
-                </div>
+                />
+            </div>
+
+            <div className=' d-flex bottom_dashboard justify-content-center ' style={{ gap: "1rem", alignItems: "flex-start" }}>
                 <div className='d-flex justify-content-center flex-column p-2 charts_block'>
                     <h3> Recently Added product</h3>
 
@@ -144,7 +144,7 @@ export default function Lists() {
                         </thead>
                         <tbody>
                             {data?.data.map((product: any, index: number) => (
-                                <tr>
+                                <tr key={index}>
                                     <td>{index + 1}</td>
                                     <td>{product?.title}</td>
                                     <td>{product?.price}</td>
@@ -175,8 +175,50 @@ export default function Lists() {
 
                     </nav>
                 </div>
+                <div className='d-flex justify-content-center flex-column p-2 charts_block'>
+                    <h3> Recently Added Webshop</h3>
+
+                    <table className="table table-striped table-bordered table-hover">
+                        <thead className="thead-dark ">
+                            <tr className='bg-info'>
+                                <th>S.No</th>
+                                <th>Product</th>
+                                <th>Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {data?.data.map((product: any, index: number) => (
+                                <tr key={index}>
+                                    <td>{index + 1}</td>
+                                    <td>{product?.title}</td>
+                                    <td>{product?.price}</td>
+                                </tr>
+                            ))}
+
+                        </tbody>
+                    </table>
 
 
+                    <nav aria-label="Page navigation example" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "1rem", width: "100%" }}>
+
+                        <ul className="pagination">
+                            <li className="page-item">
+                                <a className="page-link" href="#" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            <li className="page-item"><a className="page-link" href="#">1</a></li>
+                            <li className="page-item">
+                                <a className="page-link" href="#" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+
+                        <p>Showing 1 to 2 of entries</p>
+
+                    </nav>
+                </div>
             </div>
         </>
     )

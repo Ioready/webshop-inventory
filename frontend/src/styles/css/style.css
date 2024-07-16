@@ -12,6 +12,16 @@
   box-shadow: 0px 0px 11px -3px;
 }
 
+.order_page_text{
+  padding: 2px 6px;
+  border-radius: 9px;
+}
+
+.order_page_text:hover{
+     background: #eaeaea;
+     transition:all 0.2s linear;
+}
+
 .blocks_cards {
   background-image: url("https://images.rawpixel.com/image_800/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIyLTA1L3RwMjU2LWJhY2tncm91bmQtMDgteC5qcGc.jpg");
   background-position: center;

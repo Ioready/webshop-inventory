@@ -3,6 +3,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { CiBarcode } from "react-icons/ci";
 import { Popconfirm } from 'antd';
 import { LiaProductHunt } from "react-icons/lia";
+import { IoPeople } from "react-icons/io5";
 import { FiPackage } from "react-icons/fi";
 import { FaCartFlatbed } from "react-icons/fa6";
 import { MainContext } from "../../../contexts/mainProvider";
@@ -47,6 +48,12 @@ export const Sidebar = () => {
       icon: <FaCartFlatbed />,
       label: "WEBSHOP PRODUCTS",
       value: "webshop-product",
+      isShow: true,
+    },
+    {
+      icon: <IoPeople />,
+      label: "Customers",
+      value: "customer",
       isShow: true,
     },
     // {

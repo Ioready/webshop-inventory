@@ -367,8 +367,8 @@ export default function Lists() {
   );
 
   return (
-    <>
-      <Breadcrumbs pageName="Products" />
+    <div className=" d-flex flex-column">
+      <Breadcrumbs pageName="Webshop Products" />
       <div className="headerRight">
         <Space>
           <Dropdown overlay={dropdownMenu}>
@@ -471,6 +471,6 @@ export default function Lists() {
           data={detail}
         />
       )}
-    </>
+    </div>
   );
 }

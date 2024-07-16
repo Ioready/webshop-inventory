@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Popup from './popup';  // Import the Popup component
 import { useNavigate } from 'react-router-dom';
+import Breadcrumbs from '../../components/Breadcrumbs';
 
 interface Order {
   id: string;
@@ -166,8 +167,9 @@ const OrderTable: React.FC = () => {
   }
 
   return (
+    <div className=' d-flex flex-column'>
+    <Breadcrumbs pageName="Orders" />
     <div className="container mt-4">
-      <h2>Orders</h2>
       {selectedOrders.length >0 && (<div className="d-flex justify-content-between align-items-center mb-3">
         <button
           className="btn btn-danger"
@@ -180,6 +182,13 @@ const OrderTable: React.FC = () => {
       </div>
       )
 }
+
+      <div className=' d-flex p-2 bg-white mb-4' style={{ gap:"0.5rem", border:"1px solid gray", borderRadius:"1rem"}}>
+        <p className=' text-black m-0 order_page_text' style={{cursor:"pointer"}}>All</p>
+        <p className=' text-black m-0 order_page_text' style={{cursor:"pointer"}}>Unpaid</p>
+        <p className=' text-black m-0 order_page_text' style={{cursor:"pointer"}}>Open</p>
+        <p className=' text-black m-0 order_page_text' style={{cursor:"pointer"}}>Newest</p>
+      </div>
       <div className="table-responsive">
         <table className="table table-striped table-bordered table-hover">
           <thead className="thead-dark">
@@ -257,6 +266,7 @@ const OrderTable: React.FC = () => {
         </ul>
         <p>Showing 1 to {orders.length} of {orders.length} entries</p>
       </nav>
+    </div>
     </div>
   );
 };
