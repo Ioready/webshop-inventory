@@ -3,6 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Popup from './popup';  // Import the Popup component
 import { useNavigate } from 'react-router-dom';
 import Breadcrumbs from '../../components/Breadcrumbs';
+import { CiSearch } from "react-icons/ci";
 
 interface Order {
   id: string;
@@ -168,105 +169,114 @@ const OrderTable: React.FC = () => {
 
   return (
     <div className=' d-flex flex-column'>
-    <Breadcrumbs pageName="Orders" />
-    <div className="container mt-4">
-      {selectedOrders.length >0 && (<div className="d-flex justify-content-between align-items-center mb-3">
-        <button
-          className="btn btn-danger"
-          onClick={handleDeleteSelected}
-          disabled={selectedOrders.length === 0}
-        >
-          Delete Selected
-        </button>
-        
-      </div>
-      )
-}
+      <Breadcrumbs pageName="Orders" />
+      <div className="container mt-4">
+        {selectedOrders.length > 0 && (<div className="d-flex justify-content-between align-items-center mb-3">
+          <button
+            className="btn btn-danger"
+            onClick={handleDeleteSelected}
+            disabled={selectedOrders.length === 0}
+          >
+            Delete Selected
+          </button>
 
-      <div className=' d-flex p-2 bg-white mb-4' style={{ gap:"0.5rem", border:"1px solid gray", borderRadius:"1rem"}}>
-        <p className=' text-black m-0 order_page_text' style={{cursor:"pointer"}}>All</p>
-        <p className=' text-black m-0 order_page_text' style={{cursor:"pointer"}}>Unpaid</p>
-        <p className=' text-black m-0 order_page_text' style={{cursor:"pointer"}}>Open</p>
-        <p className=' text-black m-0 order_page_text' style={{cursor:"pointer"}}>Newest</p>
-      </div>
-      <div className="table-responsive">
-        <table className="table table-striped table-bordered table-hover">
-          <thead className="thead-dark">
-            <tr>
-              <th>
-                <input
-                  type="checkbox"
-                  checked={selectedOrders.length === orders.length}
-                  onChange={handleSelectAll}
-                />
-              </th>
-              <th>Order</th>
-              <th>Date</th>
-              <th>Customer</th>
-              <th>Channel</th>
-              <th>Total</th>
-              <th>Payment Status</th>
-              <th>Fulfillment Status</th>
-              <th>Items</th>
-              <th>Delivery Status</th>
-              <th>Delivery Method</th>
-              <th>Tags</th>
-            </tr>
-          </thead>
-          <tbody>
-            {orders.map(order => (
-              <tr key={order.id}>
-                <td>
+        </div>
+        )
+        }
+
+        <div className=' d-flex justify-content-between align-items-center mb-4 order_upper_block'>
+          <div className=' d-flex p-2 bg-white' style={{ gap: "0.5rem", border: "1px solid gray", borderRadius: "1rem" }}>
+            <p className=' text-black m-0 order_page_text' style={{ cursor: "pointer" }}>All</p>
+            <p className=' text-black m-0 order_page_text' style={{ cursor: "pointer" }}>Unpaid</p>
+            <p className=' text-black m-0 order_page_text' style={{ cursor: "pointer" }}>Open</p>
+            <p className=' text-black m-0 order_page_text' style={{ cursor: "pointer" }}>Newest</p>
+          </div>
+
+          <div className="input-group p-1 rounded w-50" style={{position:"relative"}}>
+            <input type="search" className="form-control rounded-5" placeholder="Search" aria-label="Search" aria-describedby="search-addon" style={{border: "1px solid gray"}}/>
+            <span className="input-group-text border-0" id="search-addon" style={{position:"absolute", right:"1rem", top:"0.7rem"}}>
+              <CiSearch style={{fontSize:"1.5rem"}}/>
+            </span>
+          </div>
+        </div>
+        <div className="table-responsive">
+          <table className="table table-striped table-bordered table-hover">
+            <thead className="thead-dark">
+              <tr>
+                <th>
                   <input
                     type="checkbox"
-                    checked={selectedOrders.includes(order.id)}
-                    onChange={() => handleCheckboxChange(order.id)}
+                    checked={selectedOrders.length === orders.length}
+                    onChange={handleSelectAll}
                   />
-                </td>
-                <td className="text-nowrap" onClick={handleviewallpage} style={{cursor:"pointer"}}>{order.id}</td>
-                <td className="text-nowrap" onClick={handleviewallpage} style={{cursor:"pointer"}}>{order.date}</td>
-                <td className="text-nowrap">
-                  <span onClick={() => handleCustomerClick(order.customer)} style={{ cursor: 'pointer', color: 'blue' }}>
-                    {order.customer}
-                  </span>
-                </td>
-                <td className="text-nowrap" onClick={handleviewallpage} style={{cursor:"pointer"}}>{order.channel}</td>
-                <td className="text-nowrap" onClick={handleviewallpage} style={{cursor:"pointer"}}>{order.total}</td>
-                <td className="text-nowrap" onClick={handleviewallpage} style={{cursor:"pointer"}}>{order.paymentStatus}</td>
-                <td className="text-nowrap" onClick={handleviewallpage} style={{cursor:"pointer"}}>{order.fulfillmentStatus}</td>
-                <td className="text-nowrap" onClick={handleviewallpage} style={{cursor:"pointer"}}>{order.items}</td>
-                <td className="text-nowrap" onClick={handleviewallpage} style={{cursor:"pointer"}}>{order.deliveryStatus}</td>
-                <td className="text-nowrap" onClick={handleviewallpage} style={{cursor:"pointer"}}>{order.deliveryMethod}</td>
-                <td className="text-nowrap" onClick={handleviewallpage} style={{cursor:"pointer"}}>{order.tags}</td>
+                </th>
+                <th>Order</th>
+                <th>Date</th>
+                <th>Customer</th>
+                <th>Channel</th>
+                <th>Total</th>
+                <th>Payment Status</th>
+                <th>Fulfillment Status</th>
+                <th>Items</th>
+                <th>Delivery Status</th>
+                <th>Delivery Method</th>
+                <th>Tags</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {orders.map(order => (
+                <tr key={order.id}>
+                  <td>
+                    <input
+                      type="checkbox"
+                      checked={selectedOrders.includes(order.id)}
+                      onChange={() => handleCheckboxChange(order.id)}
+                    />
+                  </td>
+                  <td className="text-nowrap" onClick={handleviewallpage} style={{ cursor: "pointer" }}>{order.id}</td>
+                  <td className="text-nowrap" onClick={handleviewallpage} style={{ cursor: "pointer" }}>{order.date}</td>
+                  <td className="text-nowrap">
+                    <span onClick={() => handleCustomerClick(order.customer)} style={{ cursor: 'pointer', color: 'blue' }}>
+                      {order.customer}
+                    </span>
+                  </td>
+                  <td className="text-nowrap" onClick={handleviewallpage} style={{ cursor: "pointer" }}>{order.channel}</td>
+                  <td className="text-nowrap" onClick={handleviewallpage} style={{ cursor: "pointer" }}>{order.total}</td>
+                  <td className="text-nowrap" onClick={handleviewallpage} style={{ cursor: "pointer" }}>{order.paymentStatus}</td>
+                  <td className="text-nowrap" onClick={handleviewallpage} style={{ cursor: "pointer" }}>{order.fulfillmentStatus}</td>
+                  <td className="text-nowrap" onClick={handleviewallpage} style={{ cursor: "pointer" }}>{order.items}</td>
+                  <td className="text-nowrap" onClick={handleviewallpage} style={{ cursor: "pointer" }}>{order.deliveryStatus}</td>
+                  <td className="text-nowrap" onClick={handleviewallpage} style={{ cursor: "pointer" }}>{order.deliveryMethod}</td>
+                  <td className="text-nowrap" onClick={handleviewallpage} style={{ cursor: "pointer" }}>{order.tags}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {popupCustomer && (
+          <Popup customer={popupCustomer} onClose={closePopup} />
+        )}
+        <nav aria-label="Page navigation example" className="d-flex justify-content-between align-items-center">
+          <ul className="pagination">
+            <li className="page-item">
+              <a className="page-link" href="#" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+              </a>
+            </li>
+            <li className="page-item">
+              <a className="page-link" href="#">
+                1
+              </a>
+            </li>
+            <li className="page-item">
+              <a className="page-link" href="#" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+              </a>
+            </li>
+          </ul>
+          <p>Showing 1 to {orders.length} of {orders.length} entries</p>
+        </nav>
       </div>
-      {popupCustomer && (
-        <Popup customer={popupCustomer} onClose={closePopup} />
-      )}
-      <nav aria-label="Page navigation example" className="d-flex justify-content-between align-items-center">
-        <ul className="pagination">
-          <li className="page-item">
-            <a className="page-link" href="#" aria-label="Previous">
-              <span aria-hidden="true">&laquo;</span>
-            </a>
-          </li>
-          <li className="page-item">
-            <a className="page-link" href="#">
-              1
-            </a>
-          </li>
-          <li className="page-item">
-            <a className="page-link" href="#" aria-label="Next">
-              <span aria-hidden="true">&raquo;</span>
-            </a>
-          </li>
-        </ul>
-        <p>Showing 1 to {orders.length} of {orders.length} entries</p>
-      </nav>
-    </div>
     </div>
   );
 };
