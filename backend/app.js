@@ -5,7 +5,7 @@ import morgan from "morgan";
 import userRout from "./routes/user.js";
 import connectDB from "./config/db.js";
 // import {data} from "./8pyff-qme8y.js";
-// import Product from "./models/product.js";
+// import webshopUser from "./models/webshopUser.js";
 
 const app = express()
 dotenv.config() 

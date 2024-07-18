@@ -30,6 +30,7 @@ import {
 import { CSVLink } from "react-csv";
 import axios from "axios";
 import Papa from 'papaparse';
+import { usePostToWebshop } from "../../contexts/usePostToWebshop";
 
 const resource = "products";
 
@@ -37,11 +38,11 @@ export default function Lists() {
   const [detail, setDetail] = useState<any>(null);
   const [search, setSearch] = useState<any>(null);
   const { create, data: file, loading: loadingFile } = usePostFile();
-  const [query, setQuery] = useState({ skip: 0, take: 10, search: "", filterKey: "Filter Options" });
+  const [query, setQuery] = useState({ skip: 0, take: 10, search: "", filterKey: "Filter Options"});
   const { fetch, data, loading } = useFetchByLoad();
   const { edit, data: patchData, loading: patchLoading } = usePatch();
   const { remove, loading: deleteLoading } = useDelete(); // Updated this line
-
+  const { update, data:webShopData, loading:webShopLoading } = usePostToWebshop();
   const [selectedRowKeys, setSelectedRowKeys] = useState<any[]>([]);
   console.log("patchData", patchData);
 
@@ -132,7 +133,6 @@ export default function Lists() {
         minSellingPrice = parseFloat((((purchasePrice * 1.42353) + 8.38459) - 5.53).toFixed(2));
       }
     }
-    console.log('minSellingPrice', data);
     return minSellingPrice;
   };
 
@@ -218,6 +218,25 @@ export default function Lists() {
     });
   };
 
+  const handlePostToWebshop =()=>{
+    Modal.confirm({
+      title: "Confirm To Webshop",
+      icon: <ExclamationCircleOutlined />,
+      content: "Are you sure you want to post the selected products?",
+      okText: "Yes",
+      cancelText: "No",
+      onOk: async () => {
+        try {
+          update(`${resource}/update-webshop-status`, { productIds: selectedRowKeys ,isWebshopProduct:true})
+          message.success("Selected products post successfully");
+          // refreshData();
+        } catch (error) {
+          console.error("Error posting products:", error);
+          message.error("Error posting products");
+        }
+      },
+    });
+  }
   const rowSelection = {
     selectedRowKeys,
     onChange: (selectedKeys: any[]) => { setSelectedRowKeys(selectedKeys) },
@@ -379,7 +398,7 @@ export default function Lists() {
             </Button>
 
            <Button
-            onClick={handleDeleteSelected}
+            onClick={handlePostToWebshop}
             style={{backgroundColor:"#1677ff",  color:"white"}}
             >
              Post To Webshop

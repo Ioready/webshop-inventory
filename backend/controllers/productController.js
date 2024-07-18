@@ -2,7 +2,20 @@ import csvtojson from "csvtojson";
 import Product from "../models/product.js";
 
 export const products = {
+  markWebshopProduct :async (req, res) => {
+    try {
+      const { productIds, isWebshopProduct } = req.body;
 
+      const result = await Product.updateMany(
+        { _id: { $in: productIds } },
+        { $set: { isWebshopProduct } }
+      );
+      res.status(200).json({ message: 'Products marked as Webshop product', result });
+    } catch (error) {
+      res.status(500).json({ message: 'Server error', error });
+    }
+  },
+  
   
  createProduct : async (req, res) => {
     try {
@@ -55,7 +68,7 @@ export const products = {
   
   getProducts: async (req, res) => {
     try {
-      let { skip, take, search,filterKey } = req.query;
+      let { skip, take, search,filterKey,isWebshopProduct } = req.query;
       skip = parseInt(skip);
       take = parseInt(take);
       const myFieldDataExists = await Product.exists({ myField: { $exists: true, $ne: null } });
@@ -91,6 +104,11 @@ export const products = {
       if (filterKey) {
         query[filterKey] = { $exists: false };
       }
+
+      if (isWebshopProduct === 'true' || isWebshopProduct === 'false') {
+        query.isWebshopProduct = (isWebshopProduct === 'true');
+      }
+
       const products = await Product.find(query).skip(skip).limit(take);
       const platformCount = await Product.aggregate([
         {

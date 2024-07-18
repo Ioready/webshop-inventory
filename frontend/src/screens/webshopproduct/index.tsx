@@ -5,16 +5,14 @@ import {
   Table,
   Space,
   Input,
-  Tag,
   Button,
   Dropdown,
   Avatar,
   Menu,
-  Upload,
   message,
   Modal,
 } from "antd";
-import { LoadingOutlined, PlusOutlined, DownOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
+import {DownOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
 import { LiaProductHunt } from "react-icons/lia";
 import { usePostFile, useFetchByLoad, usePatch, useDelete } from "../../contexts";
 import { CiMenuKebab } from "react-icons/ci";
@@ -28,95 +26,51 @@ import {
   ViewDataDrawer,
 } from "../../components/Forms";
 import { CSVLink } from "react-csv";
-import axios from "axios";
-import Papa from 'papaparse';
+
 
 const resource = "products";
 
-const sampleProducts = [
-  {
-    id: '1',
-    title: 'Product A',
-    ean: '1234567890123',
-    price: 100,
-    stores: [{ quantity: 10 }],
-    supplierRef: 'SUPP001',
-    minSellingPrice: 150,
-    platform: 'platform1',
-    status: 'active',
-    images: ['https://via.placeholder.com/50']
-  },
-  {
-    id: '2',
-    title: 'Product B',
-    ean: '2345678901234',
-    price: 200,
-    stores: [{ quantity: 20 }],
-    supplierRef: 'SUPP002',
-    minSellingPrice: 250,
-    platform: 'platform2',
-    status: 'inactive',
-    images: ['https://via.placeholder.com/50']
-  },
-  {
-    id: '3',
-    title: 'Product C',
-    ean: '3456789012345',
-    price: 300,
-    stores: [{ quantity: 30 }],
-    supplierRef: 'SUPP003',
-    minSellingPrice: 350,
-    platform: 'platform3',
-    status: 'active',
-    images: ['https://via.placeholder.com/50']
-  },
-];
 
 export default function Lists() {
   const [detail, setDetail] = useState<any>(null);
   const [search, setSearch] = useState<any>(null);
   const { create, data: file, loading: loadingFile } = usePostFile();
-  const [query, setQuery] = useState({ skip: 0, take: 10, search: "", filterKey: "Filter Options" });
+  const [query, setQuery] = useState({ skip: 0, take: 10, search: "", filterKey: "Filter Options",isWebshopProduct:"true" });
   const { fetch, data, loading } = useFetchByLoad();
   const { edit, data: patchData, loading: patchLoading } = usePatch();
   const { remove, loading: deleteLoading } = useDelete();
 
   const [selectedRowKeys, setSelectedRowKeys] = useState<any[]>([]);
 
-  const [products, setProducts] = useState(sampleProducts);
+
+  useEffect(() => {
+    fetch({ url: resource, query: JSON.stringify(query) })
+      .then(() => {
+        if (data?.data) {
+          // Log the product data and IDs
+          console.log("Fetched Product Data:", data.data);
+          data.data.forEach((item: any) => {
+            console.log("Product ID:", item.id);
+          });
+        }
+      });
+  }, [query, file]);
 
   const refreshData = () => {
+    fetch({ url: resource, query: JSON.stringify(query) })
+      .then(() => {
+        if (data?.data) {
+          // Log the product data and IDs
+          console.log("Fetched Product Data (refresh):", data.data);
+          data.data.forEach((item: any) => {
+            console.log("Product ID (refresh):", item.id);
+          });
+        }
+      });
     setDetail(null);
     setSelectedRowKeys([]);
   };
 
-  const [loadingFiles, setLoadingFiles] = useState(false);
-
-  const handleFileUpload = ({ file }: any) => {
-    setLoadingFiles(true);
-
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      const text = e.target?.result;
-      if (typeof text === "string") {
-        Papa.parse(text, {
-          header: true,
-          complete: async (results: any) => {
-            let csvData = results.data;
-            csvData = csvData?.filter((data: any) => data.ean);
-            console.log("Parsed CSV Data:", csvData);
-            await updateProducts(csvData);
-            setLoadingFiles(false);
-          },
-          error: (error: any) => {
-            console.error("Error parsing CSV:", error);
-            setLoadingFiles(false);
-          },
-        });
-      }
-    };
-    reader.readAsText(file);
-  };
 
   const updateProducts = async (csvData: any) => {
     const url = `/${resource}/csv`;
@@ -168,7 +122,7 @@ export default function Lists() {
   const [csvData, setCsvData] = useState([]);
 
   const downloadCsv = () => {
-    const stockData = products.filter((item: any) => item.stores.length > 0);
+    const stockData = data?.data.filter((item: any) => item.stores.length > 0);
     if (stockData.length > 0) {
       const csvDataFormatted = stockData.map((item: any) => {
         const storeInfo = item.stores.map((store: any) => {
@@ -215,7 +169,7 @@ export default function Lists() {
       cancelText: "No",
       onOk: async () => {
         try {
-          setProducts(products.filter(product => !selectedRowKeys.includes(product.id)));
+          remove(`${resource}`, { _id: selectedRowKeys })
           message.success("Selected products deleted successfully");
           refreshData();
         } catch (error) {
@@ -226,12 +180,12 @@ export default function Lists() {
     });
   };
 
-  const handleStatusChange = (record: any, key: string) => {
-    setProducts(products.map(product =>
-      product.id === record.id ? { ...product, status: key } : product
-    ));
-    message.success(`Product status changed to ${key}`);
-  };
+  // const handleStatusChange = (record: any, key: string) => {
+  //   setProducts(products.map(product =>
+  //     product.id === record.id ? { ...product, status: key } : product
+  //   ));
+  //   message.success(`Product status changed to ${key}`);
+  // };
 
   const rowSelection = {
     selectedRowKeys,
@@ -293,9 +247,17 @@ export default function Lists() {
       render: (text: any, record: any) => (
         <Dropdown
           overlay={
-            <Menu onClick={({ key }) => handleStatusChange(record, key)}>
-              <Menu.Item key="active">Active</Menu.Item>
-              <Menu.Item key="inactive">Inactive</Menu.Item>
+            <Menu
+            //  onClick={({ key }) => handleStatusChange(record, key)}
+             >
+               <Menu.Item key="3">
+                <Button
+                  type="link"
+                  onClick={() => setDetail({ ...record, active: true })}
+                >
+                  {record.status ? "INACTIVE" : "ACTIVE"}
+                </Button>
+              </Menu.Item>
             </Menu>
           }
         >
@@ -419,14 +381,14 @@ export default function Lists() {
         rowSelection={rowSelection}
         className="mainTable"
         loading={loading}
-        dataSource={products.map((item: any) => ({
+        dataSource={data?.data.map((item: any) => ({
           ...item,
-          key: item.id,
-        }))}
+          key: item._id,
+        })) ?? []}
         columns={columns}
         pagination={{
           showQuickJumper: true,
-          total: products.length,
+          total: data?.data.length,
           onChange: (page, pageSize) => {
             setQuery({ ...query, skip: (page - 1) * pageSize, take: pageSize });
           },

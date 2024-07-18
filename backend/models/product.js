@@ -22,6 +22,7 @@ const ProductSchema = new Schema(
     description: String,
     images: [String],
     totalStock:String,
+    isWebshopProduct:Boolean,
     tags: String,
     weight: Number,
     taxValue: Number,
