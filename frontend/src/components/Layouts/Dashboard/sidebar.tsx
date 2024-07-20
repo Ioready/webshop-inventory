@@ -10,9 +10,11 @@ import { MainContext } from "../../../contexts/mainProvider";
 import { IoIosSettings } from "react-icons/io";
 import { FaRegUserCircle } from "react-icons/fa";
 import { MdDashboard } from "react-icons/md";
+import { FaClipboardList } from "react-icons/fa";
 import { FaShoppingCart } from "react-icons/fa";
 import { FaProductHunt } from "react-icons/fa";
 import { MdDocumentScanner } from "react-icons/md";
+import { MdDashboardCustomize } from "react-icons/md";
 
 
 export const Sidebar = () => {
@@ -56,6 +58,18 @@ export const Sidebar = () => {
       value: "customer",
       isShow: true,
     },
+    {
+      icon: <FaClipboardList />,
+      label: "Enqury",
+      value: "enqury",
+      isShow: true,
+    },
+    {
+      icon: <MdDashboardCustomize />,
+      label: "Content Management",
+      value: "cms",
+      isShow: true,
+    },
     // {
     //   icon: <FaShoppingCart />,
     //   label: "Sales Return",
@@ -73,7 +87,7 @@ export const Sidebar = () => {
         <span>{labels.sitename}</span>
       </div>
 
-      <div className="admin-nav scrollbar-inner">
+      <div className="admin-nav scrollbar-inner overflow-hide overflow-y-auto">
         <ul>
           {menuItems.map((item: any, key: any) => {
             if (item.isShow) {

@@ -5066,9 +5066,22 @@ select {
   content: "\f106";
 }
 
+.cms_cards{
+  transition: all 0.3s linear;
+}
+
+.cms_cards:hover{
+  transform: scale(1.04);
+}
+
 .admin-nav {
   max-height: calc(100vh - 128px);
   height: 100%;
+  overflow: scroll;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .admin-nav ul {
