@@ -42,7 +42,7 @@ export default function Lists() {
                 <div className=" d-flex align-items-center justify-content-between rounded-3 shadow-lg blocks_cards" style={{ padding: "1rem", gap: "3rem" }}>
                     <div>
                         <p className="h1">17</p>
-                        <p className="h5"> Total Stocked product</p>
+                        <p className="h5"> Total Inventory Stock</p>
                     </div>
                     <div>
                         <CiShoppingCart style={{ fontSize: "3rem" }} />
@@ -69,7 +69,7 @@ export default function Lists() {
                 <div className=" d-flex align-items-center justify-content-between rounded-3 shadow-lg blocks_cards" style={{ padding: "1rem", gap: "3rem" }}>
                     <div>
                         <p className=" h1">17</p>
-                        <p className=" h5">Demo</p>
+                        <p className=" h5">Total Product Webshop</p>
                     </div>
                     <div>
                         <LuUsers2 style={{ fontSize: "3rem" }} />
@@ -78,7 +78,7 @@ export default function Lists() {
                 <div className=" d-flex align-items-center justify-content-between rounded-3 shadow-lg blocks_cards" style={{ padding: "1rem", gap: "1rem" }}>
                     <div>
                         <p className=" h1">17</p>
-                        <p className=" h5">Demo</p>
+                        <p className=" h5">Total Order</p>
                     </div>
                     <div>
                         <FiUserCheck style={{ fontSize: "3rem" }} />
@@ -87,7 +87,7 @@ export default function Lists() {
                 <div className=" d-flex align-items-center justify-content-between rounded-3 shadow-lg blocks_cards" style={{ padding: "1rem", gap: "1rem" }}>
                     <div>
                         <p className=" h1">17</p>
-                        <p className=" h5">Demo</p>
+                        <p className=" h5">Total Customers</p>
                     </div>
                     <div>
                         <LuUsers2 style={{ fontSize: "3rem" }} />
@@ -96,7 +96,7 @@ export default function Lists() {
                 <div className=" d-flex align-items-center justify-content-between rounded-3 shadow-lg blocks_cards" style={{ padding: "1rem", gap: "1rem" }}>
                     <div>
                         <p className=" h1">17</p>
-                        <p className=" h5">Demo</p>
+                        <p className=" h5">Total Earning</p>
                     </div>
                     <div>
                         <LuUsers2 style={{ fontSize: "3rem" }} />
@@ -130,7 +130,7 @@ export default function Lists() {
                 />
             </div>
 
-            <div className=' d-flex bottom_dashboard justify-content-center ' style={{ gap: "1rem", alignItems: "flex-start" }}>
+            {/* <div className=' d-flex bottom_dashboard justify-content-center ' style={{ gap: "1rem", alignItems: "flex-start" }}>
                 <div className='d-flex justify-content-center flex-column p-2 charts_block'>
                     <h3> Recently Added product</h3>
 
@@ -219,7 +219,7 @@ export default function Lists() {
 
                     </nav>
                 </div>
-            </div>
+            </div> */}
         </>
     )
 }
