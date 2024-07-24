@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 export const auth = {
   genrateToken: (id) => {
     const token = jwt.sign({ id: id }, process.env.AUTH_SECRET, {
-      expiresIn: "1d",
+      expiresIn: "2min",
     });
     return token;
   },
@@ -22,7 +22,7 @@ export const auth = {
     } catch (error) {
       console.log(error);
       return res
-        .status(404)
+        .status(401)
         .json({ message: "Authentication failed: invalid Login..." });
     }
   },
