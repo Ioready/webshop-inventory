@@ -46,6 +46,7 @@ const Herosection: React.FC = () => {
 
   return (
     <div className="container mt-4">
+      <h3 className=' my-2'>Herosection</h3>
       <form onSubmit={handleSubmit}>
         {sections.map(section => (
           <div className='row mb-4 d-flex justify-content-between align-items-center' key={section.id} style={{gap:"1rem"}}>
