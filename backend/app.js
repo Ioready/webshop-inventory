@@ -4,14 +4,13 @@ import cors from "cors"
 import morgan from "morgan";
 import userRout from "./routes/user.js";
 import connectDB from "./config/db.js";
-// import {data} from "./8pyff-qme8y.js";
-// import webshopUser from "./models/webshopUser.js";
-
+import Product from "./models/product.js";
+import {data} from "./csv.js";
 const app = express()
 dotenv.config() 
 
 // const callback = async () => {
-//     try {
+//     try { 
 //       // Find products where the supplier is in the list and the stores array exists and is not empty
 //       const productsWithStores = await Product.aggregate([
 //         {
@@ -84,10 +83,93 @@ dotenv.config()
 //       console.error('Error deleting products:', error);
 //     }
 //   };
+// const calculateTotalQuantity = (data) => {
+//     let totalQuantity = 0;
+//     if (data) {
+//       for (const item of data) {
+//         const qty = parseInt(item.qty) || 0;
+//         const laps = parseInt(item.laps) || 0;
+//         totalQuantity += qty - laps;
+//       }
+//     }
+//     return totalQuantity;
+//   };
 
 
+//  async function updateTotalStock() {
+//   try {
+//     // Fetch all products
+//     const products = await Product.find();
+
+//     // Iterate over each product and calculate totalStock
+//     for (const product of products) {
+//       product.totalStock = calculateTotalQuantity(product.stores); // Adjust based on your fields
+      
+//       // Log the product before saving
+//       console.log('Updating product:', product._id, 'with totalStock:', product.totalStock);
+      
+//       // Ensure purchasePrice is a number before saving
+//       product.purchasePrice = product.purchasePrice || 0;
+      
+//       try {
+//         await product.save();
+//       } catch (saveError) {
+//         console.error('Error saving product:', product._id, saveError);
+//       }
+//     }
+
+//     console.log('Total stock updated successfully for all products');
+//   } catch (error) {
+//     console.error('Error updating total stock:', error);
+//   }
+// }
+  
+//   const connectDB = async (callback) => {
+//     try {
+//       await mongoose.connect(process.env.DATABASE_URL, {
+//         useNewUrlParser: true,
+//         useUnifiedTopology: true,
+//       });
+//       console.log("DB connected");
+//       callback();
+//     } catch (error) {
+//       console.log("DB connection error", error);
+//     }
+//   };
+
+// Call the function
+// updateTotalStock();
+
+
+// connectDB(updateTotalStock);
+
+// const callback = async () => {
+//     try {
+//       // Iterate over each correction entry
+//       for (const correction of data) {
+//         const { "current ean": currentEan, "correct ean": correctEan, "correct scancode": correctScancode } = correction;
+  
+//         // Update the document where ean matches current ean
+//         await Product.updateMany(
+//           { ean: currentEan },
+//           {
+//             $set: {
+//               ean: correctEan,
+//               scanCode: correctScancode
+//             }
+//           }
+//         );
+//       }
+  
+//       console.log("Products updated successfully");
+  
+//     } catch (error) {
+//       console.error("Error:", error);
+//     }
+//   };
+// connectDB(callback);
 connectDB();
-const port = process.env.PORT 
+const port = process.env.PORT
 
 app.use(express.json({limit : "10mb"}))
 app.use(cors())
@@ -96,4 +178,4 @@ app.use('/',userRout);
 
 app.listen(port,'0.0.0.0', ()=>{
     console.log(`server connected ${port}`);
-})
+}) 

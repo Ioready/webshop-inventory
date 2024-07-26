@@ -1,9 +1,7 @@
 //imports packages
 import mongoose from "mongoose";
-
 import { genPass } from "../config/bcript.js";
 import { auth } from "../middlewares/auth.js";
-
 const { password, compairePass } = genPass;
 const { genrateToken } = auth;
 

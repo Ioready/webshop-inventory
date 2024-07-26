@@ -2,6 +2,7 @@
 import { genPass } from "../config/bcript.js";
 import User from "../models/user.js";
 import webshopUser from "../models/webshopUser.js";
+import bcrypt from "bcryptjs"
 
 export const user = {
   // user Login
@@ -55,13 +56,13 @@ export const user = {
   },
   webshopRegister : async(req,res)=>{
     try{
-        const {title,firstName,lastName,email,password,offers,privacy,newsletter} = req.body;
-        const newPassword = await genPass.password(password)
-        const exists = await webshopUser.find({email})
+        const {firstName,lastName,email,password} = req.body;
+        const exists =  await webshopUser.find({email})
         if(exists.length>0){
             res.status(400).send({message:"emailId already exists"})
         }else{
-                const user = await webshopUser.create({firstName,lastName,title,email,password:newPassword,offers,privacy,newsletter})
+          const newPassword = await bcrypt.hash(password,10)
+                const user = await webshopUser.create({firstName,lastName,email,password:newPassword})
                 await user.save()
                 res.status(200).send(user)  
         }
@@ -74,7 +75,7 @@ export const user = {
       const { email, password } = req.body;
       const user = await webshopUser.findOne({ email }).select("+password");
       if (user) {
-        const isMatch = await user.comparePassword(password);
+        const isMatch = await bcrypt.compare(password,user.password)
         if (isMatch) {
           if (user.isEmailVerified) {
             user.password = undefined;

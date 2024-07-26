@@ -1,18 +1,12 @@
-//imports packages
 import mongoose from "mongoose";
-import bcrypt from 'bcrypt';
 import { genPass } from "../config/bcript.js";
 import { auth } from "../middlewares/auth.js";
-
-const { password, comparePass } = genPass;
+const { password, compairePass } = genPass;
 const { genrateToken } = auth;
 
 const { Schema, ObjectId } = mongoose;
 
 const webshopUserSchema = new Schema({
-  title:{
-    type:String,
-    },
   firstName: {
     type: String,
   },
@@ -30,50 +24,23 @@ const webshopUserSchema = new Schema({
     type:Boolean,
     default:true,
   },
-  offers:{
-    type:Boolean,
-    default:false,
-  },
-  privacy:{
-    type:Boolean,
-    default:false,
-  },
-  newsletter:{
-    type:Boolean,
-    default:false,
-  }
+ 
 },{timestamps:true});
-//cnvrtPass
-// webshopUserSchema.pre("save", async function () {
-//   const newPassword = await password(this.password);
-//   this.password = newPassword;
-// });
-// //compare password
-// webshopUserSchema.methods.comparePassword = async function (password) {
-//   const isMatch = await compairePass(password, this.password);
-//   return isMatch;
-// };
-// //jwtToken
-// webshopUserSchema.methods.creatJwt = async function () {
-//   const token = await genrateToken(this._id);
-//   return token;
-// };
 
-
-webshopUserSchema.pre("save", async function (next) {
-    if (!this.isModified("password")) return next();
-    this.password = await bcrypt.hash(this.password, 10);
-    next();
-  });
-  
+  // webshopUserSchema.pre("save", async function () {
+  //   const newPassword = await password(this.password);
+  //   this.password = newPassword;
+  // });
   // Compare password
-  webshopUserSchema.methods.comparePassword = function (password) {
-    return bcrypt.compare(password, this.password);
-  };
+  // webshopUserSchema.newPasswordmethods.comparePassword = async function (password) {
+  //   console.log('password',password,this.password, await compairePass(password, this.password));
+  //   return await compairePass(password, this.password);
+  // };
   
   // Generate JWT
-  webshopUserSchema.methods.createJwt = function () {
-    return auth.generateToken(this._id); // assuming auth.generateToken creates JWT
+  webshopUserSchema.methods.creatJwt = async function () {
+    const token = await genrateToken(this._id);
+    return token;
   };
 const webshopUser = mongoose.model("webshopUser", webshopUserSchema, "webshopUser");
 

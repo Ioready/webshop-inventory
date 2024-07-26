@@ -11,13 +11,3 @@ export const genPass = {
         return isMatch
     }
 }
-
-// export const genPass = {
-//     password: async (plainPassword) => {
-//       const salt = await bcrypt.genSalt(10);
-//       return await bcrypt.hash(plainPassword, salt);
-//     },
-//     comparePass: async (plainPassword, hashedPassword) => {
-//       return await bcrypt.compare(plainPassword, hashedPassword);
-//     },
-//   };
