@@ -40,15 +40,20 @@ const CMS: React.FC = () => {
               <p className=' m-0 p-l10'>Header</p>
             </Link>
 
-            <div className=' d-flex align-items-center text-white px-3 py-1  rounded-4 bg-danger cms_cards' style={{fontSize:"xxx-large", cursor:"pointer"}}>
+            <Link to="/cms/top-product" className=' d-flex align-items-center text-white px-3 py-1  rounded-4 bg-danger cms_cards' style={{fontSize:"xxx-large", cursor:"pointer"}}>
               <AiOutlineFileProtect/>
               <p className=' m-0 p-l10'>Top Product</p>
-            </div>
+            </Link>
 
-            <div className=' d-flex align-items-center text-white px-3 py-1  rounded-4 bg-info cms_cards' style={{fontSize:"xxx-large", cursor:"pointer"}}>
+            <Link to="/cms/best-product" className=' d-flex align-items-center text-white px-3 py-1  rounded-4 bg-info cms_cards' style={{fontSize:"xxx-large", cursor:"pointer"}}>
+              <AiOutlineFileProtect/>
+              <p className=' m-0 p-l10'>Best Selling Product</p>
+            </Link>
+
+            <Link to="/cms/top-category" className=' d-flex align-items-center text-white px-3 py-1  rounded-4 bg-info cms_cards' style={{fontSize:"xxx-large", cursor:"pointer"}}>
               <TbDeviceDesktopShare/>
               <p className=' m-0 p-l10'>Top Category</p>
-            </div>
+            </Link>
 
             <Link to='/cms/review' className=' d-flex align-items-center text-white px-3 py-1  rounded-4 bg-secondary cms_cards' style={{fontSize:"xxx-large", cursor:"pointer"}}>
               <MdOutlineRateReview/>

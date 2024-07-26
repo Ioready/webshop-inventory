@@ -57,15 +57,7 @@ const Footer: React.FC = () => {
             />
           </label>
         </div>
-        <div className="col-12 mb-3">
-          <label className="form-label">Email :</label>
-          <input 
-            type="email" 
-            className="form-control" 
-            value={email} 
-            onChange={(e) => setEmail(e.target.value)} 
-          />
-        </div>
+
         <div className="col-12 mb-3">
           <label className="form-label">Content:</label>
           <input 
@@ -75,15 +67,7 @@ const Footer: React.FC = () => {
             onChange={(e) => setContent(e.target.value)} 
           />
         </div>
-        <div className="col-12 mb-3">
-          <label className="form-label">Phone :</label>
-          <input 
-            type="text" 
-            className="form-control" 
-            value={phone} 
-            onChange={(e) => setPhone(e.target.value)} 
-          />
-        </div>
+
         <div className="col-12 mb-3">
           <label className="form-label">Address :</label>
           <input 
@@ -93,12 +77,24 @@ const Footer: React.FC = () => {
         </div>
 
         <div className="col-12 mb-3">
-          <label className="form-label">Tax :</label>
+          <label className="form-label">Tax Information :</label>
           <input 
             type="text" 
             className="form-control" 
           />
         </div>
+
+        
+        <div className="col-12 mb-3">
+          <label className="form-label">Newsletter Content :</label>
+          <input 
+            type="text" 
+            className="form-control" 
+          />
+        </div>
+        
+
+        
         <div className="col-12 my-2">
           <button type="submit" className="btn btn-primary">
             Save
