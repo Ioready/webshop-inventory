@@ -5,6 +5,7 @@ import { useFetch } from "../../contexts";
 import { FaUser, FaPhoneAlt } from "react-icons/fa";
 import { MdEmail, MdOutlineSubtitles } from "react-icons/md";
 import { useState } from "react";
+import Select from 'react-select';
 
 const initialData = {
     title: "",
@@ -13,8 +14,8 @@ const initialData = {
     sku: "",
     language: "nl_NL",
     categories: "",
-    subCategories:"",
-    subSubCategories:"",
+    subCategories: "",
+    subSubCategories: "",
     images: [],
     tags: " allow webshop",
     weight: "",
@@ -32,7 +33,25 @@ const initialData = {
     purchasePrice: "",
     price: "",
     platform: [],
-}
+};
+
+const sampleCategories = [
+    { value: 'category1', label: 'Category 1' },
+    { value: 'category2', label: 'Category 2' },
+    { value: 'category3', label: 'Category 3' },
+];
+
+const sampleSubCategories = [
+    { value: 'subcategory1', label: 'Sub Category 1' },
+    { value: 'subcategory2', label: 'Sub Category 2' },
+    { value: 'subcategory3', label: 'Sub Category 3' },
+];
+
+const sampleSubSubCategories = [
+    { value: 'subsubcategory1', label: 'Sub Sub Category 1' },
+    { value: 'subsubcategory2', label: 'Sub Sub Category 2' },
+    { value: 'subsubcategory3', label: 'Sub Sub Category 3' },
+];
 
 export function FormData({ initialValues, handleUpdate, loading }: any) {
     const [imageFields, setImageFields] = useState(
@@ -54,17 +73,13 @@ export function FormData({ initialValues, handleUpdate, loading }: any) {
         setImageFields(updatedImageFields);
     };
 
-    console.log("selectedPlatform", initialValues);
     const handlePlatformChange = (platform: string) => {
         if (selectedPlatform.includes(platform)) {
-            // Remove the platform if it already exists
             setSelectedPlatform(selectedPlatform?.filter((p: string) => p !== platform));
         } else {
-            // Add the platform if it doesn't exist
             setSelectedPlatform([...selectedPlatform, platform]);
         }
     };
-
 
     const validationSchema = Yup.object().shape({
         title: Yup.string().required("Title is required"),
@@ -87,46 +102,35 @@ export function FormData({ initialValues, handleUpdate, loading }: any) {
         supplier: Yup.string().required("Supplier is required"),
     });
 
-
     return (
         <Formik
             initialValues={initialValues?.edit ? initialValues : initialData}
             validationSchema={validationSchema}
             onSubmit={(values) => { console.log(values, "log value"); handleUpdate({ ...values, sku: +values.sku, weight: +values.weight, taxValue: +values.taxValue, ean: values.ean, platform: selectedPlatform?.join(",") }) }}
         >
-            {({ handleChange, handleBlur, handleSubmit, values, errors }) => (
+            {({ handleChange, handleBlur, handleSubmit, values, errors, setFieldValue }) => (
                 <div className="w-full p-3">
                     <div className="mb-4 d-flex" style={{ gap: "1rem" }}>
                         <div className=" d-flex align-items-center" style={{ gap: "6px" }}>
                             <input
                                 type="checkbox"
-                                // checked={selectedPlatform === 'amazon'}
                                 onChange={() => handlePlatformChange('amazon')}
                             />
-                            <label className="m-0">
-                                Amazon
-                            </label>
+                            <label className="m-0">Amazon</label>
                         </div>
                         <div className=" d-flex align-items-center" style={{ gap: "6px" }}>
                             <input
                                 type="checkbox"
-                                // checked={selectedPlatform === 'bol.com'}
                                 onChange={() => handlePlatformChange('bol.com')}
                             />
-                            <label className=" m-0">
-                                Bol.com
-                            </label>
+                            <label className=" m-0">Bol.com</label>
                         </div>
-
                         <div className=" d-flex align-items-center" style={{ gap: "6px" }}>
                             <input
                                 type="checkbox"
-                                // checked={selectedPlatform === 'amazon'}
                                 onChange={() => handlePlatformChange('webshop')}
                             />
-                            <label className="m-0">
-                                Webshop
-                            </label>
+                            <label className="m-0">Webshop</label>
                         </div>
                     </div>
                     <div className="mb-4">
@@ -166,30 +170,27 @@ export function FormData({ initialValues, handleUpdate, loading }: any) {
                         />
                     </div>
                     <div className="mb-4">
-                        <InputBox
-                            required={true}
+                        <Select
                             name="categories"
-                            label="Categorie"
-                            placeholder="Enter Categorie"
-                            icon={<MdOutlineSubtitles />}
+                            options={sampleCategories}
+                            placeholder="Select Categorie"
+                            onChange={(option) => setFieldValue('categories', option ? option.value : '')}
                         />
                     </div>
                     <div className="mb-4">
-                        <InputBox
-                            required={true}
+                        <Select
                             name="subCategories"
-                            label="sub Categorie"
-                            placeholder="Enter Sub Categorie"
-                            icon={<MdOutlineSubtitles />}
+                            options={sampleSubCategories}
+                            placeholder="Select Sub Categorie"
+                            onChange={(option) => setFieldValue('subCategories', option ? option.value : '')}
                         />
                     </div>
                     <div className="mb-4">
-                        <InputBox
-                            required={true}
+                        <Select
                             name="subSubCategories"
-                            label="sub sub Categorie"
-                            placeholder="Enter Sub Sub Categorie"
-                            icon={<MdOutlineSubtitles />}
+                            options={sampleSubSubCategories}
+                            placeholder="Select Sub Sub Categorie"
+                            onChange={(option) => setFieldValue('subSubCategories', option ? option.value : '')}
                         />
                     </div>
                     {imageFields.map((field: any, index: any) => (
@@ -281,7 +282,6 @@ export function FormData({ initialValues, handleUpdate, loading }: any) {
                     </div>
                     <div className="mb-4">
                         <InputBox
-                            // required={true}
                             name="sizeMixed"
                             label="Size Mixed"
                             placeholder="Enter Size Mixed"
@@ -299,7 +299,6 @@ export function FormData({ initialValues, handleUpdate, loading }: any) {
                     </div>
                     <div className="mb-4">
                         <InputBox
-                            // required={true}
                             name="dogJacketType"
                             label="Dog Jacket Type"
                             placeholder="Enter Dog Jacket Type"
@@ -317,7 +316,6 @@ export function FormData({ initialValues, handleUpdate, loading }: any) {
                     </div>
                     <div className="mb-4">
                         <InputBox
-                            // required={true}
                             name="dogJacketSize"
                             label="Dog Jacket Size"
                             placeholder="Enter Dog Jacket Size"
@@ -344,7 +342,7 @@ export function FormData({ initialValues, handleUpdate, loading }: any) {
                     </div>
                     <div className="mb-4">
                         <InputBox
-                            required={true} 
+                            required={true}
                             name="price"
                             label="Webshop Price"
                             placeholder="Enter Webshop Price"
@@ -352,8 +350,7 @@ export function FormData({ initialValues, handleUpdate, loading }: any) {
                         />
                     </div>
                     <div className="fixedBottom">
-                        <ButtonBox value={initialValues?.edit ? "Update" : "Add new"} loading={loading} onClick={() => {console.log(values, "log value");
-                         handleSubmit()}} />
+                        <ButtonBox value={initialValues?.edit ? "Update" : "Add new"} loading={loading} onClick={() => {console.log(values, "log value"); handleSubmit()}} />
                     </div>
                 </div>
             )}
