@@ -33,6 +33,8 @@ import Papa from 'papaparse';
 import { usePostToWebshop } from "../../contexts/usePostToWebshop";
 
 const resource = "products";
+const resource2 = "getCategory";
+
 
 export default function Lists() {
   const [detail, setDetail] = useState<any>(null);
@@ -44,20 +46,20 @@ export default function Lists() {
   const { remove, loading: deleteLoading } = useDelete(); // Updated this line
   const { update, data:webShopData, loading:webShopLoading } = usePostToWebshop();
   const [selectedRowKeys, setSelectedRowKeys] = useState<any[]>([]);
-  console.log("patchData", patchData);
+  const { fetch: fetchCategories, data: categoryData, loading: loadingCategories } = useFetchByLoad();
 
   useEffect(() => {
     fetch({ url: resource, query: JSON.stringify(query) })
+  }, [query, file]);
+
+  useEffect(() => {
+    fetchCategories({ url: resource2 })
       .then(() => {
-        if (data?.data) {
-          // Log the product data and IDs
-          console.log("Fetched Product Data:", data.data);
-          data.data.forEach((item: any) => {
-            console.log("Product ID:", item.id);
-          });
+        if (categoryData) {
+          console.log("Fetched Category Data:", categoryData.categories[0].categories) ;
         }
       });
-  }, [query, file]);
+  }, []);
 
   const refreshData = () => {
     fetch({ url: resource, query: JSON.stringify(query) })
@@ -168,7 +170,7 @@ export default function Lists() {
             return {
               Title: item.title || "",
               EanBarcode: item.ean || "",
-              Price: item.price || "",
+              Price: item.price || "", 
               TotalStock: calculateTotalQuantity(item.stores) || "",
               SellingPrice: item.minSellingPrice || "",
               SupplierRef: item.supplierRef || "",
@@ -449,6 +451,7 @@ export default function Lists() {
           resource={resource}
           close={refreshData}
           FormData={FormData}
+          categoryData={categoryData}
           data={detail}
         />
       )}
@@ -457,6 +460,7 @@ export default function Lists() {
           resource={resource}
           close={refreshData}
           FormData={FormData}
+          categoryData={categoryData}
           data={detail}
         />
       )}

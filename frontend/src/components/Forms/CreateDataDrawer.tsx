@@ -1,7 +1,7 @@
 import { Drawer } from "antd";
 import { usePost } from "../../contexts";
 import { toast } from 'react-toastify';
-export const CreateDataDrawer = ({ resource, close, FormData, data }: any) => {
+export const CreateDataDrawer = ({ resource, close, FormData,categoryData, data }: any) => {
     console.log(data , " create product");
     
     
@@ -16,7 +16,7 @@ export const CreateDataDrawer = ({ resource, close, FormData, data }: any) => {
     }
     return (
         <Drawer maskClosable={false} mask={true} width="70%" title={`Add ${resource}`} placement="right" onClose={() => close(null)} open={true} footer={<div className="p-7"></div>}>
-            <FormData initialValues={data} handleUpdate={handleUpdate} loading={loading} />
+            <FormData initialValues={data} handleUpdate={handleUpdate} loading={loading} categoryData={categoryData}/>
         </Drawer>
     );
 };

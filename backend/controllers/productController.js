@@ -1,5 +1,6 @@
 import csvtojson from "csvtojson";
 import Product from "../models/product.js";
+import Category from "../models/category.js";
 
 export const products = {
   markWebshopProduct :async (req, res) => {
@@ -15,8 +16,62 @@ export const products = {
       res.status(500).json({ message: 'Server error', error });
     }
   },
-  
-  
+
+  addCategory :async (req, res) => {
+    try {
+      const { categories, subCategories,subSubCategories } = req.body;
+      const categoryId = '66ab6dbc5245c0297ccc3ba2';
+      const updateObject = {};
+    if (categories) {
+      updateObject['$push'] = {
+        categories: { $each: [categories] }
+      };
+    }
+    if (subCategories) {
+      updateObject['$push'] = {
+        ...updateObject['$push'],
+        subCategories: { $each: [subCategories] }
+      };
+    }
+    if (subSubCategories) {
+      updateObject['$push'] = {
+        ...updateObject['$push'],
+        subSubCategories: { $each: [subSubCategories] }
+      };
+    }
+
+    // Perform the update
+    const result = await Category.findByIdAndUpdate(
+      categoryId,
+      updateObject,
+      { new: true, upsert: true }
+    );
+      
+      res.status(200).json({ message: 'Categories added successfully', result });
+    } catch (error) {
+      res.status(500).json({ message: 'Server error', error });
+    }
+  },
+
+  getCategory: async (req, res) => {
+    try {
+        const categories = await Category.find({}, 'categories subCategories subSubCategories');
+
+        // Extract unique categories
+        // const uniqueCategories = Array.from(new Set(categories.map(item => item.categories)));
+
+        res.status(200).json({
+            message: 'Categories fetched successfully',
+            categories: categories
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: 'Server error',
+            error
+        });
+    }
+},
+
  createProduct : async (req, res) => {
     try {
       const createProductData = req.body;

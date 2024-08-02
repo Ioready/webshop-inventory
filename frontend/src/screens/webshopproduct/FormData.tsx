@@ -5,8 +5,12 @@ import { useFetch } from "../../contexts";
 import { FaUser, FaPhoneAlt } from "react-icons/fa";
 import { MdEmail, MdOutlineSubtitles } from "react-icons/md";
 import { useState } from "react";
-import Select from 'react-select';
+import Select, { SingleValue } from 'react-select';
 
+interface OptionType {
+    value: string;
+    label: string;
+  }
 const initialData = {
     title: "",
     description: "",
@@ -35,25 +39,8 @@ const initialData = {
     platform: [],
 };
 
-const sampleCategories = [
-    { value: 'category1', label: 'Category 1' },
-    { value: 'category2', label: 'Category 2' },
-    { value: 'category3', label: 'Category 3' },
-];
 
-const sampleSubCategories = [
-    { value: 'subcategory1', label: 'Sub Category 1' },
-    { value: 'subcategory2', label: 'Sub Category 2' },
-    { value: 'subcategory3', label: 'Sub Category 3' },
-];
-
-const sampleSubSubCategories = [
-    { value: 'subsubcategory1', label: 'Sub Sub Category 1' },
-    { value: 'subsubcategory2', label: 'Sub Sub Category 2' },
-    { value: 'subsubcategory3', label: 'Sub Sub Category 3' },
-];
-
-export function FormData({ initialValues, handleUpdate, loading }: any) {
+export function FormData({ initialValues, handleUpdate, loading,categoryData }: any) {
     const [imageFields, setImageFields] = useState(
         initialValues?.edit ? 
         (initialValues.images.length > 0 ? initialValues.images.map((image: string, index: any) => ({ id: index + 1, value: image })) : [{ id: 1, value: "" }]) 
@@ -102,9 +89,17 @@ export function FormData({ initialValues, handleUpdate, loading }: any) {
         supplier: Yup.string().required("Supplier is required"),
     });
 
+    const formattedInitialValues = {
+        ...initialData,
+        ...initialValues,
+        categories: initialValues?.categories ? { value: initialValues.categories, label: initialValues.categories } : "",
+        subCategories: initialValues?.subCategories ? { value: initialValues.subCategories, label: initialValues.subCategories } : "",
+        subSubCategories: initialValues?.subSubCategories ? { value: initialValues.subSubCategories, label: initialValues.subSubCategories } : "",
+    };
+
     return (
         <Formik
-            initialValues={initialValues?.edit ? initialValues : initialData}
+            initialValues={initialValues?.edit ? formattedInitialValues : initialData}
             validationSchema={validationSchema}
             onSubmit={(values) => { console.log(values, "log value"); handleUpdate({ ...values, sku: +values.sku, weight: +values.weight, taxValue: +values.taxValue, ean: values.ean, platform: selectedPlatform?.join(",") }) }}
         >
@@ -170,27 +165,40 @@ export function FormData({ initialValues, handleUpdate, loading }: any) {
                         />
                     </div>
                     <div className="mb-4">
-                        <Select
+                    <Select
+                            value={values.categories}
                             name="categories"
-                            options={sampleCategories}
+                            options={categoryData?.categories[0]?.categories.map((category: string) => ({
+                                value: category, // The value used internally by the select component
+                                label: category  // The label shown to the user
+                              })) || []
+                            }
                             placeholder="Select Categorie"
-                            onChange={(option) => setFieldValue('categories', option ? option.value : '')}
+                            onChange={(option: SingleValue<OptionType>) => setFieldValue('categories', option ? option.value : '')}
                         />
                     </div>
                     <div className="mb-4">
-                        <Select
+                    <Select
+                            value={values.subCategories}
                             name="subCategories"
-                            options={sampleSubCategories}
+                            options={categoryData?.categories[0]?.subCategories.map((category: string) => ({
+                                value: category, // The value used internally by the select component
+                                label: category  // The label shown to the user
+                              })) || []}
                             placeholder="Select Sub Categorie"
-                            onChange={(option) => setFieldValue('subCategories', option ? option.value : '')}
+                            onChange={(option: SingleValue<OptionType>) => setFieldValue('subCategories', option ? option.value : '')}
                         />
                     </div>
                     <div className="mb-4">
-                        <Select
+                    <Select
+                            value={values.subSubCategories}
                             name="subSubCategories"
-                            options={sampleSubSubCategories}
+                            options={categoryData?.categories[0]?.subSubCategories.map((category: string) => ({
+                                value: category, // The value used internally by the select component
+                                label: category  // The label shown to the user
+                              })) || []}
                             placeholder="Select Sub Sub Categorie"
-                            onChange={(option) => setFieldValue('subSubCategories', option ? option.value : '')}
+                            onChange={(option: SingleValue<OptionType>) => setFieldValue('subSubCategories', option ? option.value : '')}
                         />
                     </div>
                     {imageFields.map((field: any, index: any) => (

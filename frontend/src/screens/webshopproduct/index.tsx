@@ -29,7 +29,7 @@ import { CSVLink } from "react-csv";
 
 
 const resource = "products";
-
+const resource2 = "getCategory";
 
 export default function Lists() {
   const [detail, setDetail] = useState<any>(null);
@@ -39,7 +39,7 @@ export default function Lists() {
   const { fetch, data, loading } = useFetchByLoad();
   const { edit, data: patchData, loading: patchLoading } = usePatch();
   const { remove, loading: deleteLoading } = useDelete();
-
+  const { fetch: fetchCategories, data: categoryData, loading: loadingCategories } = useFetchByLoad();
   const [selectedRowKeys, setSelectedRowKeys] = useState<any[]>([]);
 
 
@@ -56,6 +56,9 @@ export default function Lists() {
       });
   }, [query, file]);
 
+  useEffect(() => {
+    fetchCategories({ url: resource2 })
+  }, []);
   const refreshData = () => {
     fetch({ url: resource, query: JSON.stringify(query) })
       .then(() => {
@@ -400,6 +403,7 @@ export default function Lists() {
           resource={resource}
           close={refreshData}
           FormData={FormData}
+          categoryData={categoryData}
           data={detail}
         />
       )}
@@ -408,6 +412,7 @@ export default function Lists() {
           resource={resource}
           close={refreshData}
           FormData={FormData}
+          categoryData={categoryData}
           data={detail}
         />
       )}

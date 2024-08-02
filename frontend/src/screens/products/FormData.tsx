@@ -1,12 +1,18 @@
 import { MultiSelectBox, InputBox, TextareaBox, SelectBox, ButtonBox } from "../../components/RenderFroms";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import { useFetch } from "../../contexts";
+import { useFetch, usePost } from "../../contexts";
 import { FaUser, FaPhoneAlt } from "react-icons/fa";
 import { MdEmail, MdOutlineSubtitles } from "react-icons/md";
 import { useState } from "react";
-import Select from 'react-select';
+import Select, { SingleValue } from 'react-select';
+import CreatableSelect from 'react-select/creatable';
 
+interface OptionType {
+    value: string;
+    label: string;
+  }
+const resource="addCategory";
 const initialData = {
     title: "",
     description: "",
@@ -35,25 +41,10 @@ const initialData = {
     platform: [],
 };
 
-const sampleCategories = [
-    { value: 'category1', label: 'Category 1' },
-    { value: 'category2', label: 'Category 2' },
-    { value: 'category3', label: 'Category 3' },
-];
 
-const sampleSubCategories = [
-    { value: 'subcategory1', label: 'Sub Category 1' },
-    { value: 'subcategory2', label: 'Sub Category 2' },
-    { value: 'subcategory3', label: 'Sub Category 3' },
-];
+export function FormData({ initialValues, handleUpdate, loading,categoryData }: any) {
+    const { create, data: respond } = usePost();
 
-const sampleSubSubCategories = [
-    { value: 'subsubcategory1', label: 'Sub Sub Category 1' },
-    { value: 'subsubcategory2', label: 'Sub Sub Category 2' },
-    { value: 'subsubcategory3', label: 'Sub Sub Category 3' },
-];
-
-export function FormData({ initialValues, handleUpdate, loading }: any) {
     const [imageFields, setImageFields] = useState(
         initialValues?.edit ? 
         (initialValues.images.length > 0 ? initialValues.images.map((image: string, index: any) => ({ id: index + 1, value: image })) : [{ id: 1, value: "" }]) 
@@ -102,13 +93,25 @@ export function FormData({ initialValues, handleUpdate, loading }: any) {
         supplier: Yup.string().required("Supplier is required"),
     });
 
+    const formattedInitialValues = {
+        ...initialData,
+        ...initialValues,
+        categories: initialValues?.categories ? { value: initialValues.categories, label: initialValues.categories } : "",
+        subCategories: initialValues?.subCategories ? { value: initialValues.subCategories, label: initialValues.subCategories } : "",
+        subSubCategories: initialValues?.subSubCategories ? { value: initialValues.subSubCategories, label: initialValues.subSubCategories } : "",
+    };
+
     return (
         <Formik
-            initialValues={initialValues?.edit ? initialValues : initialData}
+            initialValues={initialValues?.edit ? formattedInitialValues : initialData}
             validationSchema={validationSchema}
-            onSubmit={(values) => { console.log(values, "log value"); handleUpdate({ ...values, sku: +values.sku, weight: +values.weight, taxValue: +values.taxValue, ean: values.ean, platform: selectedPlatform?.join(",") }) }}
+            onSubmit={(values) => { console.log(values, "log value");if (!categoryData?.categories[0]?.categories.includes(values.categories)) {
+                // addCategory(values.categories);
+                create(resource, values.categories)
+            }; handleUpdate({ ...values, sku: +values.sku, weight: +values.weight, taxValue: +values.taxValue, ean: values.ean, platform: selectedPlatform?.join(",") }) }}
         >
-            {({ handleChange, handleBlur, handleSubmit, values, errors, setFieldValue }) => (
+            {({ handleChange, handleBlur, handleSubmit, values, errors, setFieldValue }) => (   
+                
                 <div className="w-full p-3">
                     <div className="mb-4 d-flex" style={{ gap: "1rem" }}>
                         <div className=" d-flex align-items-center" style={{ gap: "6px" }}>
@@ -155,7 +158,7 @@ export function FormData({ initialValues, handleUpdate, loading }: any) {
                             required={true}
                             name="sku"
                             label="SKU"
-                            type="number"
+                            type="number"categories
                             placeholder="Enter SKU"
                             icon={<MdOutlineSubtitles />}
                         />
@@ -170,27 +173,55 @@ export function FormData({ initialValues, handleUpdate, loading }: any) {
                         />
                     </div>
                     <div className="mb-4">
-                        <Select
+                        <CreatableSelect
+                            value={values.categories && typeof values.categories === 'string' 
+                                ? { value: values.categories, label: values.categories } 
+                                : values.categories
+                              }
                             name="categories"
-                            options={sampleCategories}
+                            options={categoryData?.categories[0]?.categories.map((category: string) => ({
+                                value: category, // The value used internally by the select component
+                                label: category  // The label shown to the user
+                              })) || []
+                            }
                             placeholder="Select Categorie"
-                            onChange={(option) => setFieldValue('categories', option ? option.value : '')}
+                            onChange={(option: SingleValue<OptionType>) => setFieldValue('categories', option ? option.value : '')}
+                            onCreateOption={(newCategory) => {
+                                // Add the new category to the list
+                                const newOption = { value: newCategory, label: newCategory };
+                                categoryData?.categories[0]?.categories.push(newCategory);
+                                setFieldValue('categories', newCategory);
+                            }}  
                         />
                     </div>
                     <div className="mb-4">
-                        <Select
+                        <CreatableSelect
+                            value={values.subCategories && typeof values.subCategories === 'string' 
+                                ? { value: values.subCategories, label: values.subCategories } 
+                                : values.subCategories
+                              }
                             name="subCategories"
-                            options={sampleSubCategories}
+                            options={categoryData?.categories[0]?.subCategories.map((category: string) => ({
+                                value: category, // The value used internally by the select component
+                                label: category  // The label shown to the user
+                              })) || []}
                             placeholder="Select Sub Categorie"
-                            onChange={(option) => setFieldValue('subCategories', option ? option.value : '')}
+                            onChange={(option: SingleValue<OptionType>) => setFieldValue('subCategories', option ? option.value : '')}
                         />
                     </div>
                     <div className="mb-4">
-                        <Select
+                        <CreatableSelect
+                            value={values.subSubCategories && typeof values.subSubCategories === 'string' 
+                                ? { value: values.subSubCategories, label: values.subSubCategories } 
+                                : values.subSubCategories
+                              }
                             name="subSubCategories"
-                            options={sampleSubSubCategories}
+                            options={categoryData?.categories[0]?.subSubCategories.map((category: string) => ({
+                                value: category, // The value used internally by the select component
+                                label: category  // The label shown to the user
+                              })) || []}
                             placeholder="Select Sub Sub Categorie"
-                            onChange={(option) => setFieldValue('subSubCategories', option ? option.value : '')}
+                            onChange={(option: SingleValue<OptionType>) => setFieldValue('subSubCategories', option ? option.value : '')}
                         />
                     </div>
                     {imageFields.map((field: any, index: any) => (

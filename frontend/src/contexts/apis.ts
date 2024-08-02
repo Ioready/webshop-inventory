@@ -43,6 +43,42 @@ const apis = {
     logout: async () => {
         return axiosInstance.defaults.headers['Authorization'] = null
     },
+    postCmsApi: async (url: any, data: any, token: any) => {
+        getAuthorizationToken(token);
+        return axiosInstance
+            .post(url, data, { withCredentials: false })
+            .then((response: any) => {
+                if (response?.status == 200 || response?.status == 201 || response?.status == 202) {
+                    return response?.data;
+                } else {
+                    throw new Error(response);
+                }
+            })
+            .catch((error: any) => {
+                showError(error);
+            });
+    },
+    
+    getCmsApi: async (url: any, query: any, token: any) => {
+        getAuthorizationToken(token);
+        let URL = url + "?";
+        for (let key in query) {
+            URL += `${key}=${encodeURIComponent(query[key])}&`;
+        }
+        return axiosInstance
+            .get(URL.slice(0, -1), { withCredentials: false })
+            .then((response: any) => {
+                if (response?.status == 200 || response?.status == 201 || response?.status == 202) {
+                    return response?.data;
+                } else {
+                    throw new Error(response);
+                }
+            })
+            .catch((error: any) => {
+                showError(error);
+            });
+    },
+    
     getDataApi: async (url: any, query: any, token: any) => {
         getAuthorizationToken(token)
         let URL = url + "?"
