@@ -3,23 +3,49 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { MdCloudUpload } from 'react-icons/md';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import { usePost } from '../../../../contexts';
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 const BlogForm: React.FC = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [images, setImages] = useState<string[]>([]);
+  const [image, setImage] = useState<string[]>([]);
+
+  const { create, data, loading } = usePost();
+
+  const navigate = useNavigate();
+
+  const handleUpdate = async () => {
+    const body = {
+      blogs: {
+        title,
+        description,
+        image,
+        date: new Date(),
+      }
+    };
+
+    try {
+      const response = await create('addCms', body);
+      toast.success('Blog added successfully!');
+      navigate('/cms/blog-list');
+    } catch (error) {
+      toast.error('Failed to add blog. Please try again.');
+    }
+  };
 
   useEffect(() => {
     // Cleanup URLs on component unmount
     return () => {
-      images.forEach((url) => URL.revokeObjectURL(url));
+      image.forEach((url) => URL.revokeObjectURL(url));
     };
-  }, [images]);
+  }, [image]);
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
       const fileArray = Array.from(event.target.files).map((file) => URL.createObjectURL(file));
-      setImages((prevImages) => prevImages.concat(fileArray));
+      setImage((prevImages) => prevImages.concat(fileArray));
     }
   };
 
@@ -70,7 +96,7 @@ const BlogForm: React.FC = () => {
                 <div>Click to upload an image</div>
               </label>
             </div>
-            {images.map((image, index) => (
+            {image.map((image, index) => (
               <div className="col-12 col-md-4 mb-3" key={index}>
                 <img src={image} alt={`upload-${index}`} className="img-fluid" />
               </div>
@@ -78,7 +104,7 @@ const BlogForm: React.FC = () => {
           </div>
         </div>
 
-        <button type="submit" className="btn btn-primary mt-3">
+        <button type="submit" className="btn btn-primary mt-3" onClick={handleUpdate}>
           Submit
         </button>
       </form>

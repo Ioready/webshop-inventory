@@ -20,7 +20,7 @@ export const products = {
   addCategory :async (req, res) => {
     try {
       const { categories, subCategories,subSubCategories } = req.body;
-      const categoryId = '66ab6dbc5245c0297ccc3ba2';
+      const categoryId = '66b1036ef752edb1c5e86e93';
       const updateObject = {};
     if (categories) {
       updateObject['$push'] = {

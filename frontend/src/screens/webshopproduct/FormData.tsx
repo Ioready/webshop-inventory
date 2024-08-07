@@ -6,6 +6,7 @@ import { FaUser, FaPhoneAlt } from "react-icons/fa";
 import { MdEmail, MdOutlineSubtitles } from "react-icons/md";
 import { useState } from "react";
 import Select, { SingleValue } from 'react-select';
+import CreatableSelect from 'react-select/creatable';
 
 interface OptionType {
     value: string;
@@ -165,8 +166,11 @@ export function FormData({ initialValues, handleUpdate, loading,categoryData }: 
                         />
                     </div>
                     <div className="mb-4">
-                    <Select
-                            value={values.categories}
+                    <CreatableSelect
+                            value={values.categories && typeof values.categories === 'string' 
+                                ? { value: values.categories, label: values.categories } 
+                                : values.categories
+                              }
                             name="categories"
                             options={categoryData?.categories[0]?.categories.map((category: string) => ({
                                 value: category, // The value used internally by the select component
@@ -175,11 +179,20 @@ export function FormData({ initialValues, handleUpdate, loading,categoryData }: 
                             }
                             placeholder="Select Categorie"
                             onChange={(option: SingleValue<OptionType>) => setFieldValue('categories', option ? option.value : '')}
+                            onCreateOption={async (newCategory) => {
+                                // Add the new category to the list
+                                const newOption = { value: newCategory, label: newCategory };
+                                // await create('addCategory', { name: newCategory });
+                                setFieldValue('categories', newCategory);
+                            }}  
                         />
                     </div>
                     <div className="mb-4">
-                    <Select
-                            value={values.subCategories}
+                    <CreatableSelect
+                            value={values.subCategories && typeof values.subCategories === 'string' 
+                                ? { value: values.subCategories, label: values.subCategories } 
+                                : values.subCategories
+                              }
                             name="subCategories"
                             options={categoryData?.categories[0]?.subCategories.map((category: string) => ({
                                 value: category, // The value used internally by the select component
@@ -190,8 +203,11 @@ export function FormData({ initialValues, handleUpdate, loading,categoryData }: 
                         />
                     </div>
                     <div className="mb-4">
-                    <Select
-                            value={values.subSubCategories}
+                    <CreatableSelect
+                            value={values.subSubCategories && typeof values.subSubCategories === 'string' 
+                                ? { value: values.subSubCategories, label: values.subSubCategories } 
+                                : values.subSubCategories
+                              }
                             name="subSubCategories"
                             options={categoryData?.categories[0]?.subSubCategories.map((category: string) => ({
                                 value: category, // The value used internally by the select component

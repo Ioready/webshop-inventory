@@ -96,19 +96,25 @@ export function FormData({ initialValues, handleUpdate, loading,categoryData }: 
     const formattedInitialValues = {
         ...initialData,
         ...initialValues,
-        categories: initialValues?.categories ? { value: initialValues.categories, label: initialValues.categories } : "",
-        subCategories: initialValues?.subCategories ? { value: initialValues.subCategories, label: initialValues.subCategories } : "",
-        subSubCategories: initialValues?.subSubCategories ? { value: initialValues.subSubCategories, label: initialValues.subSubCategories } : "",
+        // categories: initialValues?.categories ? { value: initialValues.categories, label: initialValues.categories } : "",
+        // subCategories: initialValues?.subCategories ? { value: initialValues.subCategories, label: initialValues.subCategories } : "",
+        // subSubCategories: initialValues?.subSubCategories ? { value: initialValues.subSubCategories, label: initialValues.subSubCategories } : "",
+
+        categories: initialValues?.categories?.value || initialValues?.categories,
+        subCategories: initialValues?.subCategories?.value || initialValues?.subCategories,
+        subSubCategories: initialValues?.subSubCategories?.value || initialValues?.subSubCategories,
     };
 
     return (
         <Formik
             initialValues={initialValues?.edit ? formattedInitialValues : initialData}
             validationSchema={validationSchema}
-            onSubmit={(values) => { console.log(values, "log value");if (!categoryData?.categories[0]?.categories.includes(values.categories)) {
-                // addCategory(values.categories);
-                create(resource, values.categories)
-            }; handleUpdate({ ...values, sku: +values.sku, weight: +values.weight, taxValue: +values.taxValue, ean: values.ean, platform: selectedPlatform?.join(",") }) }}
+            onSubmit={async(values) => { console.log(values, "log value");
+                if (values.categories && !categoryData?.categories[0]?.categories.includes(values.categories)) {
+                    console.log('Adding new category:', values.categories);
+                    await create('addCategory', { name: values.categories });
+                }    
+            handleUpdate({ ...values, sku: +values.sku, weight: +values.weight, taxValue: +values.taxValue, ean: values.ean, platform: selectedPlatform?.join(",") }) }}
         >
             {({ handleChange, handleBlur, handleSubmit, values, errors, setFieldValue }) => (   
                 
@@ -186,10 +192,10 @@ export function FormData({ initialValues, handleUpdate, loading,categoryData }: 
                             }
                             placeholder="Select Categorie"
                             onChange={(option: SingleValue<OptionType>) => setFieldValue('categories', option ? option.value : '')}
-                            onCreateOption={(newCategory) => {
+                            onCreateOption={async (newCategory) => {
                                 // Add the new category to the list
                                 const newOption = { value: newCategory, label: newCategory };
-                                categoryData?.categories[0]?.categories.push(newCategory);
+                                await create('addCategory', { name: newCategory });
                                 setFieldValue('categories', newCategory);
                             }}  
                         />

@@ -1,56 +1,52 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { MdEdit } from "react-icons/md";
 import { Link } from 'react-router-dom';
+import { useFetchByLoad } from '../../../contexts';
 
-interface Customers {
-  id: string;
+interface Blog {
   title: string;
   image: string;
   date: string;
+  description: string;
 }
 
-const initialCustomers: Customers[] = [
-  {
-    id: '1',
-    title: 'Jennifer Miyakubo',
-    image: 'https://gratisography.com/wp-content/uploads/2024/01/gratisography-cyber-kitty-800x525.jpg',
-    date: '$1.00',
-  },
-  {
-    id: '2',
-    title: 'Jennifer Miyakubo',
-    image: 'https://gratisography.com/wp-content/uploads/2024/01/gratisography-cyber-kitty-800x525.jpg',
-    date: '$1.00',
-  },
-  {
-    id: '3',
-    title: 'Jennifer Miyakubo',
-    image: 'https://gratisography.com/wp-content/uploads/2024/01/gratisography-cyber-kitty-800x525.jpg',
-    date: '$1.00',
-  },
-  {
-    id: '4',
-    title: 'Jennifer Miyakubo',
-    image: 'https://gratisography.com/wp-content/uploads/2024/01/gratisography-cyber-kitty-800x525.jpg',
-    date: '$1.00',
-  },
-  {
-    id: '5',
-    title: 'Jennifer Miyakubo',
-    image: 'https://gratisography.com/wp-content/uploads/2024/01/gratisography-cyber-kitty-800x525.jpg',
-    date: '$1.00',
-  }
-];
-
 const Blog: React.FC = () => {
-  const [customers, setCustomers] = useState<Customers[]>(initialCustomers);
+  const { fetch, data } = useFetchByLoad();
+  const [blogs, setBlogs] = useState<Blog[]>([])
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        await fetch({ url: 'getCms' });
+        // console.log('API Response:', response); // Debugging step: log the API response
+        
+        if (data && data.blogs) {
+          setBlogs(data.blogs);
+          console.log('Blogs set:', data.blogs); // Debugging step: log the state after setting
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+
+  // useEffect(() => {
+  //   if (data && data.blogs) {
+  //     setBlogs(data.blogs);
+  //   }
+  // }, [data]);
 
   return (
     <div className="container mt-4">
-      <div className=' w-100 d-flex justify-content-between align-items-center my-2'>
-      <h3>All Blog</h3>
-      <Link to='/add-blog' className=' px-2 py-1 rounded-2 bg-black text-white' style={{cursor:"pointer"}}>Add New Blog</Link>
+      <div className='w-100 d-flex justify-content-between align-items-center my-2'>
+        <h3>All Blog</h3>
+        <Link to='/add-blog' className='px-2 py-1 rounded-2 bg-black text-white' style={{ cursor: "pointer" }}>
+          Add New Blog
+        </Link>
       </div>
 
       <div className="table-responsive">
@@ -64,19 +60,30 @@ const Blog: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {customers.map(order => (
-              <tr key={order.id}>
-                <td className="text-center text-nowrap" style={{cursor:"pointer"}}><Link to='/add-blog'><MdEdit style={{fontSize:"x-large"}}/></Link></td>
-                <td className="text-center text-nowrap" style={{cursor:"pointer"}}>{order.title}</td>
-                <td className="text-center text-nowrap" style={{cursor:"pointer"}}>
-                  <img src={order.image} alt={order.title} className='img-fluid' style={{height:"5rem", objectFit: 'cover'}} />
-                </td>
-                <td className="text-center text-nowrap" style={{cursor:"pointer"}}>{order.date}</td>
+            {blogs?.length > 0 ? (
+              blogs.map((blog, index) => (
+                <tr key={index}>
+                  <td className="text-center text-nowrap" style={{ cursor: "pointer" }}>
+                    <Link to={`/edit-blog/${index}`}><MdEdit style={{ fontSize: "x-large" }} /></Link>
+                  </td>
+                  <td className="text-center text-nowrap" style={{ cursor: "pointer" }}>{blog.title}</td>
+                  <td className="text-center text-nowrap" style={{ cursor: "pointer" }}>
+                    <img src={blog?.image} alt={blog.title} className='img-fluid' style={{ height: "5rem", objectFit: 'cover' }} />
+                  </td>
+                  <td className="text-center text-nowrap" style={{ cursor: "pointer" }}>
+                    {new Date(blog.date).toLocaleDateString()}
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={4} className="text-center">No blogs found</td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
+      
       <nav aria-label="Page navigation example" className="d-flex justify-content-between align-items-center">
         <ul className="pagination">
           <li className="page-item">
@@ -95,7 +102,7 @@ const Blog: React.FC = () => {
             </a>
           </li>
         </ul>
-        <p>Showing 1 to {customers.length} of {customers.length} entries</p>
+        <p>Showing 1 to {blogs?.length} of {blogs?.length} entries</p>
       </nav>
     </div>
   );

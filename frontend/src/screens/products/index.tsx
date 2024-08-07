@@ -54,11 +54,6 @@ export default function Lists() {
 
   useEffect(() => {
     fetchCategories({ url: resource2 })
-      .then(() => {
-        if (categoryData) {
-          console.log("Fetched Category Data:", categoryData.categories[0].categories) ;
-        }
-      });
   }, []);
 
   const refreshData = () => {

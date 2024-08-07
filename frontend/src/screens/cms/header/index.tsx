@@ -1,12 +1,18 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { MdCloudUpload } from 'react-icons/md';
+import { useFetchByLoad, usePost } from '../../../contexts'; // Assuming you have a custom hook for posting data
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Header: React.FC = () => {
-  const [email, setEmail] = useState('info@classies.be');
-  const [content, setContent] = useState('Vandaag besteld en het wordt bir');
-  const [phone, setPhone] = useState('+32 495 76 23 05');
-  const [image, setImage] = useState<string>('/mnt/data/image.png'); // Assuming this is the path to your initial image
+  const [email, setEmail] = useState('');
+  const [content, setContent] = useState('');
+  const [phone, setPhone] = useState('');
+  const [image, setImage] = useState<string>(''); // Path to your initial image
+
+  const { create} = usePost();
+  const { fetch, data } = useFetchByLoad();
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
@@ -16,17 +22,50 @@ const Header: React.FC = () => {
     }
   };
 
-  const handleSubmit = (event: React.FormEvent) => {
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        await fetch({ url: 'getCms' });
+        // console.log('API Response:', response); // Debugging step: log the API response
+        
+        if (data && data.header) {
+          setEmail(data.header.email);
+          setContent(data.header.slogan);
+          setImage(data.header.logo);
+          setPhone(data.header.phone);
+          // console.log('Blogs set:', data.herosection); // Debugging step: log the state after setting
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    // Handle form submission
-    console.log({ email, content, phone, image });
+    try {
+      const body = {
+        header: {
+          logo: image,
+          slogan: content,
+          phone,
+          email,
+        },
+      };
+      await create('addCms', body);
+      toast.success('Header updated successfully');
+    } catch (error) {
+      toast.error('Failed to update header');
+    }
   };
 
   return (
     <div className="container mt-4">
-        <h3 className=' my-2'>Header</h3>
+      <h3 className='my-2'>Header</h3>
       <form onSubmit={handleSubmit} className="row">
-      <div className="col-12 mb-3">
+        <div className="col-12 mb-3">
           <label className="form-label">Slogan:</label>
           <input 
             type="text" 
@@ -47,7 +86,7 @@ const Header: React.FC = () => {
           >
             {image ? (
               <img 
-                src={image} 
+                src={image}
                 alt="upload" 
                 className="img-fluid" 
                 style={{height:"7rem", objectFit:"cover"}}
@@ -69,7 +108,7 @@ const Header: React.FC = () => {
         </div>
 
         <div className="col-12 mb-3">
-          <label className="form-label">Phone :</label>
+          <label className="form-label">Phone:</label>
           <input 
             type="text" 
             className="form-control" 
@@ -79,11 +118,11 @@ const Header: React.FC = () => {
         </div>
 
         <div className="col-12 mb-3">
-          <label className="form-label">Email :</label>
+          <label className="form-label">Email:</label>
           <input 
             type="email" 
             className="form-control" 
-            value={email} 
+            value={email}
             onChange={(e) => setEmail(e.target.value)} 
           />
         </div>
