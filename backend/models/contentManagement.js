@@ -84,24 +84,16 @@ const cmsSchema = new mongoose.Schema({
     }
   }],
   termAndConditions: {
-    content: {
       type: String,
-    },
   },
   privacyPolicy: {
-    content: {
       type: String,
-    },
   },
   returnPolicy: {
-    content: {
       type: String,
-    },
   },
   aboutUs: {
-    content: {
       type: String,
-    },
   },
 });
 

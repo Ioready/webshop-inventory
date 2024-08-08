@@ -134,7 +134,7 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { useFetchByLoad, usePost } from '../../../contexts';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import { toast } from 'react-toastify'
 
 interface Section {
   id: number;
@@ -144,30 +144,35 @@ interface Section {
 
 const Herosection: React.FC = () => {
   const [sections, setSections] = useState<Section[]>([
-    { id: Date.now(), description: 'Welkom bij Classies', image: '' },
+    // { id: Date.now(), description: 'Welkom bij Classis', image: '' },
   ]);
 
   const { create} = usePost();
   const { fetch, data } = useFetchByLoad();
   const navigate = useNavigate();
-  useEffect(() => {
+  
+ 
     const fetchData = async () => {
       try {
         await fetch({ url: 'getCms' });
-        // console.log('API Response:', response); // Debugging step: log the API response
-        
-        if (data && data.herosection) {
-          setSections(data.herosection);
-          console.log('Blogs set:', data.herosection); // Debugging step: log the state after setting
-        }
       } catch (error) {
         console.error('Error fetching data:', error)
       }
     };
-
+    useEffect(() => {
     fetchData();
   }, []);
 
+  // useEffect(() => {
+  //   try {
+  //           if (data && data.herosection) {
+  //       setSections([...data.herosection]);
+  //       console.log('Blogs set:', data.herosection); // Debugging step: log the state after setting
+  //     }
+  //   } catch (error) {
+  //     console.error('Error fetching data:', error)
+  //   }  }, [data]);
+  
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>, id: number) => {
     if (event.target.files && event.target.files[0]) {
@@ -204,10 +209,10 @@ const Herosection: React.FC = () => {
     try {
       await create('addCms', body);
       
-      toast.success('Hero Section added successfully!');
+      toast.success('Hero Section added successfully!')
       // navigate('/cms/hero-list');
     } catch (error) {
-      toast.error('Failed to add Hero Section.');
+      toast.error('Failed to add Hero Section.')
     }
   };
 
@@ -215,8 +220,8 @@ const Herosection: React.FC = () => {
     <div className="container mt-4">
       <h3 className=' my-2'>Herosection</h3>
       <form onSubmit={handleSubmit}>
-        {sections.map(section => (
-          <div className='row mb-4 d-flex justify-content-between align-items-center' key={section.id} style={{gap:"1rem"}}>
+        {data?.herosection?.map((section:any) => (
+          <div className='row mb-4 d-flex justify-content-between align-items-center'  key={section.id} style={{gap:"1rem"}}>
             <div className="col-12 col-md-4">
               <div className="form-group">
                 <label 
@@ -248,9 +253,9 @@ const Herosection: React.FC = () => {
             
             <div className="col-12 col-md-8">
               <div className="form-group">
-                <ReactQuill 
+                <input 
                   value={section.description} 
-                  onChange={(value) => handleDescriptionChange(value, section.id)} 
+                  onChange={(event) => handleDescriptionChange(event.target.value, section.id)} 
                   placeholder="Please Write Your Content Here" 
                 />
               </div>

@@ -13,32 +13,17 @@ interface Blog {
 
 const Blog: React.FC = () => {
   const { fetch, data } = useFetchByLoad();
-  const [blogs, setBlogs] = useState<Blog[]>([])
-
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await fetch({ url: 'getCms' });
-        // console.log('API Response:', response); // Debugging step: log the API response
-        
-        if (data && data.blogs) {
-          setBlogs(data.blogs);
-          console.log('Blogs set:', data.blogs); // Debugging step: log the state after setting
-        }
+        await fetch({ url: 'getCms' })
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching data:', error); 
       }
     };
-
     fetchData();
   }, []);
 
-
-  // useEffect(() => {
-  //   if (data && data.blogs) {
-  //     setBlogs(data.blogs);
-  //   }
-  // }, [data]);
 
   return (
     <div className="container mt-4">
@@ -60,8 +45,8 @@ const Blog: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {blogs?.length > 0 ? (
-              blogs.map((blog, index) => (
+            {data?.blogs?.length > 0 ? (
+              data?.blogs.map((blog:any, index:any) => (
                 <tr key={index}>
                   <td className="text-center text-nowrap" style={{ cursor: "pointer" }}>
                     <Link to={`/edit-blog/${index}`}><MdEdit style={{ fontSize: "x-large" }} /></Link>
@@ -102,7 +87,7 @@ const Blog: React.FC = () => {
             </a>
           </li>
         </ul>
-        <p>Showing 1 to {blogs?.length} of {blogs?.length} entries</p>
+        <p>Showing 1 to {data?.blogs?.length} of {data?.blogs?.length} entries</p>
       </nav>
     </div>
   );

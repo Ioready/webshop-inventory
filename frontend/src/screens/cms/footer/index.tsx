@@ -27,25 +27,28 @@ const Footer: React.FC = () => {
     const fetchData = async () => {
       try {
         await fetch({ url: 'getCms' });
-        // console.log('API Response:', response); // Debugging step: log the API response
-        
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+    fetchData();
+  }, []);
+
+
+  useEffect(() => {
+      try {
         if (data && data.footer) {
           setAddress(data.footer.address);
           setContent(data.footer.content);
           setLogo(data.footer.logo);
           setTaxInformation(data.footer.taxInformation);
           setNewsletterContent(data.footer.newsletterContent);
-
-          // console.log('Blogs set:', data.herosection); // Debugging step: log the state after setting
         }
       } catch (error) {
         console.error('Error fetching data:', error);
       }
-    };
 
-    fetchData();
-  }, []);
-
+  }, [data]);
 
   const handleSubmit = async(event: React.FormEvent) => {
     event.preventDefault();

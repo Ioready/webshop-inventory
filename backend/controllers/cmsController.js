@@ -77,5 +77,9 @@ export const cms = {
         } catch (error) {
             res.status(500).json({ message: 'Server error', error });
         }
+    },
+    editCms:async (req, res) => {
+         
     }
+
 };

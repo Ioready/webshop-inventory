@@ -26,22 +26,25 @@ const Header: React.FC = () => {
     const fetchData = async () => {
       try {
         await fetch({ url: 'getCms' });
-        // console.log('API Response:', response); // Debugging step: log the API response
-        
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+      try {
         if (data && data.header) {
           setEmail(data.header.email);
           setContent(data.header.slogan);
           setImage(data.header.logo);
           setPhone(data.header.phone);
-          // console.log('Blogs set:', data.herosection); // Debugging step: log the state after setting
         }
       } catch (error) {
         console.error('Error fetching data:', error);
       }
-    };
-
-    fetchData();
-  }, []);
+  }, [data]);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();

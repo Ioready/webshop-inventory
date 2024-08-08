@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { MdCloudUpload } from 'react-icons/md';
-import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { usePost } from '../../../../contexts';
 import { toast } from 'react-toastify';
@@ -12,7 +11,7 @@ const BlogForm: React.FC = () => {
   const [description, setDescription] = useState('');
   const [image, setImage] = useState<string[]>([]);
 
-  const { create, data, loading } = usePost();
+  const { create} = usePost();
 
   const navigate = useNavigate();
 
@@ -72,9 +71,9 @@ const BlogForm: React.FC = () => {
         
         <div className="form-group mt-3">
           <label htmlFor="blogDescription">Description</label>
-          <ReactQuill 
+          <input 
             value={description} 
-            onChange={setDescription} 
+            onChange={ (e) => setDescription(e.target.value)}
             placeholder="Please Write Your Content Here" 
           />
         </div>
