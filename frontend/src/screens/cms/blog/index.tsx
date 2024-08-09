@@ -49,7 +49,7 @@ const Blog: React.FC = () => {
               data?.blogs.map((blog:any, index:any) => (
                 <tr key={index}>
                   <td className="text-center text-nowrap" style={{ cursor: "pointer" }}>
-                    <Link to={`/edit-blog/${index}`}><MdEdit style={{ fontSize: "x-large" }} /></Link>
+                    <Link to={`/add-blog`}><MdEdit style={{ fontSize: "x-large" }} /></Link>
                   </td>
                   <td className="text-center text-nowrap" style={{ cursor: "pointer" }}>{blog.title}</td>
                   <td className="text-center text-nowrap" style={{ cursor: "pointer" }}>
