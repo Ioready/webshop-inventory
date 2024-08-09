@@ -98,8 +98,7 @@ const TopCategory: React.FC = () => {
                 </td>
                 <td className="text-center text-nowrap" style={{cursor:"pointer"}}>{order.category}</td>
                 <td className=' d-flex' style={{ gap:"1rem"}}>
-                <Link to='/cms/add-category' className="btn btn-primary btn-sm">Edit</Link>
-                  <button  onClick={handleDeleteClick} className="btn btn-danger btn-sm ml-2">Delete</button>
+                  <button  onClick={handleDeleteClick} className="btn btn-danger btn-sm ml-2">Remove</button>
                 </td>
               </tr>
             ))}
