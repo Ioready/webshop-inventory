@@ -3,12 +3,20 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { MdEdit } from "react-icons/md";
 import { Link } from 'react-router-dom';
 import Delete from './delete';
+import Select from 'react-select';
 
 interface Customers {
   id: string;
   category: string;
   image: string;
 }
+
+const categoryOptions = [
+  { value: 'electronics', label: 'Electronics' },
+  { value: 'books', label: 'Books' },
+  { value: 'clothing', label: 'Clothing' },
+  { value: 'beauty', label: 'Beauty' }
+];
 
 const initialCustomers: Customers[] = [
   {
@@ -46,6 +54,7 @@ const initialCustomers: Customers[] = [
 const TopCategory: React.FC = () => {
   const [customers, setCustomers] = useState<Customers[]>(initialCustomers);
   const [popupCustomer, setPopupCustomer] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<{ value: string, label: string } | null>(null);
 
   const closePopup = () => {
     setPopupCustomer(false);
@@ -59,7 +68,17 @@ const TopCategory: React.FC = () => {
     <div className="container mt-4">
       <div className=' w-100 d-flex justify-content-between align-items-center my-2'>
       <h3>Top Category</h3>
-      <Link to='/cms/add-category' className=' px-2 py-1 rounded-2 bg-black text-white' style={{cursor:"pointer"}}>Add New Category</Link>
+      </div>
+
+      <div className=' d-flex mb-4' style={{gap:"1rem"}}>
+      
+      <Select
+            options={categoryOptions}
+            onChange={setSelectedCategory}
+            placeholder="Select a category"
+            value={selectedCategory}
+          />
+      <button className=' btn btn-info text-white'>Add Category</button>
       </div>
 
       <div className="table-responsive">

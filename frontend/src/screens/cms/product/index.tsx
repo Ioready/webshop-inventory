@@ -63,14 +63,14 @@ const TopProducts: React.FC = () => {
   return (
     <div className="container mt-5">
       <h3 className=' my-2'>Top Product</h3>
-      <div className='mb-4 d-flex justify-content-between' style={{gap:"1rem"}}>
-      <Select
-        options={categoryOptions}
-        onChange={(option) => handleSelect(sampleData.find(category => category.name === option?.value) || null)}
-        placeholder="Search and select category..."
-      />
-
-      <Link to="/cms/add-product" className=' d-flex justify-content-center align-items-center text-center px-3 rounded-1 bg-info text-white' style={{cursor:"pointer"}}>Add Product</Link>
+      <div className=' d-flex' style={{gap:"1rem"}}>
+      
+      <input
+            type="text"
+            className="form-control w-25 h-50"
+            placeholder='EAN Code'
+          />
+      <button className=' btn btn-info text-white'>Add Product</button>
       </div>
 
       <table className="table table-striped table-bordered table-hover mt-3">
@@ -96,8 +96,7 @@ const TopProducts: React.FC = () => {
                 )}
                 <td>{product.name}</td>
                 <td className=' d-flex' style={{ gap:"1rem"}}>
-                  <Link to="/cms/add-product"  className="btn btn-primary btn-sm">Edit</Link>
-                  <button onClick={handleDeleteClick} className="btn btn-danger btn-sm ml-2">Delete</button>
+                  <button onClick={handleDeleteClick} className="btn btn-danger btn-sm ml-2">Remove</button>
                 </td>
               </tr>
             ))

@@ -59,7 +59,16 @@ const BestProduct: React.FC = () => {
     <div className="container mt-4">
       <div className=' w-100 d-flex justify-content-between align-items-center my-2'>
       <h3>Best Selling Products</h3>
-      <Link to='/cms/add-best-product' className=' px-2 py-1 rounded-2 bg-black text-white' style={{cursor:"pointer"}}>Add New Product</Link>
+      </div>
+
+      <div className=' d-flex mb-4' style={{gap:"1rem"}}>
+      
+      <input
+            type="text"
+            className="form-control w-25 h-50"
+            placeholder='EAN Code'
+          />
+      <button className=' btn btn-info text-white'>Add Product</button>
       </div>
 
       <div className="table-responsive">
@@ -79,8 +88,7 @@ const BestProduct: React.FC = () => {
                 </td>
                 <td className="text-center text-nowrap" style={{cursor:"pointer"}}>{order.category}</td>
                 <td className=' d-flex' style={{ gap:"1rem"}}>
-                <Link to='/cms/add-best-product' className="btn btn-primary btn-sm">Edit</Link>
-                  <button onClick={handleDeleteClick}  className="btn btn-danger btn-sm ml-2">Delete</button>
+                  <button onClick={handleDeleteClick}  className="btn btn-danger btn-sm ml-2">Remove</button>
                 </td>
               </tr>
             ))}
