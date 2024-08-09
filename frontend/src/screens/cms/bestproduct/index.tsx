@@ -55,6 +55,15 @@ const BestProduct: React.FC = () => {
     setPopupCustomer(true);
   };
 
+  // const handlePostToWebshop =async ()=>{
+  //       try {
+  //         update(`${resource}/update-webshop-status`, { productIds: selectedRowKeys ,isWebshopProduct:true})
+  //       } catch (error) {
+  //         console.error("Error posting products:", error);
+  //         message.error("Error posting products");
+  //       }
+  // }
+
   return (
     <div className="container mt-4">
       <div className=' w-100 d-flex justify-content-between align-items-center my-2'>
