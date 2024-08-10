@@ -25,10 +25,12 @@ import Enqury from '../screens/enquiry';
 import TopProducts from '../screens/cms/product';
 import AddProduct from '../screens/cms/product/addproduct';
 import TopCategory from '../screens/cms/category';
-import AddCategory from '../screens/cms/category/addcategory';
 import BestProducts from '../screens/cms/bestproduct';
 import AddBestProduct from '../screens/cms/bestproduct/addbestproduct';
 import ReviewForm from '../screens/cms/review/editreview';
+import AddCategory from '../screens/products/add/addcategorie';
+import AddSubCategory from '../screens/products/add/addsubcategorie';
+import AddSubSubCategory from '../screens/products/add/addsubsubcategorie';
 
 const Scanner = lazy(() => import('../screens/scanner'));
 const SalesReport = lazy(() => import('../screens/sales-report'));
@@ -49,6 +51,9 @@ export const Navigation = () => {
           <Route path="/webshop-product" element={<Webshopproduct />} />
           <Route path="/customer" element={<CustomerPage />} />
           <Route path="/enqury" element={<Enqury />} />
+          <Route path="/addcategory" element={<AddCategory />} />
+          <Route path="/addsubcategory" element={<AddSubCategory />} />
+          <Route path="/addsubsubcategory" element={<AddSubSubCategory />} />
           <Route path="/cms" element={<CMS />} />
           <Route
             path="/cms/top-product"
@@ -56,7 +61,6 @@ export const Navigation = () => {
           />
           <Route path="/cms/add-product" element={<AddProduct />} />
           <Route path="/cms/top-category" element={<TopCategory />} />
-          <Route path="/cms/add-category" element={<AddCategory />} />
           <Route path="/cms/best-product" element={<BestProducts />} />
           <Route path="/cms/add-best-product" element={<AddBestProduct />} />
           <Route path="/cms/blog-list" element={<Blog />} />
