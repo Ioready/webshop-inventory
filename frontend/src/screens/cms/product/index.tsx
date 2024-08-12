@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import Select from 'react-select';
-import Delete from './delete';
+import React, { useEffect, useState } from 'react';
+import { message } from 'antd';
+import { usePostToWebshop } from '../../../contexts/usePostToWebshop';
+import { useFetchByLoad } from '../../../contexts';
 
 interface Product {
   name: string;
+  ean: string;
 }
 
 interface Category {
@@ -13,64 +14,75 @@ interface Category {
   products: Product[];
 }
 
-const sampleData: Category[] = [
-  {
-    name: "Electronics",
-    image: "https://gratisography.com/wp-content/uploads/2024/01/gratisography-cyber-kitty-800x525.jpg",
-    products: [
-      { name: "Laptop" },
-      { name: "Smartphone" },
-      { name: "Camera" },
-      { name: "Headphones" }
-    ]
-  },
-  {
-    name: "Books",
-    image: "https://gratisography.com/wp-content/uploads/2024/01/gratisography-cyber-kitty-800x525.jpg",
-    products: [
-      { name: "Fiction" },
-      { name: "Non-fiction" },
-      { name: "Comics" },
-      { name: "Biographies" }
-    ]
-  }
-];
-
 const TopProducts: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
-  const [popupCustomer, setPopupCustomer] = useState(false);
+  const [ean, setEan] = useState<string | undefined>(undefined);
+  const [groupedData, setGroupedData] = useState<Category[]>([]);
+  const [query, setQuery] = useState({ skip: 0, take: 10, search: "", filterKey: "Filter Options", topProduct: "true" });
 
-  const closePopup = () => {
-    setPopupCustomer(false);
+  const { update } = usePostToWebshop();
+  const { fetch, data } = useFetchByLoad();
+
+  useEffect(() => {
+    fetch({ url: 'products', query: JSON.stringify(query) });
+  }, [query]);
+
+  useEffect(() => {
+    if (data?.data) {
+      const grouped = data.data.reduce((acc: any, product: any) => {
+        const { categories, title, ean } = product;
+        const existingCategory = acc.find((item: any) => item.name === categories);
+        if (existingCategory) {
+          existingCategory.products.push({ name: title, ean });
+        } else {
+          acc.push({ name: categories, products: [{ name: title, ean }] });
+        }
+        return acc;
+      }, []);
+      setGroupedData(grouped);
+    }
+  }, [data]);
+
+  const handleTopProductToggle = async (topProduct: boolean, categoryIndex: number, productIndex: number) => {
+    try {
+      const product = groupedData[categoryIndex].products[productIndex];
+      await update(`products/update-webshop-status`, { ean: product.ean, topProduct });
+
+      const updatedGroupedData = [...groupedData];
+      updatedGroupedData[categoryIndex].products.splice(productIndex, 1);
+      if (updatedGroupedData[categoryIndex].products.length === 0) {
+        updatedGroupedData.splice(categoryIndex, 1);
+      }
+      setGroupedData(updatedGroupedData);
+      message.success(`Product ${topProduct ? 'marked as' : 'removed from'} Top Product`);
+    } catch (error) {
+      console.error("Error updating product status:", error);
+      message.error("Error updating product status");
+    }
   };
 
-  const handleDeleteClick = () => {
-    setPopupCustomer(true);
+  const handleAddProduct = async () => {
+    try {
+      await update(`products/update-webshop-status`, { ean, topProduct: true });
+      fetch({ url: 'products', query: JSON.stringify(query) });
+      message.success('Product added to Top Products');
+    } catch (error) {
+      console.error("Error adding product:", error);
+      message.error("Error adding product");
+    }
   };
-
-  const handleSelect = (category: Category | null) => {
-    setSelectedCategory(category);
-    console.log(`Selected category: ${category?.name}`);
-  };
-
-  const categoryOptions = sampleData.map((category) => ({
-    value: category.name,
-    label: category.name
-  }));
-
-  const displayedCategories = selectedCategory ? [selectedCategory] : sampleData;
 
   return (
     <div className="container mt-5">
-      <h3 className=' my-2'>Top Product</h3>
-      <div className=' d-flex' style={{gap:"1rem"}}>
-      
-      <input
-            type="text"
-            className="form-control w-25 h-50"
-            placeholder='EAN Code'
-          />
-      <button className=' btn btn-info text-white'>Add Product</button>
+      <h3 className='my-2'>Top Product</h3>
+      <div className='d-flex' style={{ gap: "1rem" }}>
+        <input
+          type="text"
+          className="form-control w-25 h-50"
+          placeholder='EAN Code'
+          onChange={(e) => { setEan(e.target.value); }}
+        />
+        <button className='btn btn-info text-white' onClick={handleAddProduct}>Add Product</button>
       </div>
 
       <table className="table table-striped table-bordered table-hover mt-3">
@@ -83,8 +95,8 @@ const TopProducts: React.FC = () => {
           </tr>
         </thead>
         <tbody>
-          {displayedCategories.map((category, categoryIndex) => 
-            category.products.map((product, productIndex) => (
+          {groupedData?.map((category: any, categoryIndex: any) =>
+            category.products.map((product: any, productIndex: any) => (
               <tr key={`${categoryIndex}-${productIndex}`}>
                 {productIndex === 0 && (
                   <>
@@ -95,17 +107,19 @@ const TopProducts: React.FC = () => {
                   </>
                 )}
                 <td>{product.name}</td>
-                <td className=' d-flex' style={{ gap:"1rem"}}>
-                  <button onClick={handleDeleteClick} className="btn btn-danger btn-sm ml-2">Remove</button>
+                <td className='d-flex' style={{ gap: "1rem" }}>
+                  <button
+                    className="btn btn-danger btn-sm ml-2"
+                    onClick={() => handleTopProductToggle(false, categoryIndex, productIndex)}
+                  >
+                    Remove
+                  </button>
                 </td>
               </tr>
             ))
           )}
         </tbody>
       </table>
-      {popupCustomer && (
-        <Delete onClose={closePopup} />
-      )}
     </div>
   );
 };

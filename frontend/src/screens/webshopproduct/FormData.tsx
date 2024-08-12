@@ -7,6 +7,7 @@ import { MdEmail, MdOutlineSubtitles } from "react-icons/md";
 import { useState } from "react";
 import Select, { SingleValue } from 'react-select';
 import CreatableSelect from 'react-select/creatable';
+import { Link } from "react-router-dom";
 
 interface OptionType {
     value: string;
@@ -165,13 +166,14 @@ export function FormData({ initialValues, handleUpdate, loading,categoryData }: 
                             icon={<MdOutlineSubtitles />}
                         />
                     </div>
-                    <div className="mb-4">
+                    <div className="mb-4 d-flex w-100">
                     <CreatableSelect
                             value={values.categories && typeof values.categories === 'string' 
                                 ? { value: values.categories, label: values.categories } 
                                 : values.categories
                               }
                             name="categories"
+                            className=" w-100"
                             options={categoryData?.categories[0]?.categories.map((category: string) => ({
                                 value: category, // The value used internally by the select component
                                 label: category  // The label shown to the user
@@ -186,14 +188,17 @@ export function FormData({ initialValues, handleUpdate, loading,categoryData }: 
                                 setFieldValue('categories', newCategory);
                             }}  
                         />
+                        <Link to="/addcategory"><button className=" btn border-1 btn-outline-secondary">Add</button></Link>
+                    
                     </div>
-                    <div className="mb-4">
+                    <div className="mb-4 d-flex w-100">
                     <CreatableSelect
                             value={values.subCategories && typeof values.subCategories === 'string' 
                                 ? { value: values.subCategories, label: values.subCategories } 
                                 : values.subCategories
                               }
                             name="subCategories"
+                            className=" w-100"
                             options={categoryData?.categories[0]?.subCategories.map((category: string) => ({
                                 value: category, // The value used internally by the select component
                                 label: category  // The label shown to the user
@@ -201,14 +206,17 @@ export function FormData({ initialValues, handleUpdate, loading,categoryData }: 
                             placeholder="Select Sub Categorie"
                             onChange={(option: SingleValue<OptionType>) => setFieldValue('subCategories', option ? option.value : '')}
                         />
+                        <Link to="/addsubcategory"><button className=" btn border-1 btn-outline-secondary">Add</button></Link>
+                    
                     </div>
-                    <div className="mb-4">
+                    <div className="mb-4 d-flex w-100">
                     <CreatableSelect
                             value={values.subSubCategories && typeof values.subSubCategories === 'string' 
                                 ? { value: values.subSubCategories, label: values.subSubCategories } 
                                 : values.subSubCategories
                               }
                             name="subSubCategories"
+                            className=" w-100"
                             options={categoryData?.categories[0]?.subSubCategories.map((category: string) => ({
                                 value: category, // The value used internally by the select component
                                 label: category  // The label shown to the user
@@ -216,6 +224,7 @@ export function FormData({ initialValues, handleUpdate, loading,categoryData }: 
                             placeholder="Select Sub Sub Categorie"
                             onChange={(option: SingleValue<OptionType>) => setFieldValue('subSubCategories', option ? option.value : '')}
                         />
+                        <Link to="/addsubsubcategory"><button className=" btn border-1 btn-outline-secondary">Add</button></Link>
                     </div>
                     {imageFields.map((field: any, index: any) => (
                         <div key={field.id} className="mb-4 flex items-center">

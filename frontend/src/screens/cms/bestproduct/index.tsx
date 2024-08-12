@@ -1,68 +1,37 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { MdEdit } from "react-icons/md";
-import { Link } from 'react-router-dom';
-import Delete from './delete';
+import { usePostToWebshop } from '../../../contexts/usePostToWebshop';
+import { message } from 'antd';
+import { useFetchByLoad } from '../../../contexts';
 
-interface Customers {
-  id: string;
-  category: string;
-  image: string;
-}
 
-const initialCustomers: Customers[] = [
-  {
-    id: '1',
-    category: 'Jennifer Miyakubo',
-    image: 'https://gratisography.com/wp-content/uploads/2024/01/gratisography-cyber-kitty-800x525.jpg',
-    
-  },
-  {
-    id: '2',
-    category: 'Jennifer Miyakubo',
-    image: 'https://gratisography.com/wp-content/uploads/2024/01/gratisography-cyber-kitty-800x525.jpg',
-   
-  },
-  {
-    id: '3',
-    category: 'Jennifer Miyakubo',
-    image: 'https://gratisography.com/wp-content/uploads/2024/01/gratisography-cyber-kitty-800x525.jpg',
-    
-  },
-  {
-    id: '4',
-    category: 'Jennifer Miyakubo',
-    image: 'https://gratisography.com/wp-content/uploads/2024/01/gratisography-cyber-kitty-800x525.jpg',
-   
-  },
-  {
-    id: '5',
-    category: 'Jennifer Miyakubo',
-    image: 'https://gratisography.com/wp-content/uploads/2024/01/gratisography-cyber-kitty-800x525.jpg',
-    
-  }
-];
-
+const resource = "products";
 const BestProduct: React.FC = () => {
-  const [customers, setCustomers] = useState<Customers[]>(initialCustomers);
-  const [popupCustomer, setPopupCustomer] = useState(false);
+  const [ean, setEan] = useState<string | undefined>(undefined);
+  const [query, setQuery] = useState({skip: 0, take: 10, search: "", filterKey: "Filter Options", bestProduct:"true"});
 
-  const closePopup = () => {
-    setPopupCustomer(false);
+  const { update} = usePostToWebshop();
+  const { fetch, data} = useFetchByLoad();
+
+  useEffect(() => {
+    fetch({ url: resource, query: JSON.stringify(query) })
+    console.log(data);
+  }, [query]);
+
+  const refreshData = () => {
+    fetch({ url: resource, query: JSON.stringify(query) })
   };
-
-  const handleDeleteClick = () => {
-    setPopupCustomer(true);
+  const handleBestProductToggle = async (bestProduct:any) => {
+    console.log("dchdscbh")
+    try {
+      await update(`${resource}/update-webshop-status`, { ean, bestProduct });
+      refreshData();
+      message.success(`Product ${bestProduct ? 'marked as' : 'removed from'} Best Product`);
+    } catch (error) {
+      console.error("Error updating product status:", error);
+      message.error("Error updating product status");
+    }
   };
-
-  // const handlePostToWebshop =async ()=>{
-  //       try {
-  //         update(`${resource}/update-webshop-status`, { productIds: selectedRowKeys ,isWebshopProduct:true})
-  //       } catch (error) {
-  //         console.error("Error posting products:", error);
-  //         message.error("Error posting products");
-  //       }
-  // }
 
   return (
     <div className="container mt-4">
@@ -76,8 +45,9 @@ const BestProduct: React.FC = () => {
             type="text"
             className="form-control w-25 h-50"
             placeholder='EAN Code'
+            onChange={(e)=>{setEan(e.target.value)}}
           />
-      <button className=' btn btn-info text-white'>Add Product</button>
+      <button className=' btn btn-info text-white' onClick={()=>handleBestProductToggle(true)}>Add Product</button>
       </div>
 
       <div className="table-responsive">
@@ -90,25 +60,22 @@ const BestProduct: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {customers.map(order => (
+            {data?.data?.map((order:any) => (
               <tr key={order.id}>
                 <td className="text-center text-nowrap" style={{cursor:"pointer"}}>
-                  <img src={order.image} alt={order.category} className='img-fluid' style={{height:"5rem", objectFit: 'cover'}} />
+                  <img src={order.images} alt={order.category} className='img-fluid' style={{height:"5rem", objectFit: 'cover'}} />
                 </td>
-                <td className="text-center text-nowrap" style={{cursor:"pointer"}}>{order.category}</td>
+                <td className="text-center text-nowrap" style={{cursor:"pointer"}}>{order?.title}</td>
                 <td className=' d-flex' style={{ gap:"1rem"}}>
-                  <button onClick={handleDeleteClick}  className="btn btn-danger btn-sm ml-2">Remove</button>
+                  <button onClick={()=>handleBestProductToggle(false)}  className="btn btn-danger btn-sm ml-2">Remove</button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-      {popupCustomer && (
-        <Delete onClose={closePopup} />
-      )}
       <nav aria-label="Page navigation example" className="d-flex justify-content-between align-items-center">
-        <ul className="pagination">
+        {/* <ul className="pagination">
           <li className="page-item">
             <a className="page-link" href="#" aria-label="Previous">
               <span aria-hidden="true">&laquo;</span>
@@ -124,8 +91,8 @@ const BestProduct: React.FC = () => {
               <span aria-hidden="true">&raquo;</span>
             </a>
           </li>
-        </ul>
-        <p>Showing 1 to {customers.length} of {customers.length} entries</p>
+        </ul> */}
+        <p>Showing 1 to {data?.data?.length} of {data?.data?.length} entries</p>
       </nav>
     </div>
   );

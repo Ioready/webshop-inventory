@@ -23,7 +23,7 @@ userRout.post("/webshopRegister", webshopRegister);
 userRout.post("/login", userLogin);
 userRout.post("/products", verifyToken , createProduct);
 userRout.post("/products/import", verifyToken , upload.single('file'), csvFileUpload);
-userRout.get("/products", verifyToken , getProducts);
+userRout.get("/products", getProducts);
 userRout.get("/allproduct", verifyToken , getAllProduct);
 userRout.patch("/products/undefined", verifyToken , editProduct);
 userRout.patch("/products/:id", verifyToken , setStores);
