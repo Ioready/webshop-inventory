@@ -18,7 +18,7 @@ export const products = {
   // },
   markWebshopProduct :async (req, res) => {
     try {
-      const { productIds, isWebshopProduct, bestProduct, topProduct, ean } = req.body;
+      const { productIds, isWebshopProduct, bestProduct, topProduct,popularProduct, ean } = req.body;
 
       let filter = {};
 
@@ -39,7 +39,9 @@ export const products = {
       if (typeof topProduct !== 'undefined') {
         updateFields.topProduct = topProduct;
       }
-
+      if (typeof popularProduct !== 'undefined') {
+        updateFields.popularProduct = popularProduct;
+      }
       const result = await Product.updateMany(
         filter,
         { $set: updateFields }
