@@ -25,6 +25,10 @@ const ProductSchema = new Schema(
     isWebshopProduct:Boolean,
     bestProduct:Boolean,
     topProduct:Boolean,
+    popularProduct:{
+      type: Boolean,
+      default: false,
+    },
     tags: String,
     weight: Number,
     taxValue: Number,

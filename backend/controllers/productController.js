@@ -167,7 +167,7 @@ export const products = {
   
   getProducts: async (req, res) => {
     try {
-      let { skip, take, search,filterKey,isWebshopProduct,bestProduct,topProduct } = req.query;
+      let { skip, take, search,filterKey,filterValue,isWebshopProduct,bestProduct,topProduct,popularProduct } = req.query;
       skip = parseInt(skip);
       take = parseInt(take);
       const myFieldDataExists = await Product.exists({ myField: { $exists: true, $ne: null } });
@@ -200,8 +200,12 @@ export const products = {
           ];
         }
       }
-      if (filterKey) {
+      if (filterKey && !filterValue) {
         query[filterKey] = { $exists: false };
+      }
+
+      if (filterKey && filterKey === "categories" && filterValue) {
+        query[filterKey] = { $in: filterValue }; // Find products with categories in the filterValue array
       }
 
       if (isWebshopProduct === 'true' || isWebshopProduct === 'false') {
@@ -215,6 +219,11 @@ export const products = {
       if (topProduct === 'true' || topProduct === 'false') {
         query.topProduct = (topProduct === 'true');
       }
+
+      if (popularProduct === 'true' || popularProduct === 'false') {
+        query.popularProduct = (popularProduct === 'true');
+      }
+
 
       const products = await Product.find(query).skip(skip).limit(take);
       const platformCount = await Product.aggregate([

@@ -7,6 +7,8 @@ import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from '../../../firebase/firebase';
+import ReactQuill from 'react-quill';
+
 
 const BlogForm: React.FC = () => {
   const [title, setTitle] = useState('');
@@ -73,9 +75,9 @@ const BlogForm: React.FC = () => {
         
         <div className="form-group mt-3">
           <label htmlFor="blogDescription">Description</label>
-          <input 
+          <ReactQuill 
             value={description} 
-            onChange={ (e) => setDescription(e.target.value)}
+            onChange={(content: string) => setDescription(content)}
             placeholder="Please Write Your Content Here" 
           />
         </div>

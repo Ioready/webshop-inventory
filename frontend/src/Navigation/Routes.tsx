@@ -26,6 +26,7 @@ import TopProducts from '../screens/cms/product';
 import AddProduct from '../screens/cms/product/addproduct';
 import TopCategory from '../screens/cms/category';
 import BestProducts from '../screens/cms/bestproduct';
+import PopularProducts from '../screens/cms/popularproduct';
 import AddBestProduct from '../screens/cms/bestproduct/addbestproduct';
 import ReviewForm from '../screens/cms/review/editreview';
 import AddCategory from '../screens/products/add/addcategorie';
@@ -62,6 +63,7 @@ export const Navigation = () => {
           <Route path="/cms/add-product" element={<AddProduct />} />
           <Route path="/cms/top-category" element={<TopCategory />} />
           <Route path="/cms/best-product" element={<BestProducts />} />
+          <Route path="/cms/popular-product" element={<PopularProducts />} />
           <Route path="/cms/add-best-product" element={<AddBestProduct />} />
           <Route path="/cms/blog-list" element={<Blog />} />
           <Route path="/add-blog" element={<BlogForm />} />

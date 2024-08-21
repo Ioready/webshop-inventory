@@ -18,7 +18,7 @@ const TopProducts: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [ean, setEan] = useState<string | undefined>(undefined);
   const [groupedData, setGroupedData] = useState<Category[]>([]);
-  const [query, setQuery] = useState({ skip: 0, take: 10, search: "", filterKey: "Filter Options", topProduct: "true" });
+  const [query, setQuery] = useState({ skip: 0, take: 10, search: "", filterKey: "Filter Options", topProduct: "true",isWebshopProduct:"true" });
 
   const { update } = usePostToWebshop();
   const { fetch, data } = useFetchByLoad();
@@ -63,7 +63,7 @@ const TopProducts: React.FC = () => {
 
   const handleAddProduct = async () => {
     try {
-      await update(`products/update-webshop-status`, { ean, topProduct: true });
+      await update(`products/update-webshop-status`, { ean, topProduct: true,isWebshopProduct:true });
       fetch({ url: 'products', query: JSON.stringify(query) });
       message.success('Product added to Top Products');
     } catch (error) {

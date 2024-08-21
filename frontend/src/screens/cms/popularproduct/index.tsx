@@ -6,9 +6,9 @@ import { useFetchByLoad } from '../../../contexts';
 
 
 const resource = "products";
-const BestProduct: React.FC = () => {
+const PopularProduct: React.FC = () => {
   const [ean, setEan] = useState<string | undefined>(undefined);
-  const [query, setQuery] = useState({skip: 0, take: 10, search: "", filterKey: "Filter Options", bestProduct:"true"});
+  const [query, setQuery] = useState({skip: 0, take: 10, search: "", filterKey: "Filter Options", popularProduct:"true"});
 
   const { update} = usePostToWebshop();
   const { fetch, data} = useFetchByLoad();
@@ -21,11 +21,11 @@ const BestProduct: React.FC = () => {
   const refreshData = () => {
     fetch({ url: resource, query: JSON.stringify(query) })
   };
-  const handleBestProductToggle = async (bestProduct:any) => {
+  const handleBestProductToggle = async (popularProduct:any) => {
     try {
-      await update(`${resource}/update-webshop-status`, { ean, bestProduct });
+      await update(`${resource}/update-webshop-status`, { ean, popularProduct });
       refreshData();
-      message.success(`Product ${bestProduct ? 'marked as' : 'removed from'} Best Product`);
+      message.success(`Product ${popularProduct ? 'marked as' : 'removed from'} Popular Product`);
     } catch (error) {
       console.error("Error updating product status:", error);
       message.error("Error updating product status");
@@ -35,7 +35,7 @@ const BestProduct: React.FC = () => {
   return (
     <div className="container mt-4">
       <div className=' w-100 d-flex justify-content-between align-items-center my-2'>
-      <h3>Best Selling Products</h3>
+      <h3>Popular Products</h3>
       </div>
 
       <div className=' d-flex mb-4' style={{gap:"1rem"}}>
@@ -74,27 +74,10 @@ const BestProduct: React.FC = () => {
         </table>
       </div>
       <nav aria-label="Page navigation example" className="d-flex justify-content-between align-items-center">
-        {/* <ul className="pagination">
-          <li className="page-item">
-            <a className="page-link" href="#" aria-label="Previous">
-              <span aria-hidden="true">&laquo;</span>
-            </a>
-          </li>
-          <li className="page-item">
-            <a className="page-link" href="#">
-              1
-            </a>
-          </li>
-          <li className="page-item">
-            <a className="page-link" href="#" aria-label="Next">
-              <span aria-hidden="true">&raquo;</span>
-            </a>
-          </li>
-        </ul> */}
         <p>Showing 1 to {data?.data?.length} of {data?.data?.length} entries</p>
       </nav>
     </div>
   );
 };
 
-export default BestProduct;
+export default PopularProduct;
