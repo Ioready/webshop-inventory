@@ -78,26 +78,33 @@ export const cms = {
             res.status(500).json({ message: 'Server error', error });
         }
     },
-    deleteCms: async (req, res) => {
+    deleteCms : async (req, res) => {
         try {
-          const { _id } = req.body.body
-          console.log("id", _id);
-          // Remove the specific section from the herosection array
-          await ContentManagement.updateOne(
-            {},
-            { $pull: { herosection: { _id } } }
-          );
-      
-          res.status(200).json({ success: true, message: "Hero section deleted successfully" });
+            const { _id, type } = req.body.body; // Assuming you send type as 'herosection' or 'blogs'
+            
+            let updateQuery;
+            if (type === 'herosection') {
+                updateQuery = { $pull: { herosection: { _id } } };
+            } else if (type === 'blogs') {
+                updateQuery = { $pull: { blogs: { _id } } };
+            }
+    
+            if (updateQuery) {
+                await ContentManagement.updateOne({}, updateQuery);
+                res.status(200).json({ success: true, message: `${type} deleted successfully` });
+            } else {
+                res.status(400).json({ success: false, message: "Invalid type provided" });
+            }
         } catch (error) {
-          console.log(error);
-          res.status(500).send({
-            success: false,
-            message: "Server error",
-            error,
-          });
+            console.error(error);
+            res.status(500).send({
+                success: false,
+                message: "Server error",
+                error,
+            });
         }
-      }
+    }
+    
       
 
 };

@@ -7,7 +7,6 @@ import { useDelete, useFetchByLoad, usePost } from '../../../contexts';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { storage } from '../../firebase/firebase';
 import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
 import { message } from 'antd';
 
 interface Section {
@@ -18,9 +17,7 @@ interface Section {
 const resource='deleteCms';
 
 const Herosection: React.FC = () => {
-  const [sections, setSections] = useState<Section[]>([]);
   const [newSections, setNewSections] = useState<Section[]>([]);
-  const navigate = useNavigate();
   const { create } = usePost();
   const { fetch, data } = useFetchByLoad();
   const { remove} = useDelete();
@@ -74,7 +71,7 @@ const Herosection: React.FC = () => {
   const handleRemoveSection = async(_id: number) => {
     // setNewSections(newSections.filter(section => section._id !== _id));
       try {
-        remove(`${resource}`, { _id})
+        remove(`${resource}`, { _id,type:"herosection"})
         message.success("Selected products deleted successfully");
         refreshData();
       } catch (error) {
