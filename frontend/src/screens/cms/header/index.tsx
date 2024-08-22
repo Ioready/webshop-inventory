@@ -4,6 +4,8 @@ import { MdCloudUpload } from 'react-icons/md';
 import { useFetchByLoad, usePost } from '../../../contexts'; // Assuming you have a custom hook for posting data
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { storage } from '../../firebase/firebase';
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 
 const Header: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -14,11 +16,17 @@ const Header: React.FC = () => {
   const { create} = usePost();
   const { fetch, data } = useFetchByLoad();
 
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-      const file = event.target.files[0];
-      const imageUrl = URL.createObjectURL(file);
-      setImage(imageUrl);
+  const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      const file = event.target.files[0]; // Get the first file
+      const storageRef = ref(storage, `images/${file.name}`);
+      try {
+        await uploadBytes(storageRef, file);
+        const url = await getDownloadURL(storageRef);
+        setImage(url); // Set single logo URL
+      } catch (error) {
+        toast.error('Failed to upload image.');
+      }
     }
   };
 
@@ -85,7 +93,6 @@ const Header: React.FC = () => {
           <label 
             className="d-block border p-2" 
             style={{ cursor: 'pointer' }}
-            onClick={() => document.getElementById('imageUpload')?.click()}
           >
             {image ? (
               <img 

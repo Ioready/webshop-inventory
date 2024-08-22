@@ -197,6 +197,7 @@ export function FormData({ initialValues, handleUpdate, loading,categoryData }: 
                             }}  
                         />
                         <button onClick={() => setIsCategoryPopupOpen(true)} className=" btn border-1 btn-outline-secondary">Add</button>
+
                     
                     </div>
                     <div className="mb-4 d-flex w-100">
@@ -215,6 +216,7 @@ export function FormData({ initialValues, handleUpdate, loading,categoryData }: 
                             onChange={(option: SingleValue<OptionType>) => setFieldValue('subCategories', option ? option.value : '')}
                         />
                         <button onClick={() => setIsSubCategoryPopupOpen(true)} className=" btn border-1 btn-outline-secondary">Add</button>
+
                     
                     </div>
                     <div className="mb-4 d-flex w-100">
@@ -233,6 +235,7 @@ export function FormData({ initialValues, handleUpdate, loading,categoryData }: 
                             onChange={(option: SingleValue<OptionType>) => setFieldValue('subSubCategories', option ? option.value : '')}
                         />
                         <button onClick={() => setIsSubSubCategoryPopupOpen(true)} className=" btn border-1 btn-outline-secondary">Add</button>
+
                     </div>
                     {imageFields.map((field: any, index: any) => (
                         <div key={field.id} className="mb-4 flex items-center">

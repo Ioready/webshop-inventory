@@ -54,18 +54,6 @@ const cmsSchema = new mongoose.Schema({
       type: String,
     }
   },
-  topProduct: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Product',
-  },
-  bestSellingProduct: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Product',
-  },
-  topCategory: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Product',
-  },
   review: [{
     user: {
       type: String,

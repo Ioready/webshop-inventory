@@ -167,7 +167,20 @@ dotenv.config()
 //       console.error("Error:", error);
 //     }
 //   };
+
+// const callback= async () => {
+//     try{
+//     await Product.updateMany(
+//         {}, // No filter, so it updates all documents
+//     { $set: { popularProduct: false } }
+//      )
+//     }
+//     catch (error) {
+//       console.error("Error:", error);
+//     }
+// }
 // connectDB(callback);
+
 connectDB();
 const port = process.env.PORT
 

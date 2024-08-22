@@ -6,6 +6,7 @@ import { MainContext } from "../../../contexts/mainProvider";
 
 export const Header = () => {
   const { logout, sidebar, setSidebar, user } = useContext(MainContext)
+
   const navigate = useNavigate();
 
   return (

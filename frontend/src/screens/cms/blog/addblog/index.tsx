@@ -5,14 +5,17 @@ import 'react-quill/dist/quill.snow.css';
 import { usePost } from '../../../../contexts';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { storage } from '../../../firebase/firebase';
+import ReactQuill from 'react-quill';
+
 
 const BlogForm: React.FC = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [image, setImage] = useState<string[]>([]);
 
-  const { create} = usePost();
-
+  const { create } = usePost();
   const navigate = useNavigate();
 
   const handleUpdate = async () => {
@@ -20,13 +23,13 @@ const BlogForm: React.FC = () => {
       blogs: {
         title,
         description,
-        image,
+        image,  // Firebase image URLs
         date: new Date(),
       }
     };
 
     try {
-      const response = await create('addCms', body);
+      await create('addCms', body);
       toast.success('Blog added successfully!');
       navigate('/cms/blog-list');
     } catch (error) {
@@ -34,23 +37,24 @@ const BlogForm: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    // Cleanup URLs on component unmount
-    return () => {
-      image.forEach((url) => URL.revokeObjectURL(url));
-    };
-  }, [image]);
-
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
-      const fileArray = Array.from(event.target.files).map((file) => URL.createObjectURL(file));
-      setImage((prevImages) => prevImages.concat(fileArray));
+      const files = Array.from(event.target.files);
+      const uploadedImages = await Promise.all(
+        files.map(async (file) => {
+          const storageRef = ref(storage, `images/${file.name}`);
+          await uploadBytes(storageRef, file);
+          const url = await getDownloadURL(storageRef);
+          return url;
+        })
+      );
+      setImage((prevImages) => [...prevImages, ...uploadedImages]);
     }
   };
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    // Handle form submission
+    handleUpdate();
   };
 
   return (
@@ -71,9 +75,9 @@ const BlogForm: React.FC = () => {
         
         <div className="form-group mt-3">
           <label htmlFor="blogDescription">Description</label>
-          <input 
+          <ReactQuill 
             value={description} 
-            onChange={ (e) => setDescription(e.target.value)}
+            onChange={(content: string) => setDescription(content)}
             placeholder="Please Write Your Content Here" 
           />
         </div>
@@ -103,7 +107,7 @@ const BlogForm: React.FC = () => {
           </div>
         </div>
 
-        <button type="submit" className="btn btn-primary mt-3" onClick={handleUpdate}>
+        <button type="submit" className="btn btn-primary mt-3">
           Submit
         </button>
       </form>

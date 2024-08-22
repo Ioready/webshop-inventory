@@ -63,7 +63,7 @@ const Blog: React.FC = () => {
                 <tr key={index}>
                   <td className="text-center text-nowrap" style={{ cursor: "pointer" }}>{blog.title}</td>
                   <td className="text-center text-nowrap" style={{ cursor: "pointer" }}>
-                    <img src={blog?.image} alt={blog.title} className='img-fluid' style={{ height: "5rem", objectFit: 'cover' }} />
+                    <img src={blog?.image[0]} alt={blog.title} className='img-fluid' style={{ height: "5rem", objectFit: 'cover' }} />
                   </td>
                   <td className="text-center text-nowrap" style={{ cursor: "pointer" }}>
                     {new Date(blog.date).toLocaleDateString()}

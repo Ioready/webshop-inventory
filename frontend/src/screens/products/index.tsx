@@ -58,15 +58,6 @@ export default function Lists() {
 
   const refreshData = () => {
     fetch({ url: resource, query: JSON.stringify(query) })
-      .then(() => {
-        if (data?.data) {
-          // Log the product data and IDs
-          console.log("Fetched Product Data (refresh):", data.data);
-          data.data.forEach((item: any) => {
-            console.log("Product ID (refresh):", item.id);
-          });
-        }
-      });
     setDetail(null);
     setSelectedRowKeys([]);
   };

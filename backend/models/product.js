@@ -23,6 +23,12 @@ const ProductSchema = new Schema(
     images: [String],
     totalStock:String,
     isWebshopProduct:Boolean,
+    bestProduct:Boolean,
+    topProduct:Boolean,
+    popularProduct:{
+      type: Boolean,
+      default: false,
+    },
     tags: String,
     weight: Number,
     taxValue: Number,

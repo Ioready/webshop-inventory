@@ -3,55 +3,101 @@ import Product from "../models/product.js";
 import Category from "../models/category.js";
 
 export const products = {
+  // markWebshopProduct :async (req, res) => {
+  //   try {
+  //     const { productIds, isWebshopProduct } = req.body;
+
+  //     const result = await Product.updateMany(
+  //       { _id: { $in: productIds } },
+  //       { $set: { isWebshopProduct } }
+  //     );
+  //     res.status(200).json({ message: 'Products marked as Webshop product', result });
+  //   } catch (error) {
+  //     res.status(500).json({ message: 'Server error', error });
+  //   }
+  // },
   markWebshopProduct :async (req, res) => {
     try {
-      const { productIds, isWebshopProduct } = req.body;
+      const { productIds, isWebshopProduct, bestProduct, topProduct,popularProduct, ean } = req.body;
 
+      let filter = {};
+
+      if (productIds) {
+        filter = { _id: { $in: productIds } };
+      } else if (ean) {
+        filter = { ean };
+      }
+
+      const updateFields = {};
+
+      if (typeof isWebshopProduct !== 'undefined') {
+        updateFields.isWebshopProduct = isWebshopProduct;
+      }
+      if (typeof bestProduct !== 'undefined') {
+        updateFields.bestProduct = bestProduct;
+      }
+      if (typeof topProduct !== 'undefined') {
+        updateFields.topProduct = topProduct;
+      }
+      if (typeof popularProduct !== 'undefined') {
+        updateFields.popularProduct = popularProduct;
+      }
       const result = await Product.updateMany(
-        { _id: { $in: productIds } },
-        { $set: { isWebshopProduct } }
+        filter,
+        { $set: updateFields }
       );
-      res.status(200).json({ message: 'Products marked as Webshop product', result });
+
+      res.status(200).json({ message: 'Products updated successfully', result });
     } catch (error) {
       res.status(500).json({ message: 'Server error', error });
     }
   },
 
-  addCategory :async (req, res) => {
+
+  addCategory: async (req, res) => {
     try {
-      const { categories, subCategories,subSubCategories } = req.body;
+      const { categories, subCategories, subSubCategories } = req.body;
       const categoryId = '66b1036ef752edb1c5e86e93';
       const updateObject = {};
-    if (categories) {
-      updateObject['$push'] = {
-        categories: { $each: [categories] }
-      };
-    }
-    if (subCategories) {
-      updateObject['$push'] = {
-        ...updateObject['$push'],
-        subCategories: { $each: [subCategories] }
-      };
-    }
-    if (subSubCategories) {
-      updateObject['$push'] = {
-        ...updateObject['$push'],
-        subSubCategories: { $each: [subSubCategories] }
-      };
-    }
-
-    // Perform the update
-    const result = await Category.findByIdAndUpdate(
-      categoryId,
-      updateObject,
-      { new: true, upsert: true }
-    );
-      
+  
+      if (categories) {
+        const categoryItems = categories.map(cat => ({
+          name: cat.categorie,
+          image: cat.image,
+          topCategory: cat.topCategory || false,
+        }));
+        updateObject['$push'] = {
+          categories: { $each: categoryItems },
+        };
+      }
+  
+      if (subCategories) {
+        updateObject['$push'] = {
+          ...updateObject['$push'],
+          subCategories: { $each: subCategories },
+        };
+      }
+  
+      if (subSubCategories) {
+        updateObject['$push'] = {
+          ...updateObject['$push'],
+          subSubCategories: { $each: subSubCategories },
+        };
+      }
+  
+      // Perform the update
+      const result = await Category.findByIdAndUpdate(
+        categoryId,
+        updateObject,
+        { new: true, upsert: true }
+      );
+  
       res.status(200).json({ message: 'Categories added successfully', result });
     } catch (error) {
       res.status(500).json({ message: 'Server error', error });
     }
   },
+  
 
   getCategory: async (req, res) => {
     try {
@@ -123,7 +169,7 @@ export const products = {
   
   getProducts: async (req, res) => {
     try {
-      let { skip, take, search,filterKey,isWebshopProduct } = req.query;
+      let { skip, take, search,filterKey,filterValue,isWebshopProduct,bestProduct,topProduct,popularProduct } = req.query;
       skip = parseInt(skip);
       take = parseInt(take);
       const myFieldDataExists = await Product.exists({ myField: { $exists: true, $ne: null } });
@@ -156,13 +202,30 @@ export const products = {
           ];
         }
       }
-      if (filterKey) {
+      if (filterKey && !filterValue) {
         query[filterKey] = { $exists: false };
+      }
+
+      if (filterKey && filterKey === "categories" && filterValue) {
+        query[filterKey] = { $in: filterValue }; // Find products with categories in the filterValue array
       }
 
       if (isWebshopProduct === 'true' || isWebshopProduct === 'false') {
         query.isWebshopProduct = (isWebshopProduct === 'true');
       }
+
+      if (bestProduct === 'true' || bestProduct === 'false') {
+        query.bestProduct = (bestProduct === 'true');
+      }
+
+      if (topProduct === 'true' || topProduct === 'false') {
+        query.topProduct = (topProduct === 'true');
+      }
+
+      if (popularProduct === 'true' || popularProduct === 'false') {
+        query.popularProduct = (popularProduct === 'true');
+      }
+
 
       const products = await Product.find(query).skip(skip).limit(take);
       const platformCount = await Product.aggregate([

@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Select from 'react-select';
 import { MdCloudUpload } from 'react-icons/md';
+import { usePost } from '../../../contexts';
 
 
 const AddCategory: React.FC = () => {
   const [image, setImage] = useState<string>(''); // Assuming this is the path to your initial image
-
+  const [categorie, setCategorie] = useState<string>('');
+  const { create} = usePost();
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0];
@@ -15,8 +17,16 @@ const AddCategory: React.FC = () => {
     }
   };
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async(event: React.FormEvent) => {
     event.preventDefault();
+    // await create('addCategory', { name: categorie ,image });
+    const newCategory = {
+      categorie, // Ensure 'categorie' holds the correct name
+      image, // Assuming 'image' is also correctly defined
+      topCategory: false // or true, depending on your logic
+  };
+
+  await create('addCategory', { categories: [newCategory] });
   };
 
   return (
@@ -62,6 +72,7 @@ const AddCategory: React.FC = () => {
           <input
             type="text"
             className="form-control"
+            onChange={(e)=>{setCategorie(e.target.value)}}
           />
         </div>
 

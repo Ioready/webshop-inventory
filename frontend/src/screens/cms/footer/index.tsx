@@ -4,10 +4,11 @@ import { MdCloudUpload } from 'react-icons/md';
 import { useFetchByLoad, usePost } from '../../../contexts';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-// toast.configure();
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { storage } from '../../firebase/firebase';
 
 const Footer: React.FC = () => {
-  const [logo , setLogo] = useState<string>(' '); // Logo image
+  const [logo, setLogo] = useState<string>(''); // Single logo image URL
   const [content, setContent] = useState('');
   const [address, setAddress] = useState('');
   const [taxInformation, setTaxInformation] = useState('');
@@ -15,14 +16,23 @@ const Footer: React.FC = () => {
 
   const { create } = usePost();
   const { fetch, data } = useFetchByLoad();
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-      const file = event.target.files[0];
-      const imageUrl = URL.createObjectURL(file);
-      setLogo(imageUrl);
+
+  // Handle image upload
+  const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      const file = event.target.files[0]; // Get the first file
+      const storageRef = ref(storage, `images/${file.name}`);
+      try {
+        await uploadBytes(storageRef, file);
+        const url = await getDownloadURL(storageRef);
+        setLogo(url); // Set single logo URL
+      } catch (error) {
+        toast.error('Failed to upload image.');
+      }
     }
   };
 
+  // Fetch footer data on component mount
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -34,64 +44,52 @@ const Footer: React.FC = () => {
     fetchData();
   }, []);
 
-
+  // Update state when data changes
   useEffect(() => {
-      try {
-        if (data && data.footer) {
-          setAddress(data.footer.address);
-          setContent(data.footer.content);
-          setLogo(data.footer.logo);
-          setTaxInformation(data.footer.taxInformation);
-          setNewsletterContent(data.footer.newsletterContent);
-        }
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-
+    if (data && data.footer) {
+      setAddress(data.footer.address);
+      setContent(data.footer.content);
+      setLogo(data.footer.logo);
+      setTaxInformation(data.footer.taxInformation);
+      setNewsletterContent(data.footer.newsletterContent);
+    }
   }, [data]);
 
-  const handleSubmit = async(event: React.FormEvent) => {
+  // Handle form submission
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-try{
-    const body = {
-      footer: {
-        logo,
-        content,
-        address,
-        taxInformation,
-        newsletterContent,
-      }
-    };
-
-    await create('addCms', body);
-    toast.success('Footer updated successfully');
-   }
-  catch(error) {
-    toast.error('Failed to update footer');
-  }
+    try {
+      const body = {
+        footer: {
+          logo,
+          content,
+          address,
+          taxInformation,
+          newsletterContent,
+        }
+      };
+      await create('addCms', body);
+      toast.success('Footer updated successfully');
+    } catch (error) {
+      toast.error('Failed to update footer');
+    }
   };
-
-
 
   return (
     <div className="container mt-4">
       <h3 className='my-2'>Footer</h3>
       <form onSubmit={handleSubmit} className="row">
         <div className="col-12 mb-3">
-          <h4 className="font-weight-bold m-0">Logo</h4>
-        </div>
-        <div className="col-12 mb-3">
           <label 
             className="d-block border p-2" 
             style={{ cursor: 'pointer' }}
-            onClick={() => document.getElementById('imageUpload')?.click()}
           >
             {logo ? (
               <img 
                 src={logo} 
-                alt="upload" 
+                alt="Logo" 
                 className="img-fluid" 
-                style={{height:"7rem", objectFit:"cover"}}
+                style={{ height: "7rem", objectFit: "cover" }}
               />
             ) : (
               <div className="text-center">
@@ -104,7 +102,6 @@ try{
               id="imageUpload" 
               className="d-none" 
               onChange={handleImageChange} 
-              style={{height:"7rem"}}
             />
           </label>
         </div>
