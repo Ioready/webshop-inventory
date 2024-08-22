@@ -8,6 +8,10 @@ import { useState } from "react";
 import Select, { SingleValue } from 'react-select';
 import CreatableSelect from 'react-select/creatable';
 import { Link } from "react-router-dom";
+import AddCategoryPopup from "./addcategory";
+import AddSubCategoryPopup from "./addsubcategory";
+import AddSubSubCategoryPopup from "./addsubsubcategory";
+import './category.css';
 
 interface OptionType {
     value: string;
@@ -49,6 +53,9 @@ export function FormData({ initialValues, handleUpdate, loading,categoryData }: 
         : 
         [{ id: 1, value: "" }]
     );
+    const [isCategoryPopupOpen, setIsCategoryPopupOpen] = useState(false);
+    const [isSubCategoryPopupOpen, setIsSubCategoryPopupOpen] = useState(false);
+    const [isSubSubCategoryPopupOpen, setIsSubSubCategoryPopupOpen] = useState(false);
     
     const [selectedPlatform, setSelectedPlatform] = useState(initialValues?.platform?.split(",") || []);
 
@@ -100,6 +107,7 @@ export function FormData({ initialValues, handleUpdate, loading,categoryData }: 
     };
 
     return (
+        <>
         <Formik
             initialValues={initialValues?.edit ? formattedInitialValues : initialData}
             validationSchema={validationSchema}
@@ -179,7 +187,7 @@ export function FormData({ initialValues, handleUpdate, loading,categoryData }: 
                                 label: category  // The label shown to the user
                               })) || []
                             }
-                            placeholder="Select Categorie"
+                            placeholder="Select Category"
                             onChange={(option: SingleValue<OptionType>) => setFieldValue('categories', option ? option.value : '')}
                             onCreateOption={async (newCategory) => {
                                 // Add the new category to the list
@@ -188,7 +196,8 @@ export function FormData({ initialValues, handleUpdate, loading,categoryData }: 
                                 setFieldValue('categories', newCategory);
                             }}  
                         />
-                        <Link to="/addcategory"><button className=" btn border-1 btn-outline-secondary">Add</button></Link>
+                        <button onClick={() => setIsCategoryPopupOpen(true)} className=" btn border-1 btn-outline-secondary">Add</button>
+
                     
                     </div>
                     <div className="mb-4 d-flex w-100">
@@ -203,10 +212,11 @@ export function FormData({ initialValues, handleUpdate, loading,categoryData }: 
                                 value: category, // The value used internally by the select component
                                 label: category  // The label shown to the user
                               })) || []}
-                            placeholder="Select Sub Categorie"
+                            placeholder="Select Sub Category"
                             onChange={(option: SingleValue<OptionType>) => setFieldValue('subCategories', option ? option.value : '')}
                         />
-                        <Link to="/addsubcategory"><button className=" btn border-1 btn-outline-secondary">Add</button></Link>
+                        <button onClick={() => setIsSubCategoryPopupOpen(true)} className=" btn border-1 btn-outline-secondary">Add</button>
+
                     
                     </div>
                     <div className="mb-4 d-flex w-100">
@@ -221,10 +231,11 @@ export function FormData({ initialValues, handleUpdate, loading,categoryData }: 
                                 value: category, // The value used internally by the select component
                                 label: category  // The label shown to the user
                               })) || []}
-                            placeholder="Select Sub Sub Categorie"
+                            placeholder="Select Sub Sub Category"
                             onChange={(option: SingleValue<OptionType>) => setFieldValue('subSubCategories', option ? option.value : '')}
                         />
-                        <Link to="/addsubsubcategory"><button className=" btn border-1 btn-outline-secondary">Add</button></Link>
+                        <button onClick={() => setIsSubSubCategoryPopupOpen(true)} className=" btn border-1 btn-outline-secondary">Add</button>
+
                     </div>
                     {imageFields.map((field: any, index: any) => (
                         <div key={field.id} className="mb-4 flex items-center">
@@ -388,5 +399,13 @@ export function FormData({ initialValues, handleUpdate, loading,categoryData }: 
                 </div>
             )}
         </Formik>
+        
+        {/* Category Popup */}
+      {isCategoryPopupOpen && <AddCategoryPopup item='Category' onClose={() => setIsCategoryPopupOpen(false)} />}
+      {/* Subcategory Popup */}
+      {isSubCategoryPopupOpen && <AddSubCategoryPopup item='Sub-Category' onClose={() => setIsSubCategoryPopupOpen(false)} />}
+      {/* Sub-subcategory Popup */}
+      {isSubSubCategoryPopupOpen && <AddSubSubCategoryPopup item='Sub-Sub Category' onClose={() => setIsSubSubCategoryPopupOpen(false)} />}
+    </>
     );
 }
