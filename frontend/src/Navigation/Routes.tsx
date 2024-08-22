@@ -31,6 +31,7 @@ import ReviewForm from '../screens/cms/review/editreview';
 import AddCategory from '../screens/products/add/addcategorie';
 import AddSubCategory from '../screens/products/add/addsubcategorie';
 import AddSubSubCategory from '../screens/products/add/addsubsubcategorie';
+import ManageCategories from '../screens/category';
 
 const Scanner = lazy(() => import('../screens/scanner'));
 const SalesReport = lazy(() => import('../screens/sales-report'));
@@ -51,6 +52,7 @@ export const Navigation = () => {
           <Route path="/webshop-product" element={<Webshopproduct />} />
           <Route path="/customer" element={<CustomerPage />} />
           <Route path="/enqury" element={<Enqury />} />
+          <Route path="/manage-category" element={<ManageCategories />} />
           <Route path="/addcategory" element={<AddCategory />} />
           <Route path="/addsubcategory" element={<AddSubCategory />} />
           <Route path="/addsubsubcategory" element={<AddSubSubCategory />} />

@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { MdEdit } from "react-icons/md";
+import { MdDelete } from "react-icons/md";
 import { Link } from 'react-router-dom';
 import { useFetchByLoad } from '../../../contexts';
+import Delete from './delete';
 
 interface Blog {
   title: string;
@@ -12,6 +14,17 @@ interface Blog {
 }
 
 const Blog: React.FC = () => {
+
+  const [popupCustomer, setPopupCustomer] = useState(false);
+
+  const closePopup = () => {
+    setPopupCustomer(false);
+  };
+
+  const handleDeleteClick = () => {
+    setPopupCustomer(true);
+  };
+
   const { fetch, data } = useFetchByLoad();
   useEffect(() => {
     const fetchData = async () => {
@@ -38,25 +51,26 @@ const Blog: React.FC = () => {
         <table className="table table-striped table-bordered table-hover">
           <thead className="thead-dark">
             <tr>
-              <th className="text-center">Edit</th>
               <th className="text-center">Title</th>
               <th className="text-center">Image</th>
               <th className="text-center">Date</th>
+              <th className="text-center">Action</th>
             </tr>
           </thead>
           <tbody>
             {data?.blogs?.length > 0 ? (
               data?.blogs.map((blog:any, index:any) => (
                 <tr key={index}>
-                  <td className="text-center text-nowrap" style={{ cursor: "pointer" }}>
-                    <Link to={`/add-blog`}><MdEdit style={{ fontSize: "x-large" }} /></Link>
-                  </td>
                   <td className="text-center text-nowrap" style={{ cursor: "pointer" }}>{blog.title}</td>
                   <td className="text-center text-nowrap" style={{ cursor: "pointer" }}>
                     <img src={blog?.image} alt={blog.title} className='img-fluid' style={{ height: "5rem", objectFit: 'cover' }} />
                   </td>
                   <td className="text-center text-nowrap" style={{ cursor: "pointer" }}>
                     {new Date(blog.date).toLocaleDateString()}
+                  </td>
+                  <td className="text-center text-nowrap" style={{ cursor: "pointer" }}>
+                    <Link to={`/add-blog`}><MdEdit style={{ fontSize: "x-large" }} /></Link>
+                  <button onClick={handleDeleteClick} className="btn btn-sm ml-2"><MdDelete style={{ fontSize: "x-large" }} className=' text-danger'/></button>
                   </td>
                 </tr>
               ))
@@ -89,6 +103,10 @@ const Blog: React.FC = () => {
         </ul>
         <p>Showing 1 to {data?.blogs?.length} of {data?.blogs?.length} entries</p>
       </nav>
+
+      {popupCustomer && (
+        <Delete onClose={closePopup} />
+      )}
     </div>
   );
 };

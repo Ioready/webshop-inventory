@@ -66,6 +66,12 @@ export const Sidebar = () => {
     },
     {
       icon: <MdDashboardCustomize />,
+      label: "Manage Category",
+      value: "manage-category",
+      isShow: true,
+    },
+    {
+      icon: <MdDashboardCustomize />,
       label: "Content Management",
       value: "cms",
       isShow: true,
