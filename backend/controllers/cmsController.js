@@ -78,8 +78,26 @@ export const cms = {
             res.status(500).json({ message: 'Server error', error });
         }
     },
-    editCms:async (req, res) => {
-         
-    }
+    deleteCms: async (req, res) => {
+        try {
+          const { _id } = req.body.body
+          console.log("id", _id);
+          // Remove the specific section from the herosection array
+          await ContentManagement.updateOne(
+            {},
+            { $pull: { herosection: { _id } } }
+          );
+      
+          res.status(200).json({ success: true, message: "Hero section deleted successfully" });
+        } catch (error) {
+          console.log(error);
+          res.status(500).send({
+            success: false,
+            message: "Server error",
+            error,
+          });
+        }
+      }
+      
 
 };
