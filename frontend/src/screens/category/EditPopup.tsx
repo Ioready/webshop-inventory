@@ -17,7 +17,10 @@ const EditPopup: React.FC<EditPopupProps> = ({ onClose, item }) => {
             className="form-control h-25"
             placeholder={`${item}`}
           />
-        <button onClick={onClose} className="btn btn-danger mt-2">Close</button>
+          <div className=' d-flex align-items-center'>
+        <button onClick={onClose} className="btn btn-info mt-2">Save</button>
+        <button onClick={onClose} className="btn btn-danger mt-2 ms-1">Close</button>
+        </div>
       </div>
     </div>
   );
