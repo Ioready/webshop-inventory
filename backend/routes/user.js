@@ -9,7 +9,7 @@ const upload = multer({ dest: 'uploads/' });
 
 const {addCms,getCms,deleteCms} = cms;
 const { userLogin,webshopLogin,webshopRegister } = user;
-const { createProduct, getProducts, editProduct, setStores,setCsvData, deleteProduct, csvFileUpload, getAllProduct,markWebshopProduct,addCategory,getCategory} = products;
+const { createProduct, getProducts, editProduct, setStores,setCsvData, deleteProduct, csvFileUpload, getAllProduct,markWebshopProduct,addCategory,getCategory,editCategory,getProductById} = products;
 const { verifyToken } = auth
 const userRout = express.Router();
 
@@ -17,6 +17,7 @@ userRout.post("/addCms", addCms);
 userRout.get("/getCms", getCms);
 userRout.post("/deleteCms/:id",deleteCms);
 userRout.post("/addCategory", addCategory);
+userRout.patch("/editCategory/:id", editCategory);
 userRout.get("/getCategory", getCategory);
 userRout.post("/webshopLogin", webshopLogin);
 userRout.post("/webshopRegister", webshopRegister);
@@ -30,5 +31,6 @@ userRout.patch("/products/:id", verifyToken , setStores);
 userRout.patch("/products/csv/undefined", verifyToken , setCsvData);
 userRout.post("/products/:id", verifyToken , deleteProduct);
 userRout.patch("/products/update-webshop-status/undefined", verifyToken , markWebshopProduct);
+userRout.get("/getProductByIds", getProductById);
 
 export default userRout;

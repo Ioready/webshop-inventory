@@ -1,134 +1,70 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 const { ObjectId } = mongoose.Schema;
 
 const Schema = mongoose.Schema(
   {
-    billNumber: {
-      type: String,
-    },
-    customerId: {
+    userId: {
       type: ObjectId,
-      ref: "Customer",
+      ref: 'webshopUser',
     },
-    cartId: {
-      type: ObjectId,
-      ref: "Cart",
-    },
-
-    // store: {
-    //   type: ObjectId,
-    //   ref: "Store",
-    // },
-    // pos: {
-    //   type: ObjectId,
-    //   ref: "Pos",
-    // },
-
-    item: [
-      {
-        product: {
-          type: ObjectId,
-          ref: "Item",
-        },
-        price: {
-          type: Number,
-          required: true,
-        },
-        quantity: {
-          type: Number,
-          default: 1,
-          required: true,
-        },
-        variant: {
-          type: String,
-        },
-        tableNumber: {
-          type: String,
-        },
-        is_canceled: {
-          type: Boolean,
-          default: false,
-        },
-        modifier: [
-          {
-            name: {
-              type: String,
-            },
-            quantity: {
-              type: Number,
-              default: 1,
-            },
-            price: {
-              type: Number,
-            },
-          },
-        ],
+    orderDetails:[{
+      productId: {
+        type: ObjectId, 
+        ref: 'Product',
       },
-    ],
-    employeeId: {
-      type: ObjectId,
-      ref: "Employee",
-    },
-    orderType: {
+      quantity: { 
+        type: Number, 
+        required: true, 
+        default: 1 
+      },
+      totalAmount:{
+        type: Number, 
+      },
+    }],
+    date: {
       type: String,
-      required: true,
-    },
-    tableNumber: {
-      type: String,
-    },
-    delivered_date: {
-      type: Date,
-    },
-    totalPrice: {
-      type: Number,
-    },
-    discount: {
-      type: Number,
-    },
-    tax: {
-      type: Number,
-      default: 0,
-    },
-    grandTotal: {
-      type: Number,
-    },
-    refund: {
-      type: Number,
-      default: 0,
-    },
-
-    orderStatus: {
-      type: String,
-    },
-    customer_cancelled: {
-      type: Boolean,
-      default: false,
-    },
-    employee_cancelled: {
-      type: Boolean,
-      default: false,
-    },
-    return_reason: {
-      type: String,
-    },
-    is_returned: {
-      type: Boolean,
-      default: false,
     },
     address: {
-      type: Array,
-    },
-    paymentType:{
-      type: String
-    },
-    paymentStatus: {
-      type: String,
-    },
-    amountRecieved: {
-      type: Number,
-    },
-    balanceAmount: {
-      type: Number,
+      firstName: {
+        type: String,
+        required: true,
+      },
+      lastName: {
+        type: String,
+        required: true,
+      },
+      company: {
+        type: String,
+        required: false, // Optional field
+      },
+      address: {
+        type: String,
+        required: true,
+      },
+      addressComplement: {
+        type: String,
+        required: false, // Optional field
+      },
+      city: {
+        type: String,
+        required: true,
+      },
+      state: {
+        type: String,
+        required: true,
+      },
+      zipCode: {
+        type: String,
+        required: true,
+      },
+      country: {
+        type: String,
+        required: true,
+      },
+      phone: {
+        type: String,
+        required: false, // Optional field
+      },
     },
   },
   {
@@ -138,4 +74,4 @@ const Schema = mongoose.Schema(
 
 const Orders = mongoose.model("Orders", Schema);
 
-module.exports = Orders;
+export default Orders;
