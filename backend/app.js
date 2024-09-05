@@ -185,6 +185,7 @@ dotenv.config()
 
 
 
+
 // const callback = async () => {
 //     try {
 //         for (const entry of data) {
@@ -196,23 +197,52 @@ dotenv.config()
 //             });
 
 //             if (category) {
-//                 // Category exists, update it with the subCategories and subSubCategories
-//                 await Category.updateOne(
-//                     {
-//                         _id: category._id,
-//                         'categories.name': categories
-//                     },
-//                     {
-//                         $addToSet: {
-//                             'categories.$.subCategories': {
-//                                 name: subCategories,
-//                                 subSubCategories: subSubCategories ? [{ name: subSubCategories }] : []
+//                 // Category exists, check if the subCategory already exists
+//                 const existingSubCategory = category.categories.find(cat => cat.name === categories)
+//                     .subCategories.find(subCat => subCat.name === subCategories);
+
+//                 if (existingSubCategory) {
+//                     // SubCategory exists, check if the subSubCategory exists
+//                     if (subSubCategories && !existingSubCategory.subSubCategories.some(subSub => subSub.name === subSubCategories)) {
+//                         // Add the subSubCategory if it doesn't already exist
+//                         await Category.updateOne(
+//                             {
+//                                 _id: category._id,
+//                                 'categories.name': categories,
+//                                 'categories.subCategories.name': subCategories
+//                             },
+//                             {
+//                                 $addToSet: {
+//                                     'categories.$[categoryElem].subCategories.$[subCatElem].subSubCategories': { name: subSubCategories }
+//                                 }
+//                             },
+//                             {
+//                                 arrayFilters: [
+//                                     { 'categoryElem.name': categories },
+//                                     { 'subCatElem.name': subCategories }
+//                                 ]
+//                             }
+//                         );
+//                     }
+//                 } else {
+//                     // SubCategory doesn't exist, add it along with the subSubCategory
+//                     await Category.updateOne(
+//                         {
+//                             _id: category._id,
+//                             'categories.name': categories
+//                         },
+//                         {
+//                             $addToSet: {
+//                                 'categories.$.subCategories': {
+//                                     name: subCategories,
+//                                     subSubCategories: subSubCategories ? [{ name: subSubCategories }] : []
+//                                 }
 //                             }
 //                         }
-//                     }
-//                 );
+//                     );
+//                 }
 //             } else {
-//                 // Category doesn't exist, create it
+//                 // Category doesn't exist, create it with subCategories and subSubCategories
 //                 await Category.updateOne(
 //                     {},
 //                     {
