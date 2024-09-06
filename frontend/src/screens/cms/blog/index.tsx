@@ -82,7 +82,7 @@ const Blog: React.FC = () => {
                     {new Date(blog.date).toLocaleDateString()}
                   </td>
                   <td className="text-center text-nowrap" style={{ cursor: "pointer" }}>
-                    <Link to={`/add-blog`}><MdEdit style={{ fontSize: "x-large" }} /></Link>
+                    <Link to={`/add-blog`} state={{ blog }}><MdEdit style={{ fontSize: "x-large" }} /></Link>
                   <button onClick={()=>handleDeleteClick(blog?._id)} className="btn btn-sm ml-2"><MdDelete style={{ fontSize: "x-large" }} className=' text-danger'/></button>
                   </td>
                 </tr>

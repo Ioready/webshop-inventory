@@ -78,6 +78,7 @@ export const cms = {
             res.status(500).json({ message: 'Server error', error });
         }
     },
+
     deleteCms : async (req, res) => {
         try {
             const { _id, type } = req.body.body; // Assuming you send type as 'herosection' or 'blogs'
@@ -103,8 +104,36 @@ export const cms = {
                 error,
             });
         }
-    }
+    },
     
-      
+      editBlog: async (req, res) => {
+    try {
+        const { blogId, title, description, image } = req.body; // Extract blog data from the request
+
+        // Find and update the specific blog based on blogId
+        const result = await ContentManagement.findOneAndUpdate(
+            {
+                "blogs._id": blogId // Find the blog by its unique _id within the blogs array
+            },
+            {
+                $set: {
+                    "blogs.$.title": title,
+                    "blogs.$.description": description,
+                    "blogs.$.image": image
+                }
+            },
+            { new: true } // Return the updated document
+        );
+
+        if (!result) {
+            return res.status(404).json({ message: "Blog not found" });
+        }
+
+        res.status(200).json({ message: "Blog updated successfully", result });
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error });
+    }
+},
+
 
 };

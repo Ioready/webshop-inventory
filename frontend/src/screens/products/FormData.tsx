@@ -282,6 +282,166 @@ export function FormData({ initialValues, handleUpdate, loading, categoryData }:
                 </button>
               </div>
             </div>
+
+            {imageFields.map((field:any, index:any) => (
+                        <div key={field.id} className="mb-4 flex items-center">
+                            <InputBox
+                                name={`images[${index}]`}
+                                label={`Image ${index + 1}`}
+                                placeholder="Enter Image URL"
+                                defaultValue={field.value}
+                                icon={<MdOutlineSubtitles />}
+                            />
+                            {index === imageFields.length - 1 && (
+                                <button type="button" className="btn btn-success" onClick={handleAddImageField}>
+                                    + Add Image
+                                </button>
+                            )}
+                            {index !== 0 && (
+                                <button type="button" className="btn btn-danger mx-3" onClick={() => handleDeleteImageField(field.id)}>
+                                    Delete
+                                </button>
+                            )}
+                        </div>
+                    ))}
+                    <div className="mb-4">
+                        <InputBox
+                            required={true}
+                            name="tags"
+                            label="Tag"
+                            placeholder="Enter Tag"
+                            icon={<MdOutlineSubtitles />}
+                        />
+                    </div>
+                    <div className="mb-4">
+                        <InputBox
+                            required={true}
+                            name="weight"
+                            label="Weight"
+                            type="number"
+                            placeholder="Enter Weight"
+                            icon={<MdOutlineSubtitles />}
+                        />
+                    </div>
+                    <div className="mb-4">
+                        <InputBox
+                            required={true}
+                            name="taxValue"
+                            label="Tax Value"
+                            type="number"
+                            placeholder="Enter Tax Value"
+                            icon={<MdOutlineSubtitles />}
+                        />
+                    </div>
+                    <div className="mb-4">
+                        <InputBox
+                            required={true}
+                            name="ean"
+                            label="Ean"
+                            type="number"
+                            placeholder="Enter Ean"
+                            icon={<MdOutlineSubtitles />}
+                        />
+                    </div>
+                    <div className="mb-4">
+                        <InputBox
+                            required={true}
+                            name="supplierRef"
+                            label="Supplier Ref"
+                            placeholder="Enter Supplier Ref"
+                            icon={<MdOutlineSubtitles />}
+                        />
+                    </div>
+                    <div className="mb-4">
+                        <InputBox
+                            required={true}
+                            name="brand"
+                            label="Brand"
+                            placeholder="Enter Brand"
+                            icon={<MdOutlineSubtitles />}
+                        />
+                    </div>
+                    <div className="mb-4">
+                        <InputBox
+                            required={true}
+                            name="size"
+                            label="Size"
+                            placeholder="Enter Size"
+                            icon={<MdOutlineSubtitles />}
+                        />
+                    </div>
+                    <div className="mb-4">
+                        <InputBox
+                            // required={true}
+                            name="sizeMixed"
+                            label="Size Mixed"
+                            placeholder="Enter Size Mixed"
+                            icon={<MdOutlineSubtitles />}
+                        />
+                    </div>
+                    <div className="mb-4">
+                        <InputBox
+                            required={true}
+                            name="colors"
+                            label="Color"
+                            placeholder="Enter Color"
+                            icon={<MdOutlineSubtitles />}
+                        />
+                    </div>
+                    <div className="mb-4">
+                        <InputBox
+                            // required={true}
+                            name="dogJacketType"
+                            label="Dog Jacket Type"
+                            placeholder="Enter Dog Jacket Type"
+                            icon={<MdOutlineSubtitles />}
+                        />
+                    </div>
+                    <div className="mb-4">
+                        <InputBox
+                            required={true}
+                            name="supplier"
+                            label="Supplier"
+                            placeholder="Enter Supplier"
+                            icon={<MdOutlineSubtitles />}
+                        />
+                    </div>
+                    <div className="mb-4">
+                        <InputBox
+                            // required={true}
+                            name="dogJacketSize"
+                            label="Dog Jacket Size"
+                            placeholder="Enter Dog Jacket Size"
+                            icon={<MdOutlineSubtitles />}
+                        />
+                    </div>
+                    <div className="mb-4">
+                        <InputBox
+                            required={true}
+                            name="scanCode"
+                            label="Scan Code"
+                            placeholder="Enter Scan Code"
+                            icon={<MdOutlineSubtitles />}
+                        />
+                    </div>
+                    <div className="mb-4">
+                        <InputBox
+                            required={true}
+                            name="purchasePrice"
+                            label="Purchase Price"
+                            placeholder="Enter Purchase Price"
+                            icon={<MdOutlineSubtitles />}
+                        />
+                    </div>
+                    <div className="mb-4">
+                        <InputBox
+                            required={true}
+                            name="price"
+                            label="Webshop Price"
+                            placeholder="Enter Webshop Price"
+                            icon={<MdOutlineSubtitles />}
+                        />
+                    </div>
             {/* Add more fields as needed */}
             <div className="d-flex">
               <ButtonBox
