@@ -48,7 +48,6 @@ const initialData = {
 };
 
 export function FormData({ initialValues, handleUpdate, loading, categoryData }: any) {
-  console.log('categories', categoryData?.categories[0]?.categories);
   const [imageFields, setImageFields] = useState(
     initialValues?.edit ?
       (initialValues.images.length > 0 ? initialValues.images.map((image: string, index: any) => ({ id: index + 1, value: image })) : [{ id: 1, value: "" }])
@@ -109,12 +108,27 @@ export function FormData({ initialValues, handleUpdate, loading, categoryData }:
     subSubCategories: initialValues?.subSubCategories?.value || initialValues?.subSubCategories,
   };
 
+  const handleSubmitt=(values:any)=>{
+// console.log('data',data)
+handleUpdate({
+  ...values,
+  sku: +values.sku,
+  weight: +values.weight,
+  taxValue: +values.taxValue,
+  ean: values.ean,
+  platform: selectedPlatform?.join(","),
+  // categories: selectedCategory,
+  // subCategories: selectedSubCategory,
+});
+  }
+
   return (
     <>
       <Formik
         initialValues={initialValues?.edit ? formattedInitialValues : initialData}
         validationSchema={validationSchema}
         onSubmit={async (values) => {
+          console.log('values',values)
           handleUpdate({
             ...values,
             sku: +values.sku,
@@ -446,8 +460,9 @@ export function FormData({ initialValues, handleUpdate, loading, categoryData }:
             <div className="d-flex">
               <ButtonBox
                 type="submit"
-                label={loading ? "Please wait..." : initialValues?.edit ? "Update" : "Submit"}
+                value={loading ? "Please wait..." : initialValues?.edit ? "Update" : "Submit"}
                 disabled={loading}
+                onClick={()=>{console.log('ehe'); handleSubmitt(values)}}
               />
               <Link to="/categories" className="btn border-1 btn-outline-secondary">
                 Cancel
