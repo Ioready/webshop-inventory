@@ -204,6 +204,7 @@ handleUpdate({
             </div>
             <div className="mb-4 d-flex w-100">
               <Select
+              className=' w-100 me-1'
               //@ts-ignore
                 value={typeof values.categories === 'string'
                   ? { value: values.categories, label: values.categories }
@@ -244,6 +245,7 @@ handleUpdate({
                   ? { value: values.subCategories, label: values.subCategories }
                   : values.subCategories
                 }
+                className=' w-100 me-1'
                 name="subCategories"
                 options={categoryData?.categories[0]?.categories?.find((cat: any,i:number) => i === selectedCategory)?.subCategories?.map((subCategory: any,i:number) => ({
                   value: subCategory.name, // Access the name property correctly
@@ -277,6 +279,7 @@ handleUpdate({
                   : values.subSubCategories
                 }
                 name="subSubCategories"
+                className=' w-100 me-1'
                 options={categoryData?.categories[0]?.categories?.find((cat: any,i:number) => i === selectedCategory)?.subCategories?.find((subCat: any,i:number) => i === selectedSubCategory)?.subSubCategories?.map((subSubCategory: any) => ({
                   value: subSubCategory.name, // Access the name property correctly
                   label: subSubCategory.name  // Access the name property correctly
@@ -464,7 +467,7 @@ handleUpdate({
                 disabled={loading}
                 onClick={()=>{console.log('ehe'); handleSubmitt(values)}}
               />
-              <Link to="/categories" className="btn border-1 btn-outline-secondary">
+              <Link to="/categories" className="btn border-1 btn-outline-secondary w-100 ms-1">
                 Cancel
               </Link>
             </div>
