@@ -110,7 +110,7 @@ console.log('updatedFields',updatedFields);
           updateObject[`categories.${updatedFields.selectedCategory}.subCategories.${updatedFields.selectedSubCategory}.subSubCategories.${updatedFields.selectedSubSubCategory}.name`] = updatedFields.name;
       }
       if (updatedFields.image !== undefined) {
-          updateObject['categories.$[category].image'] = updatedFields.image;
+          updateObject[`categories.${updatedFields.selectedCategory}.image`] = updatedFields.image;
       }
       if (updatedFields.topCategory !== undefined) {
           updateObject[`categories.${updatedFields.selectedCategory}.topCategory`] = updatedFields.topCategory;
@@ -139,6 +139,52 @@ console.log('updatedFields',updatedFields);
   }
 },
 
+
+
+deleteCategory: async (req, res) => {
+  try {
+    const { selectedCategory, selectedSubCategory, selectedSubSubCategory } = req.body;
+    const { id } = req.params;
+
+    // Prepare the update object dynamically to remove the category or subcategories
+    const updateObject = {};
+
+    // If only the main category needs to be deleted
+    if (selectedCategory !== undefined && selectedSubCategory === undefined && selectedSubSubCategory === undefined) {
+      // Remove the entire category
+      updateObject[`categories.${selectedCategory}`] = 1; // Marks the category for removal
+    }
+
+    // If only a subcategory needs to be deleted
+    if (selectedCategory !== undefined && selectedSubCategory !== undefined && selectedSubSubCategory === undefined) {
+      // Remove the subcategory from the category
+      updateObject[`categories.${selectedCategory}.subCategories.${selectedSubCategory}`] = 1; // Marks the subcategory for removal
+    }
+
+    // If a sub-subcategory needs to be deleted
+    if (selectedCategory !== undefined && selectedSubCategory !== undefined && selectedSubSubCategory !== undefined) {
+      // Remove the sub-subcategory from the subcategory
+      updateObject[`categories.${selectedCategory}.subCategories.${selectedSubCategory}.subSubCategories.${selectedSubSubCategory}`] = 1; // Marks the sub-subcategory for removal
+    }
+
+    const result = await Category.findOneAndUpdate(
+      { _id: id }, // Look for the document by ID
+      {
+        $unset: updateObject, // Use the $unset operator to remove the category or subcategory
+      },
+      { new: true }
+    );
+
+    if (!result) {
+      return res.status(404).json({ message: 'Category or subcategory not found' });
+    }
+
+    res.status(200).json({ message: 'Category deleted successfully', result });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error });
+    console.error('Error in deleteCategory function:', error);
+  }
+},
 
   
 
