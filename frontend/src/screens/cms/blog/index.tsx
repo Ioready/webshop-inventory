@@ -3,8 +3,9 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { MdEdit } from "react-icons/md";
 import { MdDelete } from "react-icons/md";
 import { Link } from 'react-router-dom';
-import { useFetchByLoad } from '../../../contexts';
+import { useDelete, useFetchByLoad } from '../../../contexts';
 import Delete from './delete';
+import { message } from 'antd';
 
 interface Blog {
   title: string;
@@ -12,7 +13,7 @@ interface Blog {
   date: string;
   description: string;
 }
-
+const resource='deleteCms';
 const Blog: React.FC = () => {
 
   const [popupCustomer, setPopupCustomer] = useState(false);
@@ -20,12 +21,24 @@ const Blog: React.FC = () => {
   const closePopup = () => {
     setPopupCustomer(false);
   };
+  const refreshData = () => {
+    fetch({ url: 'getCms' });
+    };
 
-  const handleDeleteClick = () => {
-    setPopupCustomer(true);
+  const handleDeleteClick = (_id: number) => {
+    // setPopupCustomer(true);
+    try {
+      remove(`${resource}`, { _id,type:"blogs"})
+      message.success("Selected products deleted successfully");
+      refreshData();
+    } catch (error) {
+      console.error("Error deleting products:", error);
+      message.error("Error deleting products");
+    }
   };
 
   const { fetch, data } = useFetchByLoad();
+  const { remove} = useDelete();
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -69,8 +82,8 @@ const Blog: React.FC = () => {
                     {new Date(blog.date).toLocaleDateString()}
                   </td>
                   <td className="text-center text-nowrap" style={{ cursor: "pointer" }}>
-                    <Link to={`/add-blog`}><MdEdit style={{ fontSize: "x-large" }} /></Link>
-                  <button onClick={handleDeleteClick} className="btn btn-sm ml-2"><MdDelete style={{ fontSize: "x-large" }} className=' text-danger'/></button>
+                    <Link to={`/add-blog`} state={{ blog }}><MdEdit style={{ fontSize: "x-large" }} /></Link>
+                  <button onClick={()=>handleDeleteClick(blog?._id)} className="btn btn-sm ml-2"><MdDelete style={{ fontSize: "x-large" }} className=' text-danger'/></button>
                   </td>
                 </tr>
               ))
@@ -104,9 +117,9 @@ const Blog: React.FC = () => {
         <p>Showing 1 to {data?.blogs?.length} of {data?.blogs?.length} entries</p>
       </nav>
 
-      {popupCustomer && (
+      {/* {popupCustomer && (
         <Delete onClose={closePopup} />
-      )}
+      )} */}
     </div>
   );
 };

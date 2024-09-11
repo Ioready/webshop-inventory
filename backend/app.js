@@ -5,7 +5,9 @@ import morgan from "morgan";
 import userRout from "./routes/user.js";
 import connectDB from "./config/db.js";
 import Product from "./models/product.js";
-import {data} from "./csv.js";
+import {data} from "./categorys.js";
+import Category from "./models/category.js";
+import cartRout from "./routes/cart.js";
 const app = express()
 dotenv.config() 
 
@@ -181,13 +183,101 @@ dotenv.config()
 // }
 // connectDB(callback);
 
+
+
+
+// const callback = async () => {
+//     try {
+//         for (const entry of data) {
+//             const { categories, subCategories, subSubCategories } = entry;
+
+//             // Check if the category already exists
+//             const category = await Category.findOne({
+//                 'categories.name': categories
+//             });
+
+//             if (category) {
+//                 // Category exists, check if the subCategory already exists
+//                 const existingSubCategory = category.categories.find(cat => cat.name === categories)
+//                     .subCategories.find(subCat => subCat.name === subCategories);
+
+//                 if (existingSubCategory) {
+//                     // SubCategory exists, check if the subSubCategory exists
+//                     if (subSubCategories && !existingSubCategory.subSubCategories.some(subSub => subSub.name === subSubCategories)) {
+//                         // Add the subSubCategory if it doesn't already exist
+//                         await Category.updateOne(
+//                             {
+//                                 _id: category._id,
+//                                 'categories.name': categories,
+//                                 'categories.subCategories.name': subCategories
+//                             },
+//                             {
+//                                 $addToSet: {
+//                                     'categories.$[categoryElem].subCategories.$[subCatElem].subSubCategories': { name: subSubCategories }
+//                                 }
+//                             },
+//                             {
+//                                 arrayFilters: [
+//                                     { 'categoryElem.name': categories },
+//                                     { 'subCatElem.name': subCategories }
+//                                 ]
+//                             }
+//                         );
+//                     }
+//                 } else {
+//                     // SubCategory doesn't exist, add it along with the subSubCategory
+//                     await Category.updateOne(
+//                         {
+//                             _id: category._id,
+//                             'categories.name': categories
+//                         },
+//                         {
+//                             $addToSet: {
+//                                 'categories.$.subCategories': {
+//                                     name: subCategories,
+//                                     subSubCategories: subSubCategories ? [{ name: subSubCategories }] : []
+//                                 }
+//                             }
+//                         }
+//                     );
+//                 }
+//             } else {
+//                 // Category doesn't exist, create it with subCategories and subSubCategories
+//                 await Category.updateOne(
+//                     {},
+//                     {
+//                         $push: {
+//                             categories: {
+//                                 name: categories,
+//                                 image: '', // or provide a default value
+//                                 topCategory: false,
+//                                 subCategories: subCategories ? [{
+//                                     name: subCategories,
+//                                     subSubCategories: subSubCategories ? [{ name: subSubCategories }] : []
+//                                 }] : []
+//                             }
+//                         }
+//                     },
+//                     { upsert: true, new: true }
+//                 );
+//             }
+//         }
+
+//         console.log('Database updated successfully');
+//     } catch (error) {
+//         console.error('Error updating database:', error);
+//     }
+// };
+
 connectDB();
+
 const port = process.env.PORT
 
 app.use(express.json({limit : "10mb"}))
 app.use(cors())
 // app.use(morgan("dev"))
 app.use('/',userRout);
+app.use("/cart",cartRout);
 
 app.listen(port,'0.0.0.0', ()=>{
     console.log(`server connected ${port}`);

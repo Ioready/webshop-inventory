@@ -31,6 +31,7 @@ import { CSVLink } from "react-csv";
 const resource = "products";
 const resource2 = "getCategory";
 
+
 export default function Lists() {
   const [detail, setDetail] = useState<any>(null);
   const [search, setSearch] = useState<any>(null);
@@ -42,6 +43,14 @@ export default function Lists() {
   const { fetch: fetchCategories, data: categoryData, loading: loadingCategories } = useFetchByLoad();
   const [selectedRowKeys, setSelectedRowKeys] = useState<any[]>([]);
 
+  const dotStyle = (status: any) => ({
+    height: '8px',
+    width: '8px',
+    borderRadius: '50%',
+    display: 'inline-block',
+    marginRight: '8px',
+    backgroundColor: status ? 'green' : 'red',
+  });
 
   useEffect(() => {
     fetch({ url: resource, query: JSON.stringify(query) })
@@ -265,7 +274,9 @@ export default function Lists() {
           }
         >
           <Button>
-            {record.status} <DownOutlined />
+          <span style={dotStyle(record.status)}></span>
+          {/* {record.status ? "ACTIVE" : "INACTIVE"} */}
+          <DownOutlined />
           </Button>
         </Dropdown>
       ),
@@ -360,7 +371,7 @@ export default function Lists() {
           )}
         </Space>
       </div>
-      <div className="fixed">
+      {/* <div className="fixed">
         <Button
           type="primary"
           onClick={() => setDetail({ add: true })}
@@ -368,7 +379,7 @@ export default function Lists() {
         >
           ADD
         </Button>
-      </div>
+      </div> */}
       <div className="viewDetails">
         <Input
           autoFocus

@@ -1,10 +1,18 @@
 import React, { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CustomerDetails } from './index'; // Adjust the path as necessary
+// import { CustomerDetails } from './index'; // Adjust the path as necessary
 import '../../styles/css/style.css'
 
+// interface CustomerDetails {
+//   name: string;
+//   location: string;
+//   orders: string;
+//   email: string;
+//   phone: string;
+// }
+
 interface PopupProps {
-  customer: CustomerDetails;
+  customer:string;
   onClose: () => void;
 }
 
@@ -26,19 +34,24 @@ const Popup: React.FC<PopupProps> = ({ customer, onClose }) => {
   }, []);
 
   const handleViewCustomer = () => {
-    Navigate('/customer-details');
+    Navigate('/customer-details', { state: { customer } });
   };
 
   return (
     <div className="popup_order">
       <div className="popup-content" ref={popupRef}>
         <div className=' d-flex justify-content-between align-items-center' style={{ gap:"1rem"}}>
-          <h3>{customer.name}</h3>
+          <h3>{//@ts-ignore 
+          customer?.userId?.firstName} {customer?.userId?.lastName}</h3>
         </div>
-        <p>{customer.location}</p>
-        <p>{customer.orders}</p>
-        <p>{customer.email}</p>
-        <p>{customer.phone}</p>
+        
+        <p>{//@ts-ignore
+        customer.address.address},  {customer.address.addressComplement}, {customer.address.state}</p>
+        <p>{//@ts-ignore
+        customer.orderDetails.length} orders</p>
+        {/* <p>{customer.email}</p> */}
+        <p>{//@ts-ignore
+        customer.address.phone}</p>
         <button className="btn btn-primary" onClick={handleViewCustomer}>
           View customer
         </button>

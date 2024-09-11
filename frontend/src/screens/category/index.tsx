@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
-import { FaEdit, FaTrash, FaUpload } from 'react-icons/fa';
+import React, { useEffect, useState } from 'react';
+import { FaEdit, FaTrash } from 'react-icons/fa';
 import EditPopup from './EditPopup';
 import DeletePopup from './DeletePopup';
+import { useFetchByLoad } from '../../contexts';
+import { FaUpload } from 'react-icons/fa6';
 
 interface SubSubCategory {
   name: string;

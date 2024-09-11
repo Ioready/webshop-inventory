@@ -24,6 +24,12 @@ const Privacy: React.FC = () => {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    if (data?.privacyPolicy) {
+      setContent(data.privacyPolicy); // Populate editor content from data on load
+    }
+  }, [data]);
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     try {
@@ -43,9 +49,9 @@ const Privacy: React.FC = () => {
       <form onSubmit={handleSubmit}>
         <div className="form-group">
           <p className="m-0 fs-5">Content:</p>
-          <input 
-            value={data?.privacyPolicy} 
-            onChange={(e) => setContent(e.target.value)} 
+          <ReactQuill 
+            value={content} 
+            onChange={(e:string) => setContent(e)} 
             placeholder="Please Write Your Content Here" 
           />
         </div>

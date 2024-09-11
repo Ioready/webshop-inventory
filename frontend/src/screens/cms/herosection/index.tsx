@@ -3,100 +3,117 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { MdCloudUpload } from 'react-icons/md';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import { useFetchByLoad, usePost } from '../../../contexts';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify'
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { useDelete, useFetchByLoad, usePost } from '../../../contexts';
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { storage } from '../../firebase/firebase';
+import { toast } from 'react-toastify';
+import { message } from 'antd';
 
 interface Section {
-  id: number;
+  _id: number;
   description: string;
   image: string;
 }
+const resource='deleteCms';
 
 const Herosection: React.FC = () => {
-  const [sections, setSections] = useState<Section[]>([
-    // { id: Date.now(), description: 'Welkom bij Classis', image: '' },
-  ]);
-
-  const { create} = usePost();
+  const [newSections, setNewSections] = useState<Section[]>([]);
+  const { create } = usePost();
   const { fetch, data } = useFetchByLoad();
-  const navigate = useNavigate();
-  
- 
-    const fetchData = async () => {
-      try {
-        await fetch({ url: 'getCms' });
-      } catch (error) {
-        console.error('Error fetching data:', error)
-      }
-    };
-    useEffect(() => {
-    fetchData();
+  const { remove} = useDelete();
+
+  useEffect(() => {
+    fetch({ url: 'getCms' });
   }, []);
 
+  const refreshData = () => {
+    fetch({ url: 'getCms' });
+    };
 
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>, id: number) => {
+  const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>, _id: number) => {
     if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0];
-      const imageUrl = URL.createObjectURL(file);
-      setSections(sections.map(section => 
-        section.id === id ? { ...section, image: imageUrl } : section
+      const storageRef = ref(storage, `images/${file.name}`);
+      await uploadBytes(storageRef, file);
+      const url = await getDownloadURL(storageRef);
+
+      setNewSections(prevSections => prevSections.map(section =>
+        section._id === _id ? { ...section, image: url } : section
       ));
     }
   };
 
-  const handleDescriptionChange = (value: string, id: number) => {
-    setSections(sections.map(section => 
-      section.id === id ? { ...section, description: value } : section
-    ));
+  const handleDescriptionChange = (value: string, _id: number) => {
+    setNewSections(prevSections => {
+      const updatedSections = prevSections.map(section =>
+        section._id === _id && section.description !== value
+          ? { ...section, description: value }
+          : section
+      );
+  
+      // Check if any section has been updated
+      const isUpdated = updatedSections.some(
+        (section, index) => section.description !== prevSections[index].description
+      );
+  
+      // Only update the state if there was an actual change
+      return isUpdated ? updatedSections : prevSections;
+    });
   };
+  
+
 
   const handleAddSection = () => {
-    setSections([...sections, { id: Date.now(), description: '', image: '' }]);
+    const newSection = { _id: Date.now(), description: '', image: '' };
+    setNewSections([...newSections, newSection]);
   };
 
-  const handleRemoveSection = (id: number) => {
-    setSections(sections.filter(section => section.id !== id));
+  const handleRemoveSection = async(_id: number) => {
+    // setNewSections(newSections.filter(section => section._id !== _id));
+      try {
+        remove(`${resource}`, { _id,type:"herosection"})
+        message.success("Selected products deleted successfully");
+        refreshData();
+      } catch (error) {
+        console.error("Error deleting products:", error);
+        message.error("Error deleting products");
+      }
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
-    console.log('what',data)
     event.preventDefault();
-    
+
     const body = {
-      herosection: sections.map(({ id, ...rest }) => rest),  // Removing `id` before sending to backend
+      herosection: newSections.map(({ _id, ...rest }) => rest),  // Remove `_id` before sending to backend
     };
-    
+
     try {
       await create('addCms', body);
-      
-      toast.success('Hero Section added successfully!')
+      toast.success('Hero Section added successfully!');
       // navigate('/cms/hero-list');
     } catch (error) {
-      toast.error('Failed to add Hero Section.')
+      toast.error('Failed to add Hero Section.');
     }
   };
 
   return (
     <div className="container mt-4">
-      <h3 className=' my-2'>Herosection</h3>
+      <h3 className='my-2'>Herosection</h3>
       <form onSubmit={handleSubmit}>
         {data?.herosection?.map((section:any) => (
-          <div className='row mb-4 d-flex justify-content-between align-items-center'  key={section.id} style={{gap:"1rem"}}>
+          <div className='row mb-4 d-flex justify-content-between align-items-center' key={section._id} style={{ gap: "1rem" }}>
             <div className="col-12 col-md-4">
               <div className="form-group">
-                <label 
-                  className="d-block border p-2" 
+                <label
+                  className="d-block border p-2"
                   style={{ cursor: 'pointer' }}
                 >
                   {section.image ? (
-                    <img 
-                      src={section.image} 
-                      alt="uploaded" 
-                      className="img-fluid" 
-                      onClick={() => document.getElementById(`imageUpload-${section.id}`)?.click()} 
+                    <img
+                      src={section.image}
+                      alt="uploaded"
+                      className="img-fluid"
+                      onClick={() => document.getElementById(`imageUpload-${section._id}`)?.click()}
                     />
                   ) : (
                     <div className="text-center">
@@ -104,31 +121,84 @@ const Herosection: React.FC = () => {
                       <div>Click to upload an image</div>
                     </div>
                   )}
-                  <input 
-                    type="file" 
-                    id={`imageUpload-${section.id}`} 
-                    className="d-none" 
-                    onChange={(e) => handleImageChange(e, section.id)} 
+                  <input
+                    type="file"
+                    id={`imageUpload-${section._id}`}
+                    className="d-none"
+                    onChange={(e) => handleImageChange(e, section._id)}
                   />
                 </label>
               </div>
             </div>
-            
+
             <div className="col-12 col-md-8">
               <div className="form-group">
-                <input 
-                  value={section.description} 
-                  onChange={(event) => handleDescriptionChange(event.target.value, section.id)} 
-                  placeholder="Please Write Your Content Here" 
+                <ReactQuill
+                  value={section.description}
+                  onChange={(value) => handleDescriptionChange(value, section._id)}
+                  placeholder="Please Write Your Content Here"
                 />
               </div>
             </div>
-            
+
             <div className="col-12 text-right">
-              <button 
-                type="button" 
-                className="btn btn-danger" 
-                onClick={() => handleRemoveSection(section.id)}
+              <button
+                type="button"
+                className="btn btn-danger"
+                onClick={() => handleRemoveSection(section._id)}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        ))}
+
+        {newSections.map((section) => (
+          <div className='row mb-4 d-flex justify-content-between align-items-center' key={section._id} style={{ gap: "1rem" }}>
+            <div className="col-12 col-md-4">
+              <div className="form-group">
+                <label
+                  className="d-block border p-2"
+                  style={{ cursor: 'pointer' }}
+                >
+                  {section.image ? (
+                    <img
+                      src={section.image}
+                      alt="uploaded"
+                      className="img-fluid"
+                      onClick={() => document.getElementById(`imageUpload-${section._id}`)?.click()}
+                    />
+                  ) : (
+                    <div className="text-center">
+                      <MdCloudUpload size="3em" />
+                      <div>Click to upload an image</div>
+                    </div>
+                  )}
+                  <input
+                    type="file"
+                    id={`imageUpload-${section._id}`}
+                    className="d-none"
+                    onChange={(e) => handleImageChange(e, section._id)}
+                  />
+                </label>
+              </div>
+            </div>
+
+            <div className="col-12 col-md-8">
+              <div className="form-group">
+                <ReactQuill
+                  value={section.description}
+                  onChange={(value) => handleDescriptionChange(value, section._id)}
+                  placeholder="Please Write Your Content Here"
+                />
+              </div>
+            </div>
+
+            <div className="col-12 text-right">
+              <button
+                type="button"
+                className="btn btn-danger"
+                onClick={() => handleRemoveSection(section?._id)}
               >
                 Delete
               </button>
@@ -137,9 +207,9 @@ const Herosection: React.FC = () => {
         ))}
 
         <div className="col-12">
-          <button 
-            type="button" 
-            className="btn btn-secondary" 
+          <button
+            type="button"
+            className="btn btn-secondary"
             onClick={handleAddSection}
           >
             Add Section
@@ -147,7 +217,7 @@ const Herosection: React.FC = () => {
         </div>
 
         <div className="col-12">
-          <button type="submit" className="btn btn-primary mt-3 " >
+          <button type="submit" className="btn btn-primary mt-3">
             Submit
           </button>
         </div>
@@ -157,4 +227,3 @@ const Herosection: React.FC = () => {
 };
 
 export default Herosection;
-

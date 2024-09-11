@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from '../../firebase/firebase';
+import ReactQuill from 'react-quill';
 
 const Footer: React.FC = () => {
   const [logo, setLogo] = useState<string>(''); // Single logo image URL
@@ -108,11 +109,10 @@ const Footer: React.FC = () => {
 
         <div className="col-12 mb-3">
           <label className="form-label">Content:</label>
-          <input 
-            type="text" 
-            className="form-control" 
+          <ReactQuill 
             value={content} 
-            onChange={(e) => setContent(e.target.value)} 
+            onChange={(e:string) => setContent(e)} 
+            placeholder="Please Write Your Content Here" 
           />
         </div>
 
