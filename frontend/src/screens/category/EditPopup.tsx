@@ -7,9 +7,10 @@ interface EditPopupProps {
   item: string;
   editedName: string;
   setEditedName: (name: string) => void;
+  children?: React.ReactNode; // Add children prop
 }
 
-const EditPopup: React.FC<EditPopupProps> = ({ onClose, onSave, item, editedName, setEditedName }) => {
+const EditPopup: React.FC<EditPopupProps> = ({ onClose, onSave, item, editedName, setEditedName, children }) => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEditedName(e.target.value);
   };
@@ -21,11 +22,14 @@ const EditPopup: React.FC<EditPopupProps> = ({ onClose, onSave, item, editedName
 
         <input
           type="text"
-          className="form-control h-25"
+          className="form-control h-25 mb-1"
           value={editedName} // controlled input
           onChange={handleInputChange} // update the state when input changes
           placeholder={`Enter new name for ${item}`}
         />
+
+        {/* Display the children, if provided */}
+        {children}
 
         <div className="d-flex align-items-center">
           <button onClick={onSave} className="btn btn-info mt-2">Save</button>

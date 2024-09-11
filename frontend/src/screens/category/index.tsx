@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { FaEdit, FaTrash } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaUpload } from 'react-icons/fa';
 import EditPopup from './EditPopup';
 import DeletePopup from './DeletePopup';
 import { useDelete, useFetchByLoad, usePatch } from '../../contexts';
-import { message } from 'antd';
+import { message, Upload, Button } from 'antd';
 
 interface SubSubCategory {
   name: string;
@@ -25,6 +25,7 @@ const TopCategories: React.FC = () => {
   const [popup, setPopup] = useState<{ type: 'edit' | 'delete'; item: string } | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<{ categoryIndex: number, subCategoryIndex?: number, subSubCategoryIndex?: number } | null>(null);
   const [editedName, setEditedName] = useState<string>('');
+  const [imageUpload, setImageUpload] = useState<File | null>(null); // For image upload
 
   const { fetch, data } = useFetchByLoad();
   const { edit } = usePatch();
@@ -37,6 +38,11 @@ const TopCategories: React.FC = () => {
   const handleTextClick = (item: string, categoryIndex: number, subCategoryIndex?: number, subSubCategoryIndex?: number) => {
     setShowIconsFor(item);
     setSelectedCategory({ categoryIndex, subCategoryIndex, subSubCategoryIndex });
+  };
+
+  const handleImageClick = (categoryIndex: number) => {
+    setShowIconsFor(`image-${categoryIndex}`);
+    setSelectedCategory({ categoryIndex });
   };
 
   const handleEditClick = () => {
@@ -79,18 +85,15 @@ const TopCategories: React.FC = () => {
   const handleEdit = async () => {
     const url = `/editCategory`;
     const categoryId = data?.categories[0]?._id;
-    try {
-      const payload = {
-        id: categoryId,
-        updatedFields: {
-          selectedCategory: selectedCategory?.categoryIndex,
-          selectedSubCategory: selectedCategory?.subCategoryIndex,
-          selectedSubSubCategory: selectedCategory?.subSubCategoryIndex,
-          name: editedName
-        }
-      };
+    const formData = new FormData(); // Handle image upload
 
-      await edit(url, payload);
+    if (imageUpload) {
+      formData.append('image', imageUpload);
+    }
+    formData.append('name', editedName);
+
+    try {
+      await edit(url, formData);
       fetch({ url: "getCategory" });
       closePopup();
     } catch (error) {
@@ -119,8 +122,20 @@ const TopCategories: React.FC = () => {
             if (!hasSubCategories) {
               return (
                 <tr key={categoryIndex}>
-                  <td>
-                    <img src={category.image} alt={category.name} style={{ height: "5rem", objectFit: 'cover' }} />
+                  <td onClick={() => handleImageClick(categoryIndex)} style={{ cursor: 'pointer' }}>
+                    {category.image ? (
+                      <img src={category.image} alt={category.name} style={{ height: "5rem", objectFit: 'cover' }} />
+                    ) : (
+                      <div>
+                        <FaUpload />
+                      </div>
+                    )}
+                    {showIconsFor === `image-${categoryIndex}` && (
+                      <div className='ms-1 shadow-lg' style={{ display: 'inline-flex', gap: '0.5rem', backgroundColor: "white", padding: "3px", borderRadius: "5px" }}>
+                        <FaEdit onClick={handleEditClick} style={{ cursor: 'pointer' }} />
+                        <FaTrash onClick={handleDeleteClick} style={{ cursor: 'pointer' }} />
+                      </div>
+                    )}
                   </td>
                   <td onClick={() => handleTextClick(category.name, categoryIndex)} style={{ cursor: 'pointer' }}>
                     {category.name}
@@ -139,14 +154,22 @@ const TopCategories: React.FC = () => {
               <tr key={`${categoryIndex}-${subCategoryIndex}`}>
                 {subCategoryIndex === 0 && (
                   <>
-                    <td rowSpan={category.subCategories.length}>
-                      <img src={category.image} alt={category.name} style={{ height: "5rem", objectFit: 'cover' }} />
+                    <td rowSpan={category.subCategories.length} onClick={() => handleImageClick(categoryIndex)} style={{ cursor: 'pointer' }}>
+                      {category.image ? (
+                        <img src={category.image} alt={category.name} style={{ height: "5rem", objectFit: 'cover' }} />
+                      ) : (
+                        <div>
+                          <FaUpload />
+                        </div>
+                      )}
+                      {showIconsFor === `image-${categoryIndex}` && (
+                        <div className='ms-1 shadow-lg' style={{ display: 'inline-flex', gap: '0.5rem', backgroundColor: "white", padding: "3px", borderRadius: "5px" }}>
+                          <FaEdit onClick={handleEditClick} style={{ cursor: 'pointer' }} />
+                          <FaTrash onClick={handleDeleteClick} style={{ cursor: 'pointer' }} />
+                        </div>
+                      )}
                     </td>
-                    <td
-                      rowSpan={category.subCategories.length}
-                      onClick={() => handleTextClick(category.name, categoryIndex)}
-                      style={{ cursor: 'pointer' }}
-                    >
+                    <td rowSpan={category.subCategories.length} onClick={() => handleTextClick(category.name, categoryIndex)} style={{ cursor: 'pointer' }}>
                       {category.name}
                       {showIconsFor === category.name && (
                         <div className='ms-1 shadow-lg' style={{ display: 'inline-flex', gap: '0.5rem', backgroundColor: "white", padding: "3px", borderRadius: "5px" }}>
@@ -196,13 +219,17 @@ const TopCategories: React.FC = () => {
           onSave={handleEdit}
           editedName={editedName}
           setEditedName={setEditedName}
-        />
+        >
+          <Upload beforeUpload={(file) => { setImageUpload(file); return false; }}>
+            <Button>Click to Upload New Image</Button>
+          </Upload>
+        </EditPopup>
       )}
       {popup && popup.type === "delete" && (
-        <DeletePopup 
-          item={popup.item} 
-          onClose={closePopup} 
-          onDelete={handleDeleteSelected} // Pass the delete handler
+        <DeletePopup
+          item={popup.item}
+          onClose={closePopup}
+          onDelete={handleDeleteSelected}
         />
       )}
     </div>
