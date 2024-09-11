@@ -22,7 +22,7 @@ interface Category {
 
 const TopCategories: React.FC = () => {
   const [showIconsFor, setShowIconsFor] = useState<string | null>(null);
-  const [popup, setPopup] = useState<{ type: 'edit' | 'delete'; item: string } | null>(null);
+  const [popup, setPopup] = useState<{ type: 'edit' | 'delete'; item: string; isImageEdit?: boolean } | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<{ categoryIndex: number, subCategoryIndex?: number, subSubCategoryIndex?: number } | null>(null);
   const [editedName, setEditedName] = useState<string>('');
   const [imageUpload, setImageUpload] = useState<File | null>(null); // For image upload
@@ -46,7 +46,10 @@ const TopCategories: React.FC = () => {
   };
 
   const handleEditClick = () => {
-    if (showIconsFor) setPopup({ type: 'edit', item: showIconsFor });
+    if (showIconsFor) {
+      const isImageEdit = showIconsFor.startsWith('image-');
+      setPopup({ type: 'edit', item: showIconsFor, isImageEdit });
+    }
   };
 
   const handleDeleteClick = () => {
@@ -57,6 +60,8 @@ const TopCategories: React.FC = () => {
     setPopup(null);
     setShowIconsFor(null);
     setSelectedCategory(null);
+    setEditedName('');
+    setImageUpload(null);
   };
 
   const handleDeleteSelected = async () => {
@@ -83,17 +88,21 @@ const TopCategories: React.FC = () => {
   };
 
   const handleEdit = async () => {
+    if (!selectedCategory) return;
+
     const url = `/editCategory`;
     const categoryId = data?.categories[0]?._id;
     const formData = new FormData(); // Handle image upload
 
-    if (imageUpload) {
+    if (popup?.isImageEdit && imageUpload) {
       formData.append('image', imageUpload);
+    } else {
+      formData.append('name', editedName);
     }
-    formData.append('name', editedName);
 
     try {
       await edit(url, formData);
+      message.success("Category updated successfully");
       fetch({ url: "getCategory" });
       closePopup();
     } catch (error) {
@@ -219,16 +228,21 @@ const TopCategories: React.FC = () => {
           onSave={handleEdit}
           editedName={editedName}
           setEditedName={setEditedName}
+          isImageEdit={popup.isImageEdit}
         >
-          <Upload beforeUpload={(file) => { setImageUpload(file); return false; }}>
-            <Button>Click to Upload New Image</Button>
-          </Upload>
+          {/* Only show the image upload component if it's an image edit */}
+          {popup.isImageEdit && (
+            <Upload beforeUpload={(file) => { setImageUpload(file); return false; }}>
+              <Button>Click to Upload New Image</Button>
+            </Upload>
+          )}
         </EditPopup>
       )}
+
       {popup && popup.type === "delete" && (
-        <DeletePopup
-          item={popup.item}
-          onClose={closePopup}
+        <DeletePopup 
+          item={popup.item} 
+          onClose={closePopup} 
           onDelete={handleDeleteSelected}
         />
       )}

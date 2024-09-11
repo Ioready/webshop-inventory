@@ -7,10 +7,12 @@ interface EditPopupProps {
   item: string;
   editedName: string;
   setEditedName: (name: string) => void;
-  children?: React.ReactNode; // Add children prop
+  isImageEdit?: boolean; // Add this to differentiate between image and text editing
+  children?: React.ReactNode; // Add children prop for image upload option
 }
 
-const EditPopup: React.FC<EditPopupProps> = ({ onClose, onSave, item, editedName, setEditedName, children }) => {
+const EditPopup: React.FC<EditPopupProps> = ({ onClose, onSave, item, editedName, setEditedName, isImageEdit, children }) => {
+  
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEditedName(e.target.value);
   };
@@ -20,16 +22,19 @@ const EditPopup: React.FC<EditPopupProps> = ({ onClose, onSave, item, editedName
       <div className="popup-inner">
         <h3>Edit {item}</h3>
 
-        <input
-          type="text"
-          className="form-control h-25 mb-1"
-          value={editedName} // controlled input
-          onChange={handleInputChange} // update the state when input changes
-          placeholder={`Enter new name for ${item}`}
-        />
+        {/* Only show the name input field if it's not an image edit */}
+        {!isImageEdit && (
+          <input
+            type="text"
+            className="form-control h-25 mb-1"
+            value={editedName} // controlled input
+            onChange={handleInputChange} // update the state when input changes
+            placeholder={`Enter new name for ${item}`}
+          />
+        )}
 
-        {/* Display the children, if provided */}
-        {children}
+        {/* Display the children (image upload), if provided */}
+        {isImageEdit && children}
 
         <div className="d-flex align-items-center">
           <button onClick={onSave} className="btn btn-info mt-2">Save</button>
