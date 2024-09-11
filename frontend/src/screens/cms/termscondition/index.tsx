@@ -12,6 +12,12 @@ const Terms: React.FC = () => {
   const { create } = usePost();
 
   useEffect(() => {
+    if (data?.termAndConditions) {
+      setContent(data.termAndConditions); // Populate editor content from data on load
+    }
+  }, [data]);
+
+  useEffect(() => {
     const fetchData = async () => {
       try {
         await fetch({ url: 'getCms' });
@@ -44,9 +50,9 @@ const Terms: React.FC = () => {
       <form onSubmit={handleSubmit}>
         <div className="form-group">
           <p className="m-0 fs-5">Content:</p>
-          <input 
-            value={data?.termAndConditions} 
-            onChange={(e) => setContent(e.target.value)} 
+          <ReactQuill 
+            value={content} 
+            onChange={(e:string) => setContent(e)} 
             placeholder="Please Write Your Content Here" 
           />
         </div>

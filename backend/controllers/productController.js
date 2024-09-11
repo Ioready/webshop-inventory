@@ -3,19 +3,6 @@ import Product from "../models/product.js";
 import Category from "../models/category.js";
 
 export const products = {
-  // markWebshopProduct :async (req, res) => {
-  //   try {
-  //     const { productIds, isWebshopProduct } = req.body;
-
-  //     const result = await Product.updateMany(
-  //       { _id: { $in: productIds } },
-  //       { $set: { isWebshopProduct } }
-  //     );
-  //     res.status(200).json({ message: 'Products marked as Webshop product', result });
-  //   } catch (error) {
-  //     res.status(500).json({ message: 'Server error', error });
-  //   }
-  // },
   markWebshopProduct :async (req, res) => {
     try {
       const { productIds, isWebshopProduct, bestProduct, topProduct,popularProduct, ean } = req.body;
@@ -52,51 +39,107 @@ export const products = {
       res.status(500).json({ message: 'Server error', error });
     }
   },
-
-
   addCategory: async (req, res) => {
     try {
-      const { categories, subCategories, subSubCategories } = req.body;
-      const categoryId = '66b1036ef752edb1c5e86e93';
-      const updateObject = {};
-  
-      if (categories) {
-        const categoryItems = categories.map(cat => ({
-          name: cat.categorie,
-          image: cat.image,
-          topCategory: cat.topCategory || false,
-        }));
-        updateObject['$push'] = {
-          categories: { $each: categoryItems },
-        };
-      }
-  
-      if (subCategories) {
-        updateObject['$push'] = {
-          ...updateObject['$push'],
-          subCategories: { $each: subCategories },
-        };
-      }
-  
-      if (subSubCategories) {
-        updateObject['$push'] = {
-          ...updateObject['$push'],
-          subSubCategories: { $each: subSubCategories },
-        };
-      }
-  
-      // Perform the update
-      const result = await Category.findByIdAndUpdate(
-        categoryId,
-        updateObject,
-        { new: true, upsert: true }
-      );
-  
-      res.status(200).json({ message: 'Categories added successfully', result });
+        const { categories, subCategories, subSubCategories, selectedCategory, selectedSubCategory } = req.body;
+
+        console.log('selectedSubCategory', categories, subCategories, subSubCategories, selectedCategory, selectedSubCategory);
+
+        const updateObject = {};
+
+        // Check if categories is an array
+        if (Array.isArray(categories)) {
+            const categoryItems = categories.map(cat => ({
+                name: cat.name,
+                image: cat.image,
+                topCategory: cat.topCategory || false,
+            }));
+            updateObject['$push'] = {
+                categories: { $each: categoryItems },
+            };
+        } else {
+            console.error('Expected categories to be an array but got:', categories);
+        }
+
+        // Adding new subCategories to the selected category
+        if (Array.isArray(subCategories) && selectedCategory!==undefined) {
+         updateObject['$push'] = {
+          [`categories.${selectedCategory}.subCategories`]: { $each: subCategories },
+};
+        }
+
+        // Adding new subSubCategories to the selected subCategory
+        if (Array.isArray(subSubCategories) && selectedCategory!==undefined && selectedSubCategory!==undefined) {
+            updateObject['$push'] = {
+                [`categories.${selectedCategory}.subCategories.${selectedSubCategory}.subSubCategories`]: { $each: subSubCategories },
+            };
+        }
+
+        const result = await Category.updateOne(
+            {},
+            updateObject,
+            {
+                arrayFilters: [
+                    { 'categories.name': selectedCategory }, // Filter for categories
+                    { 'categories.subCategories.name': selectedSubCategory } // Filter for subCategories
+                ],
+                new: true,
+                upsert: true
+            }
+        );
+
+        res.status(200).json({ message: 'Categories added successfully', result });
     } catch (error) {
-      res.status(500).json({ message: 'Server error', error });
+        res.status(500).json({ message: 'Server error', error });
+        console.error('Error in addCategory function:', error);
     }
-  },
+},
+
+
+editCategory : async (req, res) => {
+  try {
+      const {updatedFields } = req.body;
+      const{id} =req.params;
+console.log('updatedFields',updatedFields);
+      // Prepare the update object dynamically based on the provided fields
+      const updateObject = {};
+
+      if (updatedFields.name !== undefined) {
+          updateObject[`categories.${updatedFields.selectedCategory}.name`] = updatedFields.name;
+          updateObject[`categories.${updatedFields.selectedCategory}.subCategories.${updatedFields.selectedSubCategory}.name`] = updatedFields.name;
+          updateObject[`categories.${updatedFields.selectedCategory}.subCategories.${updatedFields.selectedSubCategory}.subSubCategories.${updatedFields.selectedSubSubCategory}.name`] = updatedFields.name;
+      }
+      if (updatedFields.image !== undefined) {
+          updateObject['categories.$[category].image'] = updatedFields.image;
+      }
+      if (updatedFields.topCategory !== undefined) {
+          updateObject[`categories.${updatedFields.selectedCategory}.topCategory`] = updatedFields.topCategory;
+      }
+
+      const result = await Category.findOneAndUpdate(
+        {
+          _id: id, // Look for the document by ID
+        },
+        {
+          $set: updateObject,
+        },
+        {
+          new: true,
+        }
+      );
+
+      if (!result) {
+          return res.status(404).json({ message: 'Category or subcategory not found' });
+      }
+
+      res.status(200).json({ message: 'Category updated successfully', result });
+  } catch (error) {
+      res.status(500).json({ message: 'Server error', error });
+      console.error('Error in editCategory function:', error);
+  }
+},
+
+
   
 
   getCategory: async (req, res) => {
@@ -169,12 +212,32 @@ export const products = {
   
   getProducts: async (req, res) => {
     try {
-      let { skip, take, search,filterKey,filterValue,isWebshopProduct,bestProduct,topProduct,popularProduct } = req.query;
+      let { 
+        skip, 
+        take, 
+        search, 
+        filterKey, 
+        filterValue, 
+        isWebshopProduct, 
+        bestProduct, 
+        topProduct, 
+        popularProduct,
+        colors,
+        price,
+        categories,
+        subCategories,
+        subSubCategories
+      } = req.query;
+  
+     
+      // Convert skip and take to integers
       skip = parseInt(skip);
       take = parseInt(take);
-      const myFieldDataExists = await Product.exists({ myField: { $exists: true, $ne: null } });
-
+  
+      // Initialize the query object
       const query = {};
+      console.log('Final Query:', req.query);
+      // Handle search functionality
       if (search) {
         const searchNumber = parseInt(search);
         if (!isNaN(searchNumber)) {
@@ -202,32 +265,59 @@ export const products = {
           ];
         }
       }
+  
+      // Handle filterKey and filterValue
       if (filterKey && !filterValue) {
         query[filterKey] = { $exists: false };
       }
-
-      if (filterKey && filterKey === "categories" && filterValue) {
-        query[filterKey] = { $in: filterValue }; // Find products with categories in the filterValue array
+  
+      if (filterKey === "categories" && filterValue) {
+        query[filterKey] = { $in: filterValue };
       }
-
+  
+      // Filter by Webshop product, Best product, Top product, and Popular product
       if (isWebshopProduct === 'true' || isWebshopProduct === 'false') {
         query.isWebshopProduct = (isWebshopProduct === 'true');
       }
-
       if (bestProduct === 'true' || bestProduct === 'false') {
         query.bestProduct = (bestProduct === 'true');
       }
-
       if (topProduct === 'true' || topProduct === 'false') {
         query.topProduct = (topProduct === 'true');
       }
-
       if (popularProduct === 'true' || popularProduct === 'false') {
         query.popularProduct = (popularProduct === 'true');
       }
+  
+      // Handle color and size filters
+      if (colors) {
+        // query.colors = { $regex: new RegExp(colors, "i") };
+        query.colors =colors;
+      }
 
-
+      if (price) {
+        const [minPrice, maxPrice] = price.split(','); // Assuming `size` is a string like "0,100"
+        query.price = { $gte: Number(minPrice), $lte: Number(maxPrice) };
+      }
+  
+      // Handle category, subCategory, and subSubCategory filtering
+      if (categories || subCategories || subSubCategories) {
+        query.$and = [];
+        if (categories) {
+          query.$and.push({ categories: { $in: categories.split(",") } });
+        }
+        if (subCategories) {
+          query.$and.push({ subCategories: { $in: subCategories.split(",") } });
+        }
+        if (subSubCategories) {
+          query.$and.push({ subSubCategories: { $in: subSubCategories.split(",") } });
+        }
+      }
+  
+      // Fetch the products based on the query
       const products = await Product.find(query).skip(skip).limit(take);
+  
+      // Get product counts grouped by platform (e.g., Amazon, bol.com)
       const platformCount = await Product.aggregate([
         {
           $match: {
@@ -240,14 +330,19 @@ export const products = {
             count: { $sum: 1 }
           }
         }
-      ])
+      ]);
+  
+      // Get total count of products based on the query
       const totalCount = await Product.countDocuments(query);
+  
+      // Send the response
       res.status(200).send({
         success: true,
-        data: products, 
+        data: products,
         count: totalCount,
         platformCount
       });
+  
     } catch (error) {
       console.error(error);
       res.status(500).send({
@@ -257,6 +352,7 @@ export const products = {
       });
     }
   },
+  
 
   getAllProduct:async(req,res)=>{
     try {
@@ -390,4 +486,20 @@ export const products = {
       res.status(500).json({ message: "Error uploading CSV" });
     }
   },
+  getProductById: async (req, res) => {
+    const { productIds } = req.query;
+    try {
+        const products = await Product.find({ _id: { $in: productIds } });
+
+        if (products.length === 0) {
+            return res.status(404).json({ message: "No products found" });
+        }
+
+        res.status(200).json(products);
+    } catch (error) {
+        console.error("Error fetching products:", error);
+        res.status(500).json({ message: "Error fetching products" });
+    }
+},
+
 };

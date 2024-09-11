@@ -31,7 +31,7 @@ const AddCategory: React.FC = () => {
 
   return (
     <div className="container mt-4">
-      <h3 className="my-2">Add Category</h3>
+      {/* <h3 className="my-2">Add Category</h3> */}
       <form onSubmit={handleSubmit} className="row">
         <div className="col-12 mb-3">
           <h4 className="font-weight-bold m-0">Logo</h4>

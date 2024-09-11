@@ -3,10 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@firebase/app": "^0.10.10",
     "@popperjs/core": "^2.11.8",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "@types/firebase": "^3.2.1",
     "@types/jest": "^27.5.2",
     "@types/node": "^16.18.46",
     "@types/react": "^18.2.21",
@@ -16,7 +18,8 @@
     "axios": "^1.5.0",
     "bootstrap": "^5.3.2",
     "chart.js": "^4.4.2",
-    "firebase": "^10.12.5",
+    "dotenv": "^16.4.5",
+    "firebase": "^10.13.1",
     "formik": "^2.4.4",
     "jquery": "^3.7.1",
     "papaparse": "^5.4.1",
@@ -40,7 +43,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "react-scripts build && webpack-bundle-analyzer --analyzer-mode static",
     "copy-html-entry": "cp -r build/static/js/main.*.js client/accounts.js && cp -r build/static/css/main.*.css client/accounts.css",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
@@ -67,6 +70,7 @@
   "devDependencies": {
     "@types/papaparse": "^5.3.14",
     "@types/react-csv": "^1.1.10",
-    "serverless-finch": "^4.0.3"
+    "serverless-finch": "^4.0.3",
+    "webpack-bundle-analyzer": "^4.10.2"
   }
 }

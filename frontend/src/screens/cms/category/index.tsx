@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { MdEdit } from "react-icons/md";
-import { Link } from 'react-router-dom';
 import Delete from './delete';
 import Select from 'react-select';
+import { useFetchByLoad, usePatch } from '../../../contexts';
+import { message } from 'antd';
 
 interface Customers {
   id: string;
@@ -11,57 +11,80 @@ interface Customers {
   image: string;
 }
 
-const categoryOptions = [
-  { value: 'electronics', label: 'Electronics' },
-  { value: 'books', label: 'Books' },
-  { value: 'clothing', label: 'Clothing' },
-  { value: 'beauty', label: 'Beauty' }
-];
 
-const initialCustomers: Customers[] = [
-  {
-    id: '1',
-    category: 'Jennifer Miyakubo',
-    image: 'https://gratisography.com/wp-content/uploads/2024/01/gratisography-cyber-kitty-800x525.jpg',
-    
-  },
-  {
-    id: '2',
-    category: 'Jennifer Miyakubo',
-    image: 'https://gratisography.com/wp-content/uploads/2024/01/gratisography-cyber-kitty-800x525.jpg',
-   
-  },
-  {
-    id: '3',
-    category: 'Jennifer Miyakubo',
-    image: 'https://gratisography.com/wp-content/uploads/2024/01/gratisography-cyber-kitty-800x525.jpg',
-    
-  },
-  {
-    id: '4',
-    category: 'Jennifer Miyakubo',
-    image: 'https://gratisography.com/wp-content/uploads/2024/01/gratisography-cyber-kitty-800x525.jpg',
-   
-  },
-  {
-    id: '5',
-    category: 'Jennifer Miyakubo',
-    image: 'https://gratisography.com/wp-content/uploads/2024/01/gratisography-cyber-kitty-800x525.jpg',
-    
-  }
-];
 
 const TopCategory: React.FC = () => {
-  const [customers, setCustomers] = useState<Customers[]>(initialCustomers);
   const [popupCustomer, setPopupCustomer] = useState(false);
+  const { fetch, data } = useFetchByLoad();
   const [selectedCategory, setSelectedCategory] = useState<{ value: string, label: string } | null>(null);
+  const topCategories = data?.categories[0]?.categories.filter((category: any) => category.topCategory === true);
 
+  const {edit} = usePatch();
+  
+  useEffect(() => {
+    const fetchData = async () => {
+      await fetch({ url: "getCategory" });
+    };
+
+    fetchData();
+  }, []);
+
+  const handleClick = async (selectedIndex: number, topCategory: boolean) => {
+    const url = `/${"editCategory"}`;
+    const categoryId = data?.categories[0]?._id;
+
+    if (!categoryId) {
+      console.error("Category ID not found");
+      return;
+    }  
+    
+    try {
+      const payload = {
+        id: categoryId,
+        updatedFields: {
+          selectedCategory: selectedIndex,
+          topCategory: topCategory
+        }
+      };
+      await edit(url, payload);
+      fetch({ url: "getCategory" })
+    } catch (error) {
+      console.error("Error updating product:", error);
+      message.error(`Error updating product`);
+    }
+  };
+  
   const closePopup = () => {
     setPopupCustomer(false);
   };
 
   const handleDeleteClick = () => {
     setPopupCustomer(true);
+  };
+
+  const handleRemove = async(id: number) => {
+    const index = data?.categories[0].categories.findIndex(
+      (category: any) => category._id === id
+    );
+
+    const url = `/${"editCategory"}`;
+    const categoryId = data?.categories[0]?._id;
+    
+    try {
+      const payload = {
+        id: categoryId,
+        updatedFields: {
+          selectedCategory: index,
+          topCategory: false
+        }
+      };
+      await edit(url, payload);
+      fetch({ url: "getCategory" });
+    } catch (error) {
+      console.error("Error updating product:", error);
+      message.error(`Error updating product`);
+    }
+
   };
 
   return (
@@ -73,12 +96,26 @@ const TopCategory: React.FC = () => {
       <div className=' d-flex mb-4' style={{gap:"1rem"}}>
       
       <Select
-            options={categoryOptions}
-            onChange={setSelectedCategory}
-            placeholder="Select a category"
-            value={selectedCategory}
-          />
-      <button className=' btn btn-info text-white'>Add Category</button>
+        options={
+          data?.categories[0]?.categories.map((category: any, i: number) => ({
+            value: category.name,
+            label: category.name,
+            index: i
+          }))
+        }
+        //@ts-ignore
+        onChange={(option)=>{setSelectedCategory(option ? option?.index : 0);}}
+        placeholder="Select a category"
+        value={    
+          //@ts-ignore
+          data?.categories[0]?.categories[selectedCategory]? { value: selectedCategory, label: data?.categories[0]?.categories[selectedCategory].name }
+            : null
+        }
+      />
+
+      <button className=' btn btn-info text-white'
+      //@ts-ignore
+       onClick={()=>handleClick(selectedCategory!, true)}>Add Category</button>
       </div>
 
       <div className="table-responsive">
@@ -91,14 +128,14 @@ const TopCategory: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {customers.map(order => (
+            {topCategories?.map((order:any, index: number) => (
               <tr key={order.id}>
                 <td className="text-center text-nowrap" style={{cursor:"pointer"}}>
-                  <img src={order.image} alt={order.category} className='img-fluid' style={{height:"5rem", objectFit: 'cover'}} />
+                  <img src={order.image} alt={order.name} className='img-fluid' style={{height:"5rem", objectFit: 'cover'}} />
                 </td>
-                <td className="text-center text-nowrap" style={{cursor:"pointer"}}>{order.category}</td>
+                <td className="text-center text-nowrap" style={{cursor:"pointer"}}>{order.name}</td>
                 <td className=' d-flex' style={{ gap:"1rem"}}>
-                  <button  onClick={handleDeleteClick} className="btn btn-danger btn-sm ml-2">Remove</button>
+                  <button  onClick={()=>handleRemove(order._id)} className="btn btn-danger btn-sm ml-2">Remove</button>
                 </td>
               </tr>
             ))}
@@ -126,7 +163,7 @@ const TopCategory: React.FC = () => {
             </a>
           </li>
         </ul>
-        <p>Showing 1 to {customers.length} of {customers.length} entries</p>
+        <p>Showing 1 to {topCategories?.length} of {topCategories?.length} entries</p>
       </nav>
     </div>
   );

@@ -1,14 +1,17 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Popup from './popup';  // Import the Popup component
 import { useNavigate } from 'react-router-dom';
 import Breadcrumbs from '../../components/Breadcrumbs';
 import { CiSearch } from "react-icons/ci";
+import { useDelete, useFetchByLoad } from '../../contexts';
+import { message } from 'antd';
 
 interface Order {
   id: string;
   date: string;
   customer: string;
+  customerDetail: string;
   channel: string;
   total: string;
   paymentStatus: string;
@@ -19,117 +22,38 @@ interface Order {
   tags: string;
 }
 
-const initialOrders: Order[] = [
-  {
-    id: '#1008',
-    date: 'Apr 8 at 11:43 am',
-    customer: 'Jennifer Miyakubo',
-    channel: 'Online Store',
-    total: '$1.00',
-    paymentStatus: 'Paid',
-    fulfillmentStatus: 'Unfulfilled',
-    items: '1 item',
-    deliveryStatus: '',
-    deliveryMethod: 'Free Shipping',
-    tags: ''
-  },
-  {
-    id: '#1006',
-    date: 'Mar 27 at 4:44 am',
-    customer: 'Jennifer Miyakubo',
-    channel: 'Online Store',
-    total: '$0.00',
-    paymentStatus: 'Voided',
-    fulfillmentStatus: 'Unfulfilled',
-    items: '0 items',
-    deliveryStatus: '',
-    deliveryMethod: 'Free Shipping',
-    tags: ''
-  },
-  {
-    id: '#1004',
-    date: 'Mar 13 at 8:09 am',
-    customer: 'Tai Nguyen',
-    channel: 'Online Store',
-    total: '$2,598.00',
-    paymentStatus: 'Paid',
-    fulfillmentStatus: 'Fulfilled',
-    items: '2 items',
-    deliveryStatus: '',
-    deliveryMethod: 'Free Shipping',
-    tags: ''
-  },
-  {
-    id: '#1003',
-    date: 'Nov 28 at 8:24 pm',
-    customer: 'Robi Lahdo',
-    channel: 'Online Store',
-    total: '$6,613.93',
-    paymentStatus: 'Paid',
-    fulfillmentStatus: 'Chargeback lost',
-    items: '3 items',
-    deliveryStatus: '',
-    deliveryMethod: 'Custom Shipping',
-    tags: ''
-  },
-  {
-    id: '#1001',
-    date: 'Jun 12, 2023',
-    customer: 'marina Mizruh',
-    channel: 'Online Store',
-    total: '$2,594.00',
-    paymentStatus: 'Paid',
-    fulfillmentStatus: 'Fulfilled',
-    items: '2 items',
-    deliveryStatus: 'Tracking added',
-    deliveryMethod: 'Free Shipping',
-    tags: ''
-  }
-];
-
-export interface CustomerDetails {
-  name: string;
-  location: string;
-  orders: string;
-  email: string;
-  phone: string;
-}
-
-const customerDetailsMap: { [key: string]: CustomerDetails } = {
-  'Jennifer Miyakubo': {
-    name: 'Jennifer Miyakubo',
-    location: 'New York, NY, United States',
-    orders: '2 orders',
-    email: 'jennifer@example.com',
-    phone: '+1234567890',
-  },
-  'Tai Nguyen': {
-    name: 'Tai Nguyen',
-    location: 'San Francisco, CA, United States',
-    orders: '1 order',
-    email: 'tai@example.com',
-    phone: '+1987654321',
-  },
-  'Robi Lahdo': {
-    name: 'Robi Lahdo',
-    location: 'Chicago, IL, United States',
-    orders: '1 order',
-    email: 'robi@example.com',
-    phone: '+1123456789',
-  },
-  'marina Mizruh': {
-    name: 'marina Mizruh',
-    location: 'Los Angeles, CA, United States',
-    orders: '1 order',
-    email: 'marina@example.com',
-    phone: '+1098765432',
-  }
-};
-
 const OrderTable: React.FC = () => {
-  const [orders, setOrders] = useState<Order[]>(initialOrders);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
-  const [popupCustomer, setPopupCustomer] = useState<CustomerDetails | null>(null);
+  const [popupCustomer, setPopupCustomer] = useState<string | null>(null);
+
+  const { fetch, data } = useFetchByLoad();
+  const { remove } = useDelete();
+
+  useEffect(() => {
+    fetch({ url: '/cart/getOrder' });
+  }, []);
+
+  useEffect(() => {
+    if (data?.orders) {
+      const apiOrders = data.orders.map((order: any) => ({
+        id: order._id,
+        date: new Date(order.date).toLocaleString(),
+        customer: `${order.userId.firstName} ${order.userId.lastName}`,
+        customerDetail: order,
+        channel: 'Online Store',  // Static since API doesn't provide it
+        total: `$${order.orderDetails.reduce((sum: number, detail: any) => sum + detail.totalAmount, 0).toFixed(2)}`,
+        paymentStatus: 'Paid', // Static, assuming paid; adjust based on actual logic
+        fulfillmentStatus: 'Unfulfilled', // Static, adjust as needed
+        items: `${order.orderDetails.length} item${order.orderDetails.length > 1 ? 's' : ''}`,
+        deliveryStatus: '',  // Static or derived
+        deliveryMethod: 'Free Shipping', // Static, adjust as needed
+        tags: '',  // Static or derived
+      }));
+
+      setOrders(apiOrders);
+    }
+  }, [data]);
 
   const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
@@ -147,55 +71,61 @@ const OrderTable: React.FC = () => {
     }
   };
 
-  const handleDeleteSelected = () => {
-    const newOrders = orders.filter(order => !selectedOrders.includes(order.id));
-    setOrders(newOrders);
+  const handleDeleteSelected = async () => {
+    console.log('selectedOrders',selectedOrders)
+    try {
+      await remove('/cart/deleteOrder', { _id: selectedOrders }); 
+      message.success("Selected orders deleted successfully");
+      fetch({ url: '/cart/getOrder' });
+    } catch (error) {
+      console.error("Error deleting orders:", error);
+      message.error("Error deleting orders");
+    }
     setSelectedOrders([]);
   };
 
   const handleCustomerClick = (customer: string) => {
-    setPopupCustomer(customerDetailsMap[customer] || null);
+    setPopupCustomer(customer);
   };
 
   const closePopup = () => {
     setPopupCustomer(null);
   };
 
-  const Navigate = useNavigate();
+  const navigate = useNavigate();
 
-  const handleviewallpage = () => {
-    Navigate("/all-orders");
-  }
+  const handleViewAllPage = () => {
+    navigate("/all-orders");
+  };
 
   return (
-    <div className=' d-flex flex-column'>
+    <div className='d-flex flex-column'>
       <Breadcrumbs pageName="Orders" />
       <div className="container mt-4">
-        {selectedOrders.length > 0 && (<div className="d-flex justify-content-between align-items-center mb-3">
-          <button
-            className="btn btn-danger"
-            onClick={handleDeleteSelected}
-            disabled={selectedOrders.length === 0}
-          >
-            Delete Selected
-          </button>
+        {selectedOrders.length > 0 && (
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            <button
+              className="btn btn-danger"
+              onClick={handleDeleteSelected}
+              disabled={selectedOrders.length === 0}
+            >
+              Delete Selected
+            </button>
+          </div>
+        )}
 
-        </div>
-        )
-        }
-
-        <div className=' d-flex justify-content-between align-items-center mb-4 order_upper_block'>
-          <div className=' d-flex p-2 bg-white' style={{ gap: "0.5rem", border: "1px solid gray", borderRadius: "1rem" }}>
-            <p className=' text-black m-0 order_page_text' style={{ cursor: "pointer" }}>All</p>
-            <p className=' text-black m-0 order_page_text' style={{ cursor: "pointer" }}>Unpaid</p>
-            <p className=' text-black m-0 order_page_text' style={{ cursor: "pointer" }}>Open</p>
-            <p className=' text-black m-0 order_page_text' style={{ cursor: "pointer" }}>Newest</p>
+        <div className='d-flex justify-content-between align-items-center mb-4 order_upper_block'>
+          <div className='d-flex p-2 bg-white' style={{ gap: "0.5rem", border: "1px solid gray", borderRadius: "1rem" }}>
+            <p className='text-black m-0 order_page_text' style={{ cursor: "pointer" }}>All</p>
+            <p className='text-black m-0 order_page_text' style={{ cursor: "pointer" }}>Unpaid</p>
+            <p className='text-black m-0 order_page_text' style={{ cursor: "pointer" }}>Open</p>
+            <p className='text-black m-0 order_page_text' style={{ cursor: "pointer" }}>Newest</p>
           </div>
 
-          <div className="input-group p-1 rounded w-50" style={{position:"relative"}}>
-            <input type="search" className="form-control rounded-5" placeholder="Search" aria-label="Search" aria-describedby="search-addon" style={{border: "1px solid gray"}}/>
-            <span className="input-group-text border-0" id="search-addon" style={{position:"absolute", right:"1rem", top:"0.7rem"}}>
-              <CiSearch style={{fontSize:"1.5rem"}}/>
+          <div className="input-group p-1 rounded w-50" style={{ position: "relative" }}>
+            <input type="search" className="form-control rounded-5" placeholder="Search" aria-label="Search" aria-describedby="search-addon" style={{ border: "1px solid gray" }} />
+            <span className="input-group-text border-0" id="search-addon" style={{ position: "absolute", right: "1rem", top: "0.7rem" }}>
+              <CiSearch style={{ fontSize: "1.5rem" }} />
             </span>
           </div>
         </div>
@@ -233,21 +163,21 @@ const OrderTable: React.FC = () => {
                       onChange={() => handleCheckboxChange(order.id)}
                     />
                   </td>
-                  <td className="text-nowrap" onClick={handleviewallpage} style={{ cursor: "pointer" }}>{order.id}</td>
-                  <td className="text-nowrap" onClick={handleviewallpage} style={{ cursor: "pointer" }}>{order.date}</td>
+                  <td className="text-nowrap" onClick={handleViewAllPage} style={{ cursor: "pointer" }}>{order.id.slice(0, 4)}</td>
+                  <td className="text-nowrap" onClick={handleViewAllPage} style={{ cursor: "pointer" }}>{order.date}</td>
                   <td className="text-nowrap">
-                    <span onClick={() => handleCustomerClick(order.customer)} style={{ cursor: 'pointer', color: 'blue' }}>
+                    <span onClick={() => handleCustomerClick(order.customerDetail)} style={{ cursor: 'pointer', color: 'blue' }}>
                       {order.customer}
                     </span>
                   </td>
-                  <td className="text-nowrap" onClick={handleviewallpage} style={{ cursor: "pointer" }}>{order.channel}</td>
-                  <td className="text-nowrap" onClick={handleviewallpage} style={{ cursor: "pointer" }}>{order.total}</td>
-                  <td className="text-nowrap" onClick={handleviewallpage} style={{ cursor: "pointer" }}>{order.paymentStatus}</td>
-                  <td className="text-nowrap" onClick={handleviewallpage} style={{ cursor: "pointer" }}>{order.fulfillmentStatus}</td>
-                  <td className="text-nowrap" onClick={handleviewallpage} style={{ cursor: "pointer" }}>{order.items}</td>
-                  <td className="text-nowrap" onClick={handleviewallpage} style={{ cursor: "pointer" }}>{order.deliveryStatus}</td>
-                  <td className="text-nowrap" onClick={handleviewallpage} style={{ cursor: "pointer" }}>{order.deliveryMethod}</td>
-                  <td className="text-nowrap" onClick={handleviewallpage} style={{ cursor: "pointer" }}>{order.tags}</td>
+                  <td className="text-nowrap" onClick={handleViewAllPage} style={{ cursor: "pointer" }}>{order.channel}</td>
+                  <td className="text-nowrap" onClick={handleViewAllPage} style={{ cursor: "pointer" }}>{order.total}</td>
+                  <td className="text-nowrap" onClick={handleViewAllPage} style={{ cursor: "pointer" }}>{order.paymentStatus}</td>
+                  <td className="text-nowrap" onClick={handleViewAllPage} style={{ cursor: "pointer" }}>{order.fulfillmentStatus}</td>
+                  <td className="text-nowrap" onClick={handleViewAllPage} style={{ cursor: "pointer" }}>{order.items}</td>
+                  <td className="text-nowrap" onClick={handleViewAllPage} style={{ cursor: "pointer" }}>{order.deliveryStatus}</td>
+                  <td className="text-nowrap" onClick={handleViewAllPage} style={{ cursor: "pointer" }}>{order.deliveryMethod}</td>
+                  <td className="text-nowrap" onClick={handleViewAllPage} style={{ cursor: "pointer" }}>{order.tags}</td>
                 </tr>
               ))}
             </tbody>

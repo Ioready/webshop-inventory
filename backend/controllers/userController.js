@@ -56,13 +56,14 @@ export const user = {
   },
   webshopRegister : async(req,res)=>{
     try{
-        const {firstName,lastName,email,password} = req.body;
+        const {firstName,lastName,email,password,birthDate,title} = req.body;
+        console.log(firstName,lastName,email,password,birthDate)
         const exists =  await webshopUser.find({email})
         if(exists.length>0){
             res.status(400).send({message:"emailId already exists"})
         }else{
           const newPassword = await bcrypt.hash(password,10)
-                const user = await webshopUser.create({firstName,lastName,email,password:newPassword})
+                const user = await webshopUser.create({firstName,lastName,email,password:newPassword,birthDate,title})
                 await user.save()
                 res.status(200).send(user)  
         }
@@ -89,6 +90,8 @@ export const user = {
               isEmailVerified: user.isEmailVerified,
               firstName: user.firstName,
               title: user.title,
+              birthDate:user.birthDate,
+              title:user.title,
               token,
             });
           } else {

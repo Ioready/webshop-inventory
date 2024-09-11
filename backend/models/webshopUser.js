@@ -7,6 +7,10 @@ const { genrateToken } = auth;
 const { Schema, ObjectId } = mongoose;
 
 const webshopUserSchema = new Schema({
+  title: {
+    type: String,
+    // enum: ['Mr', 'Mrs', 'Miss', 'Ms', 'Dr', 'Prof'], // You can add more titles as needed
+  },
   firstName: {
     type: String,
   },
@@ -19,6 +23,9 @@ const webshopUserSchema = new Schema({
   },
   password: {
     type: String,
+  },
+  birthDate:{
+     type:String,
   },
   isEmailVerified:{
     type:Boolean,

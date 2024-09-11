@@ -2,8 +2,7 @@ import { Drawer } from "antd";
 import { usePost } from "../../contexts";
 import { toast } from 'react-toastify';
 export const CreateDataDrawer = ({ resource, close, FormData,categoryData, data }: any) => {
-    console.log(data , " create product");
-    
+    // console.log('categories',categoryData);    
     
     const { create, data: respond, loading } = usePost();
     

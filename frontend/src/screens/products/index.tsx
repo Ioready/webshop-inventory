@@ -52,6 +52,7 @@ export default function Lists() {
     fetch({ url: resource, query: JSON.stringify(query) })
   }, [query, file]);
 
+
   useEffect(() => {
     fetchCategories({ url: resource2 })
   }, []);
