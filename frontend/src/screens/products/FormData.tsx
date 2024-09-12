@@ -202,7 +202,9 @@ handleUpdate({
                 icon={<MdOutlineSubtitles />}
               />
             </div>
-            <div className="mb-4 d-flex w-100">
+
+            <p className=' mb-1'>Main Category</p>
+            <div className="mb-2 d-flex w-100">
               <Select
               className=' w-100 me-1'
               //@ts-ignore
@@ -239,7 +241,9 @@ handleUpdate({
                 </button>
               </div>
             </div>
-            <div className="mb-4 d-flex w-100">
+
+            <p className=' mb-1'>Sub Category</p>
+            <div className="mb-2 d-flex w-100 z-3">
               <Select
                 value={values.subCategories && typeof values.subCategories === 'string'
                   ? { value: values.subCategories, label: values.subCategories }
@@ -272,7 +276,9 @@ handleUpdate({
                 </button>
               </div>
             </div>
-            <div className="mb-4 d-flex w-100">
+
+            <p className=' mb-1'>Sub Sub Category</p>
+            <div className="mb-2 d-flex w-100">
               <Select
                 value={values.subSubCategories && typeof values.subSubCategories === 'string'
                   ? { value: values.subSubCategories, label: values.subSubCategories }

@@ -131,12 +131,22 @@ const TopCategories: React.FC = () => {
             if (!hasSubCategories) {
               return (
                 <tr key={categoryIndex}>
-                  <td onClick={() => handleImageClick(categoryIndex)} style={{ cursor: 'pointer' }}>
+                  <td style={{ cursor: 'pointer' }}>
                     {category.image ? (
-                      <img src={category.image} alt={category.name} style={{ height: "5rem", objectFit: 'cover' }} />
+                      <img onClick={() => handleImageClick(categoryIndex)} src={category.image} alt={category.name} style={{ height: "5rem", objectFit: 'cover' }} />
                     ) : (
                       <div>
-                        <FaUpload />
+                        <div className="file-upload position-relative w-100 p-3 border border-dashed rounded-lg d-flex align-items-center justify-content-center" style={{ height: '9rem', borderColor: '#ced4da', cursor: 'pointer' }}>
+                          <input
+                            type="file"
+                            className="position-absolute top-0 start-0 w-100 h-100 opacity-0"
+                          // onChange={handleFileChange}
+                          />
+                          <div className="text-center d-flex flex-column align-items-center">
+                            <FaUpload className="text-success mb-2" style={{ fontSize: '3rem' }} />
+                            <span className="text-muted">Drag and drop file to upload</span>
+                          </div>
+                        </div>
                       </div>
                     )}
                     {showIconsFor === `image-${categoryIndex}` && (
@@ -163,12 +173,22 @@ const TopCategories: React.FC = () => {
               <tr key={`${categoryIndex}-${subCategoryIndex}`}>
                 {subCategoryIndex === 0 && (
                   <>
-                    <td rowSpan={category.subCategories.length} onClick={() => handleImageClick(categoryIndex)} style={{ cursor: 'pointer' }}>
+                    <td rowSpan={category.subCategories.length} style={{ cursor: 'pointer' }}>
                       {category.image ? (
-                        <img src={category.image} alt={category.name} style={{ height: "5rem", objectFit: 'cover' }} />
+                        <img onClick={() => handleImageClick(categoryIndex)} src={category.image} alt={category.name} style={{ height: "5rem", objectFit: 'cover' }} />
                       ) : (
                         <div>
-                          <FaUpload />
+                          <div className="file-upload position-relative w-100 p-3 border border-dashed rounded-lg d-flex align-items-center justify-content-center" style={{ height: '9rem', borderColor: '#ced4da', cursor: 'pointer' }}>
+                            <input
+                              type="file"
+                              className="position-absolute top-0 start-0 w-100 h-100 opacity-0"
+                            // onChange={handleFileChange}
+                            />
+                            <div className="text-center d-flex flex-column align-items-center">
+                              <FaUpload className="text-success mb-2" style={{ fontSize: '2rem' }} />
+                              <span className="text-muted">Drag and drop file to upload</span>
+                            </div>
+                          </div>
                         </div>
                       )}
                       {showIconsFor === `image-${categoryIndex}` && (
@@ -240,9 +260,9 @@ const TopCategories: React.FC = () => {
       )}
 
       {popup && popup.type === "delete" && (
-        <DeletePopup 
-          item={popup.item} 
-          onClose={closePopup} 
+        <DeletePopup
+          item={popup.item}
+          onClose={closePopup}
           onDelete={handleDeleteSelected}
         />
       )}
