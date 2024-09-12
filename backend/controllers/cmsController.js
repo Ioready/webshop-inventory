@@ -79,17 +79,19 @@ export const cms = {
         }
     },
 
-    deleteCms : async (req, res) => {
+    deleteCms: async (req, res) => {
         try {
-            const { _id, type } = req.body.body; // Assuming you send type as 'herosection' or 'blogs'
+            const { _id, type } = req.body.body; // Assuming you send type as 'herosection', 'blogs', or 'reviews'
             
             let updateQuery;
             if (type === 'herosection') {
                 updateQuery = { $pull: { herosection: { _id } } };
             } else if (type === 'blogs') {
                 updateQuery = { $pull: { blogs: { _id } } };
+            } else if (type === 'reviews') {
+                updateQuery = { $pull: { reviews: { _id } } };
             }
-    
+        
             if (updateQuery) {
                 await ContentManagement.updateOne({}, updateQuery);
                 res.status(200).json({ success: true, message: `${type} deleted successfully` });
@@ -105,6 +107,7 @@ export const cms = {
             });
         }
     },
+    
     
       editBlog: async (req, res) => {
     try {
@@ -134,6 +137,37 @@ export const cms = {
         res.status(500).json({ message: "Server error", error });
     }
 },
+
+editReview: async (req, res) => {
+    try {
+        const { reviewId, user, comment, rating, date } = req.body; // Extract review data from the request
+
+        // Find and update the specific review based on reviewId
+        const result = await ContentManagement.findOneAndUpdate(
+            {
+                "review._id": reviewId // Find the review by its unique _id within the reviews array
+            },
+            {
+                $set: {
+                    "review.$.user": user,
+                    "review.$.comment": comment,
+                    "review.$.rating": rating,
+                    "review.$.date": date
+                }
+            },
+            { new: true } // Return the updated document
+        );
+
+        if (!result) {
+            return res.status(404).json({ message: "Review not found" });
+        }
+
+        res.status(200).json({ message: "Review updated successfully", result });
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error });
+    }
+},
+
 
 
 };
