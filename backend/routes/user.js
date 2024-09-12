@@ -7,7 +7,7 @@ import { cms } from "../controllers/cmsController.js";
 
 const upload = multer({ dest: 'uploads/' });
 
-const {addCms,getCms,deleteCms,editBlog} = cms;
+const {addCms,getCms,deleteCms,editBlog,editReview} = cms;
 const { userLogin,webshopLogin,webshopRegister } = user;
 const { createProduct, getProducts, editProduct, setStores,setCsvData, deleteProduct, csvFileUpload, getAllProduct,markWebshopProduct,addCategory,getCategory,editCategory,deleteCategory,getProductById} = products;
 const { verifyToken } = auth
@@ -17,6 +17,7 @@ userRout.post("/addCms", addCms);
 userRout.get("/getCms", getCms);
 userRout.post("/deleteCms/:id",deleteCms);
 userRout.patch("/editBlog/undefined", editBlog);
+userRout.patch("/editReview/undefined", editReview);
 userRout.post("/addCategory", addCategory);
 userRout.patch("/editCategory/:id", editCategory);
 userRout.post("/deleteCategory/:id",deleteCategory);
