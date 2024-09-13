@@ -4,6 +4,8 @@ import EditPopup from './EditPopup';
 import DeletePopup from './DeletePopup';
 import { useDelete, useFetchByLoad, usePatch } from '../../contexts';
 import { message, Upload, Button } from 'antd';
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
+import { storage } from '../firebase/firebase';
 
 interface SubSubCategory {
   name: string;
@@ -48,9 +50,18 @@ const TopCategories: React.FC = () => {
   const handleEditClick = () => {
     if (showIconsFor) {
       const isImageEdit = showIconsFor.startsWith('image-');
+      
+      // Open the edit popup based on user action, like clicking an icon
       setPopup({ type: 'edit', item: showIconsFor, isImageEdit });
+      
+      // If there's an uploaded image, you can update the form with the new image
+      if (isImageEdit && imageUpload) {
+        console.log('Editing image with URL:', imageUpload);
+        // Handle the image edit logic here
+      }
     }
   };
+  
 
   const handleDeleteClick = () => {
     if (showIconsFor) setPopup({ type: 'delete', item: showIconsFor });
@@ -87,29 +98,117 @@ const TopCategories: React.FC = () => {
     closePopup();
   };
 
+  // const handleEdit = async () => {
+  //   if (!selectedCategory) return;
+  
+  //   const url = `/editCategory`;
+  //   const categoryId = data?.categories[0]?._id;
+  //   // const updatedFields = new FormData(); // Handle image and data
+  
+  //   // // Prepare and append each field directly, not in an updatedFields object
+  //   // updatedFields.append('id', categoryId); // Assuming 'categoryId' is needed as a separate field
+  //   // updatedFields.append('name', editedName); // The category name
+  //   // //@ts-ignore
+  //   // updatedFields.append('selectedCategories', selectedCategory?.categoryIndex);
+    
+  //   // // Append subcategory only if available
+  //   // if (selectedCategory?.subCategoryIndex !== undefined) {
+  //   //   //@ts-ignore
+  //   //   updatedFields.append('selectedSubCategories', selectedCategory.subCategoryIndex);
+  //   // }
+  
+  //   // // Append sub-subcategory only if available
+  //   // if (selectedCategory?.subSubCategoryIndex !== undefined) {
+  //   //   //@ts-ignore
+  //   //   updatedFields.append('selectedSubSubCategories', selectedCategory.subSubCategoryIndex);
+  //   // }
+  
+  //   // // Append image if it's being updated
+  //   // if (popup?.isImageEdit && imageUpload) {
+  //   //   updatedFields.append('image', imageUpload);
+  //   // }
+  //   const updatedFields ={id:categoryId,name:editedName,selectedCategories:selectedCategory?.categoryIndex,selectedSubCategories:selectedCategory.subCategoryIndex,selectedSubSubCategories:selectedCategory.subSubCategoryIndex}
+  //   try {
+  //     await edit(url,updatedFields );  
+  //     message.success("Category updated successfully");
+  //     fetch({ url: "getCategory" });
+  //     closePopup();
+  //   } catch (error) {
+  //     console.error("Error updating category:", error);
+  //     message.error(`Error updating category`);
+  //   }
+  // };
+  
   const handleEdit = async () => {
     if (!selectedCategory) return;
-
-    const url = `/editCategory`;
     const categoryId = data?.categories[0]?._id;
-    const formData = new FormData(); // Handle image upload
+    const url = `/editCategory`;
+    
+  
+    // Prepare the payload directly as a JSON object, not FormData
+    const updatedFields = {
+      id: categoryId,
+      name: editedName,
+      selectedCategory: selectedCategory?.categoryIndex,
+      selectedSubCategory: selectedCategory?.subCategoryIndex,
+      selectedSubSubCategory: selectedCategory?.subSubCategoryIndex,
+    };
 
     if (popup?.isImageEdit && imageUpload) {
-      formData.append('image', imageUpload);
-    } else {
-      formData.append('name', editedName);
+      //@ts-ignore
+      updatedFields.image = imageUpload;  // Add the uploaded image URL to the payload
     }
-
+  
     try {
-      await edit(url, formData);
+      // Send the payload as JSON
+      await edit(url, {updatedFields}); 
       message.success("Category updated successfully");
       fetch({ url: "getCategory" });
       closePopup();
     } catch (error) {
       console.error("Error updating category:", error);
-      message.error(`Error updating category`);
+      message.error("Error updating category");
     }
   };
+  
+
+  // const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   if (event.target.files) {
+  //     const file = event.target.files[0]; // Assuming a single file upload
+  //     const storageRef = ref(storage, `images/${file.name}`);
+  //     await uploadBytes(storageRef, file);
+  //     const url = await getDownloadURL(storageRef);
+      
+  //     // Store the image URL in the state
+  //     //@ts-ignore
+  //     setImageUpload(url);
+  //     console.log('setImageUpload',imageUpload)
+  //   }
+  // };
+  
+  const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>, categoryIndex: number) => {
+    if (event.target.files) {
+      const file = event.target.files[0]; // Assuming single image upload
+      const storageRef = ref(storage, `images/${file.name}`);
+  
+      try {
+        await uploadBytes(storageRef, file);
+        const url = await getDownloadURL(storageRef);
+        
+        //@ts-ignore
+        setImageUpload(url);
+        console.log('Uploaded image URL:', url);
+        handleEdit();
+ 
+      } catch (error) {
+        console.error("Error uploading image:", error);
+        message.error("Error uploading image");
+      }
+    }
+  };
+  
+  
+  
 
   return (
     <div className="container mt-5">
@@ -140,7 +239,7 @@ const TopCategories: React.FC = () => {
                           <input
                             type="file"
                             className="position-absolute top-0 start-0 w-100 h-100 opacity-0"
-                          // onChange={handleFileChange}
+                            onChange={(e) => handleImageChange(e, categoryIndex)}
                           />
                           <div className="text-center d-flex flex-column align-items-center">
                             <FaUpload className="text-success mb-2" style={{ fontSize: '3rem' }} />
@@ -182,11 +281,11 @@ const TopCategories: React.FC = () => {
                             <input
                               type="file"
                               className="position-absolute top-0 start-0 w-100 h-100 opacity-0"
-                            // onChange={handleFileChange}
+                              onChange={(e) => handleImageChange(e, categoryIndex)}
                             />
                             <div className="text-center d-flex flex-column align-items-center">
                               <FaUpload className="text-success mb-2" style={{ fontSize: '2rem' }} />
-                              <span className="text-muted">Drag and drop file to upload</span>
+                              <span className="text-muted" >Drag and drop file to upload</span>
                             </div>
                           </div>
                         </div>

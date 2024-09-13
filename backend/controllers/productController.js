@@ -99,8 +99,8 @@ export const products = {
 editCategory : async (req, res) => {
   try {
       const {updatedFields } = req.body;
-      const{id} =req.params;
-console.log('updatedFields',updatedFields);
+
+console.log('updatedFields',updatedFields)
       // Prepare the update object dynamically based on the provided fields
       const updateObject = {};
 
@@ -118,7 +118,7 @@ console.log('updatedFields',updatedFields);
 
       const result = await Category.findOneAndUpdate(
         {
-          _id: id, // Look for the document by ID
+          _id: updatedFields.id, // Look for the document by ID
         },
         {
           $set: updateObject,
@@ -143,8 +143,7 @@ console.log('updatedFields',updatedFields);
 
 deleteCategory: async (req, res) => {
   try {
-    const { selectedCategory, selectedSubCategory, selectedSubSubCategory, removeImageOnly } = req.body;
-    const { id } = req.params;
+    const { selectedCategory, selectedSubCategory, selectedSubSubCategory, id,removeImageOnly } = req.body;
 
     // Prepare the update object dynamically to remove the category or subcategories
     const updateObject = {};
