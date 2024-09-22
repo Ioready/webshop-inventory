@@ -259,7 +259,7 @@ export const cart = {
           value: totalWithTax.toFixed(2), // Ensure that it has 2 decimals
         },
         description: `Order Payment for ${orderDetails.address.firstName} ${orderDetails.address.lastName}`,
-        redirectUrl: `http://localhost:3001/payment-success`, // Redirect URL after payment
+        redirectUrl: `https://webshop-ecommerce-3rbt.vercel.app/payment-success`, // Redirect URL after payment
         // webhookUrl: `https://70a2-2405-201-3030-a0c0-9481-f130-90b1-fa00.ngrok-free.app/payment/mollie-webhook`, // Webhook to capture payment status
         webhookUrl: `https://api.ioready.io/payment/mollie-webhook`, // Webhook to capture payment status
         metadata: {
