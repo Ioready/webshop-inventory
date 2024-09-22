@@ -22,6 +22,7 @@ import Review from '../screens/cms/review';
 import Header from '../screens/cms/header';
 import Footer from '../screens/cms/footer';
 import Enqury from '../screens/enquiry';
+import Setting from '../screens/setting';
 import TopProducts from '../screens/cms/product';
 import AddProduct from '../screens/cms/product/addproduct';
 import TopCategory from '../screens/cms/category';
@@ -33,6 +34,7 @@ import AddCategory from '../screens/products/add/addcategorie';
 import AddSubCategory from '../screens/products/add/addsubcategorie';
 import AddSubSubCategory from '../screens/products/add/addsubsubcategorie';
 import ManageCategories from '../screens/category';
+import CustomerDetail from '../screens/customer/customerDetails';
 
 const Scanner = lazy(() => import('../screens/scanner'));
 const SalesReport = lazy(() => import('../screens/sales-report'));
@@ -58,6 +60,7 @@ export const Navigation = () => {
           <Route path="/addsubcategory" element={<AddSubCategory />} />
           <Route path="/addsubsubcategory" element={<AddSubSubCategory />} />
           <Route path="/cms" element={<CMS />} />
+          <Route path="/setting" element={<Setting />} />
           <Route
             path="/cms/top-product"
             element={<TopProducts />}
@@ -78,6 +81,8 @@ export const Navigation = () => {
           <Route path="/cms/edit-review" element={<ReviewForm />} />
           <Route path="/cms/header" element={<Header />} />
           <Route path="/cms/footer" element={<Footer />} />
+          <Route path="/customerDetails/:id" element={<CustomerDetail />} />
+
         </Route>
       </Route>
       <Route path="/login" element={<Login />} />

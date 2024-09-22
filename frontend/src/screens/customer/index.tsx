@@ -6,8 +6,8 @@ interface Address {
   firstName: string;
   lastName: string;
   company: string;
-  address: string;
-  addressComplement: string;
+  addressLine1: string;
+  addressLine2: string;
   city: string;
   state: string;
   zipCode: string;
@@ -31,8 +31,8 @@ interface Customer {
     email: string;
     phone: string;
   };
-  address: Address;
-  orderDetails: OrderDetail[];
+  shippingAddress: Address;
+  orderItems: OrderDetail[];
 }
 
 const CustomerDetailsPage: React.FC = () => {
@@ -44,8 +44,9 @@ const CustomerDetailsPage: React.FC = () => {
     return <div>No customer data available</div>;
   }
 
-  const { userId, address, orderDetails } = customer;
-  const latestOrder = orderDetails[0]; // Assuming orderDetails has at least one item
+  console.log(customer,"cjdj")
+  // const { userId, address, orderItems } = customer;
+  const latestOrder = customer.orderItems[0]; // Assuming orderDetails has at least one item
 
   // const handleViewAllOrders = () => {
   //   navigate('/customer-details');
@@ -55,8 +56,8 @@ const CustomerDetailsPage: React.FC = () => {
     <div className="container mt-4">
       <div className="d-flex justify-content-between align-items-center mb-3">
         <div>
-          <h2>{`${userId.firstName} ${userId.lastName}`}</h2>
-          <p>{`${address.address}, ${address.addressComplement}, ${address.city}, ${address.state}`}</p>
+          <h2>{`${customer.userId.firstName} ${customer.userId.lastName}`}</h2>
+          <p>{`${customer.shippingAddress.addressLine1}, ${customer.shippingAddress.addressLine2}, ${customer.shippingAddress.city}, ${customer.shippingAddress.state}`}</p>
           <p>Customer for about 19 hours</p>
         </div>
       </div>
@@ -118,17 +119,17 @@ const CustomerDetailsPage: React.FC = () => {
               <h5>Customer</h5>
               <div>
                 <p>Contact information</p>
-                <p><a href={`mailto:${userId.email}`}>{userId.email}</a></p>
-                <p>{userId.phone}</p>
+                <p><a href={`mailto:${customer.userId.email}`}>{customer.userId.email}</a></p>
+                <p>{customer.userId.phone}</p>
                 <p>Will receive notifications in English</p>
               </div>
               <div>
                 <p>Default address</p>
-                <p>{`${address.firstName} ${address.lastName}`}</p>
-                <p>{address.address}</p>
-                <p>{address.phone}</p>
+                <p>{`${customer.shippingAddress.firstName} ${customer.shippingAddress.lastName}`}</p>
+                <p>{customer.shippingAddress.addressLine1}</p>
+                <p>{customer.shippingAddress.phone}</p>
               </div>
-              <div>
+              {/* <div>
                 <p>Marketing</p>
                 <p>Email not subscribed</p>
                 <p>SMS not subscribed</p>
@@ -136,7 +137,7 @@ const CustomerDetailsPage: React.FC = () => {
               <div>
                 <p>Tax exemptions</p>
                 <p>No exemptions</p>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>

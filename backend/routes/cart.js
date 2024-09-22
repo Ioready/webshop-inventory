@@ -12,6 +12,7 @@ cartRout.delete("/removeFromCart",verifyToken, removeFromCart);
 cartRout.put("/updateCartQuantity",verifyToken, updateCartQuantity);
 cartRout.get("/getCartItems",verifyToken, getCartItems);
 cartRout.post("/createOrder",verifyToken, createOrder);
+//  cartRout.post("/createOrder", createOrder);
 cartRout.get("/getOrder",verifyToken, getOrder);
 cartRout.post('/deleteOrder/:id',verifyToken, deleteOrder);
 export default cartRout;

@@ -19,5 +19,18 @@ export function useFetchByLoad() {
             setLoading(false);
         }
     };
-    return { fetch, data, loading };
+    const fetchById = async (params: any) => {
+        try {
+            setLoading(true);
+            setData(null);
+            const response: any = await apis.getDataApiById(params.url, token);
+            if (response) {
+                setData(response);
+            }
+            setLoading(false);
+        } catch (error) {
+            setLoading(false);
+        }
+    };
+    return { fetch, data, loading, fetchById };
 }

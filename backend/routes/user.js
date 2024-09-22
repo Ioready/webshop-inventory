@@ -8,8 +8,8 @@ import { cms } from "../controllers/cmsController.js";
 const upload = multer({ dest: 'uploads/' });
 
 const {addCms,getCms,deleteCms,editBlog,editReview} = cms;
-const { userLogin,webshopLogin,webshopRegister } = user;
-const { createProduct, getProducts, editProduct, setStores,setCsvData, deleteProduct, csvFileUpload, getAllProduct,markWebshopProduct,addCategory,getCategory,editCategory,deleteCategory,getProductById} = products;
+const { userLogin,webshopLogin,webshopRegister,getWebShopUsers,getUserDetailsById } = user;
+const { createProduct, getProducts, editProduct, setStores,setCsvData, deleteProduct, csvFileUpload, getAllProduct,markWebshopProduct,addCategory,getCategory,editCategory,deleteCategory,getProductById, getProductColors} = products;
 const { verifyToken } = auth
 const userRout = express.Router();
 
@@ -35,5 +35,9 @@ userRout.patch("/products/csv/undefined", verifyToken , setCsvData);
 userRout.post("/products/:id", verifyToken , deleteProduct);
 userRout.patch("/products/update-webshop-status/undefined", verifyToken , markWebshopProduct);
 userRout.get("/getProductByIds", getProductById);
+userRout.get('/colors',getProductColors);
+userRout.get('/getAllWebShopUsers',getWebShopUsers)
+userRout.get('/getUserDetailsById/:id',getUserDetailsById)
+
 
 export default userRout;

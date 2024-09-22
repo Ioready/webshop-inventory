@@ -2,12 +2,16 @@ import express  from "express";
 import dotenv from "dotenv"
 import cors from "cors"
 import morgan from "morgan";
+import bodyParser from 'body-parser';
 import userRout from "./routes/user.js";
 import connectDB from "./config/db.js";
 import Product from "./models/product.js";
 import {data} from "./categorys.js";
 import Category from "./models/category.js";
 import cartRout from "./routes/cart.js";
+import enquiryRoutes from "./routes/enquiry.js";
+import paymentRoutes from "./routes/payment.js";
+import settingsRoutes from "./routes/emailSettingRoute.js";
 const app = express()
 dotenv.config() 
 
@@ -275,9 +279,20 @@ const port = process.env.PORT
 
 app.use(express.json({limit : "10mb"}))
 app.use(cors())
+
+// Parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }));
+
+// Parse application/json (if needed)
+app.use(bodyParser.json());
+
 // app.use(morgan("dev"))
 app.use('/',userRout);
 app.use("/cart",cartRout);
+app.use("/enquiry",enquiryRoutes);
+app.use("/payment",paymentRoutes);
+app.use("/setting",settingsRoutes);
+
 
 app.listen(port,'0.0.0.0', ()=>{
     console.log(`server connected ${port}`);

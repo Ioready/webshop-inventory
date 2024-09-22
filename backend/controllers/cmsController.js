@@ -108,10 +108,52 @@ export const cms = {
         }
     },
     
-    
-      editBlog: async (req, res) => {
+    // -------------------OLD CODE-----------------------------------------
+//       editBlog: async (req, res) => {
+//     try {
+//         const { blogId, title, description, image } = req.body; // Extract blog data from the request
+
+//         // Find and update the specific blog based on blogId
+//         const result = await ContentManagement.findOneAndUpdate(
+//             {
+//                 "blogs._id": blogId // Find the blog by its unique _id within the blogs array
+//             },
+//             {
+//                 $set: {
+//                     "blogs.$.title": title,
+//                     "blogs.$.description": description,
+//                     "blogs.$.image": image
+//                 }
+//             },
+//             { new: true } // Return the updated document
+//         );
+
+//         if (!result) {
+//             return res.status(404).json({ message: "Blog not found" });
+//         }
+
+//         res.status(200).json({ message: "Blog updated successfully", result });
+//     } catch (error) {
+//         res.status(500).json({ message: "Server error", error });
+//     }
+// },
+
+editBlog: async (req, res) => {
     try {
         const { blogId, title, description, image } = req.body; // Extract blog data from the request
+
+        // Create an empty update object
+        let updateFields = {};
+
+        // Conditionally add fields to the update object if they are provided
+        if (title) updateFields["blogs.$.title"] = title;
+        if (description) updateFields["blogs.$.description"] = description;
+        if (image) updateFields["blogs.$.image"] = image;
+
+        // Check if there's something to update
+        if (Object.keys(updateFields).length === 0) {
+            return res.status(400).json({ message: "No fields provided for update" });
+        }
 
         // Find and update the specific blog based on blogId
         const result = await ContentManagement.findOneAndUpdate(
@@ -119,11 +161,7 @@ export const cms = {
                 "blogs._id": blogId // Find the blog by its unique _id within the blogs array
             },
             {
-                $set: {
-                    "blogs.$.title": title,
-                    "blogs.$.description": description,
-                    "blogs.$.image": image
-                }
+                $set: updateFields
             },
             { new: true } // Return the updated document
         );
@@ -137,6 +175,7 @@ export const cms = {
         res.status(500).json({ message: "Server error", error });
     }
 },
+
 
 editReview: async (req, res) => {
     try {
