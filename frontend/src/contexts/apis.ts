@@ -62,6 +62,22 @@ const apis = {
                 showError(error);
             });
     },
+    getDataApiById: async (url: any,token: any) => {
+        getAuthorizationToken(token)
+        let URL = url 
+        return axiosInstance
+            .get(URL, { withCredentials: false })
+            .then((response: any) => {
+                if (response?.status == 200 || response?.status == 201 || response?.status == 202) {
+                    return response?.data
+                } else {
+                    throw new Error(response)
+                }
+            })
+            .catch((error: any) => {
+                showError(error);
+            });
+    },
     getSingleDataApi: async (url: any, query: any, token: any) => {
         getAuthorizationToken(token)
         const URL = `${url}/${query.id}`

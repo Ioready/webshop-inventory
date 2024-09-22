@@ -76,6 +76,12 @@ export const Sidebar = () => {
       value: "cms",
       isShow: true,
     },
+    {
+      icon: <MdDashboardCustomize />,
+      label: "Setting",
+      value: "setting",
+      isShow: true,
+    },
     // {
     //   icon: <FaShoppingCart />,
     //   label: "Sales Return",

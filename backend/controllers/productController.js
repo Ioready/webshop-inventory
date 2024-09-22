@@ -95,50 +95,97 @@ export const products = {
     }
 },
 
+// --------------------OLD CODE----------------------------------------------
+// editCategory : async (req, res) => {
+//   try {
+//       const {updatedFields } = req.body;
 
-editCategory : async (req, res) => {
+// console.log('updatedFields',updatedFields)
+//       // Prepare the update object dynamically based on the provided fields
+//       const updateObject = {};
+
+//       if (updatedFields.name !== undefined) {
+//           updateObject[`categories.${updatedFields.selectedCategory}.name`] = updatedFields.name;
+//           updateObject[`categories.${updatedFields.selectedCategory}.subCategories.${updatedFields.selectedSubCategory}.name`] = updatedFields.name;
+//           updateObject[`categories.${updatedFields.selectedCategory}.subCategories.${updatedFields.selectedSubCategory}.subSubCategories.${updatedFields.selectedSubSubCategory}.name`] = updatedFields.name;
+//       }
+//       if (updatedFields.image !== undefined) {
+//           updateObject[`categories.${updatedFields.selectedCategory}.image`] = updatedFields.image;
+//       }
+//       if (updatedFields.topCategory !== undefined) {
+//           updateObject[`categories.${updatedFields.selectedCategory}.topCategory`] = updatedFields.topCategory;
+//       }
+
+//       const result = await Category.findOneAndUpdate(
+//         {
+//           _id: updatedFields.id, // Look for the document by ID
+//         },
+//         {
+//           $set: updateObject,
+//         },
+//         {
+//           new: true,
+//         }
+//       );
+
+//       if (!result) {
+//           return res.status(404).json({ message: 'Category or subcategory not found' });
+//       }
+
+//       res.status(200).json({ message: 'Category updated successfully', result });
+//   } catch (error) {
+//       res.status(500).json({ message: 'Server error', error });
+//       console.error('Error in editCategory function:', error);
+//   }
+// },
+// -------------------------------OLD CODE-----------------------------------
+editCategory: async (req, res) => {
   try {
-      const {updatedFields } = req.body;
+    const { updatedFields } = req.body;
 
-console.log('updatedFields',updatedFields)
-      // Prepare the update object dynamically based on the provided fields
-      const updateObject = {};
+    console.log('updatedFields', updatedFields);
 
-      if (updatedFields.name !== undefined) {
-          updateObject[`categories.${updatedFields.selectedCategory}.name`] = updatedFields.name;
-          updateObject[`categories.${updatedFields.selectedCategory}.subCategories.${updatedFields.selectedSubCategory}.name`] = updatedFields.name;
-          updateObject[`categories.${updatedFields.selectedCategory}.subCategories.${updatedFields.selectedSubCategory}.subSubCategories.${updatedFields.selectedSubSubCategory}.name`] = updatedFields.name;
-      }
-      if (updatedFields.image !== undefined) {
-          updateObject[`categories.${updatedFields.selectedCategory}.image`] = updatedFields.image;
-      }
-      if (updatedFields.topCategory !== undefined) {
-          updateObject[`categories.${updatedFields.selectedCategory}.topCategory`] = updatedFields.topCategory;
-      }
+    // Prepare the update object dynamically based on the provided fields
+    const updateObject = {};
 
-      const result = await Category.findOneAndUpdate(
-        {
-          _id: updatedFields.id, // Look for the document by ID
-        },
-        {
-          $set: updateObject,
-        },
-        {
-          new: true,
-        }
-      );
+    // If subSubCategory is selected, update only the subSubCategory name
+    if (updatedFields.selectedSubSubCategory !== undefined) {
+      updateObject[`categories.${updatedFields.selectedCategory}.subCategories.${updatedFields.selectedSubCategory}.subSubCategories.${updatedFields.selectedSubSubCategory}.name`] = updatedFields.name;
+    }
+    // If subCategory is selected, update only the subCategory name
+    else if (updatedFields.selectedSubCategory !== undefined) {
+      updateObject[`categories.${updatedFields.selectedCategory}.subCategories.${updatedFields.selectedSubCategory}.name`] = updatedFields.name;
+    }
+    // Otherwise, update only the main category name
+    else {
+      updateObject[`categories.${updatedFields.selectedCategory}.name`] = updatedFields.name;
+    }
 
-      if (!result) {
-          return res.status(404).json({ message: 'Category or subcategory not found' });
-      }
+    // Check if image is being updated (only for main category)
+    if (updatedFields.image !== undefined) {
+      updateObject[`categories.${updatedFields.selectedCategory}.image`] = updatedFields.image;
+    }
 
-      res.status(200).json({ message: 'Category updated successfully', result });
+    // Perform the update in the database
+    const result = await Category.findOneAndUpdate(
+      { _id: updatedFields.id },  // Document lookup by ID
+      { $set: updateObject },      // Applying the updates
+      { new: true }                // Return the updated document
+    );
+
+    // If no result is found, return a 404 error
+    if (!result) {
+      return res.status(404).json({ message: 'Category or subcategory not found' });
+    }
+
+    // Return success response
+    res.status(200).json({ message: 'Category updated successfully', result });
   } catch (error) {
-      res.status(500).json({ message: 'Server error', error });
-      console.error('Error in editCategory function:', error);
+    // Error handling
+    res.status(500).json({ message: 'Server error', error });
+    console.error('Error in editCategory function:', error);
   }
 },
-
 
 
 deleteCategory: async (req, res) => {
@@ -271,6 +318,63 @@ deleteCategory: async (req, res) => {
         message: "Server error",
         error,
       });
+    }
+  },
+
+  // getProductColors: async (req, res) => {
+  //   const { query } = req.query; // Get the search query from the request
+  //   try {
+  //     const products = await Product.find({}, 'colors');
+  
+  //     let allColors = [];
+  //     products.forEach((product) => {
+  //       if (typeof product.colors === 'string') {
+  //         allColors = allColors.concat(product.colors.split(',').map(color => color.trim()));
+  //       } else if (Array.isArray(product.colors)) {
+  //         allColors = allColors.concat(product.colors);
+  //       }
+  //     });
+  
+  //     const uniqueColors = [...new Set(allColors)];
+      
+  //     // Filter colors that match the query
+  //     const filteredColors = uniqueColors.filter(color => 
+  //       color.toLowerCase().startsWith(query.toLowerCase())
+  //     );
+  
+  //     res.json(filteredColors); // Return filtered colors
+  //   } catch (error) {
+  //     console.error(error);
+  //     res.status(500).send('Server Error');
+  //   }
+  // },   
+  
+  getProductColors: async (req, res) => {
+    const { query } = req.query; // Get the search query from the request
+    try {
+      const products = await Product.find({}, 'colors');
+    
+      let allColors = [];
+      products.forEach((product) => {
+        if (typeof product.colors === 'string') {
+          allColors = allColors.concat(product.colors.split(',').map(color => color.trim()));
+        } else if (Array.isArray(product.colors)) {
+          allColors = allColors.concat(product.colors);
+        }
+      });
+      
+      // Normalize all color names to lowercase
+      const uniqueColors = [...new Set(allColors.map(color => color.toLowerCase()))];
+  
+      // Filter colors that match the query (case-insensitive)
+      const filteredColors = uniqueColors.filter(color => 
+        color.startsWith(query.toLowerCase())
+      );
+  
+      res.json(filteredColors); // Return filtered colors
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Server Error');
     }
   },
   
@@ -550,20 +654,39 @@ deleteCategory: async (req, res) => {
       res.status(500).json({ message: "Error uploading CSV" });
     }
   },
-  getProductById: async (req, res) => {
-    const { productIds } = req.query;
-    try {
-        const products = await Product.find({ _id: { $in: productIds } });
+//   getProductById: async (req, res) => {
+//     const { productIds } = req.query;
+//     try {
+//         const products = await Product.find({ _id: { $in: productIds } });
 
-        if (products.length === 0) {
-            return res.status(404).json({ message: "No products found" });
-        }
+//         if (products.length === 0) {
+//             return res.status(404).json({ message: "No products found" });
+//         }
 
-        res.status(200).json(products);
-    } catch (error) {
-        console.error("Error fetching products:", error);
-        res.status(500).json({ message: "Error fetching products" });
-    }
-},
+//         res.status(200).json(products);
+//     } catch (error) {
+//         console.error("Error fetching products:", error);
+//         res.status(500).json({ message: "Error fetching products" });
+//     }
+// },
+
+getProductById: async (req, res) => {
+  const { productIds } = req.query;
+
+  try {
+      const idsArray = productIds.split(','); // Assuming productIds is a comma-separated string
+      const products = await Product.find({ _id: { $in: idsArray } });
+
+      if (products.length === 0) {
+          return res.status(404).json({ message: "No products found" });
+      }
+
+      res.status(200).json(products);
+  } catch (error) {
+      console.error("Error fetching products:", error);
+      res.status(500).json({ message: "Error fetching products" });
+  }
+}
+
 
 };

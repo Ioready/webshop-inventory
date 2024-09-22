@@ -10,6 +10,7 @@ export const auth = {
   
   verifyToken: async (req, res, next) => {
     let token = req.headers.authorization;
+    console.log(token,"toke")
     try {
       if (!token || !token.startsWith("Bearer "))
         return res
@@ -17,6 +18,7 @@ export const auth = {
           .json({ message: "Authentication failed: Please Login..." });
       token = token.split(" ")[1];
       const verified = jwt.verify(token, process.env.AUTH_SECRET);
+      console.log(verified,"ver")
       req.user = { userId: verified.id };
       next();
     } catch (error) {

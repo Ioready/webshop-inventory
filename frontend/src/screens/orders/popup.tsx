@@ -17,6 +17,8 @@ interface PopupProps {
 }
 
 const Popup: React.FC<PopupProps> = ({ customer, onClose }) => {
+
+  console.log(customer,"customerpopup")
   const popupRef = useRef<HTMLDivElement>(null);
   const Navigate = useNavigate();
 
@@ -46,12 +48,13 @@ const Popup: React.FC<PopupProps> = ({ customer, onClose }) => {
         </div>
         
         <p>{//@ts-ignore
-        customer.address.address},  {customer.address.addressComplement}, {customer.address.state}</p>
+        customer.shippingAddress.addressLine1},  {customer.shippingAddress.addressLine2}, {customer.shippingAddress.state}</p>
         <p>{//@ts-ignore
-        customer.orderDetails.length} orders</p>
+        `${ customer.orderItems.length} order${ customer.orderItems.length > 1 ? 's' : ''}`
+        }</p>
         {/* <p>{customer.email}</p> */}
         <p>{//@ts-ignore
-        customer.address.phone}</p>
+        customer.shippingAddress.phone}</p>
         <button className="btn btn-primary" onClick={handleViewCustomer}>
           View customer
         </button>
