@@ -249,6 +249,46 @@ export const user = {
             .status(200)
             .json({ message: "User upgraded to webShopUser", ...response });
         }
+        else if(existingUser.type === "GuestUser" && type === "GuestUser") {
+          // Update the existing GuestUser to a webShopUser
+          existingUser.firstName = firstName;
+          existingUser.lastName = lastName;
+          existingUser.birthDate = birthDate;
+          existingUser.title = title;
+          if (hashedPassword) {
+            existingUser.password = hashedPassword; // Update password if provided
+          }
+
+          // Save the updated user
+          const updatedUser = await existingUser.save();
+          // const token = await updatedUser.createJwt();
+          const token = jwt.sign(
+            { id: updatedUser._id}, // Payload
+            process.env.AUTH_SECRET, // Secret key for signing
+           
+          );
+
+          const response = {
+            title: updatedUser.title,
+            firstName: updatedUser.firstName,
+            lastName: updatedUser.lastName,
+            email: updatedUser.email,
+            password: updatedUser.password,
+            birthDate: updatedUser.birthDate,
+            isEmailVerified: updatedUser.isEmailVerified,
+            _id: updatedUser._id,
+            createdAt: updatedUser.createdAt,
+            updatedAt: updatedUser.updatedAt,
+            type: updatedUser.type,
+            __v: updatedUser.__v,
+            token: token,
+          };
+
+          return res
+            .status(200)
+            .json({ message: "User upgraded to GuestUser", ...response });
+        }
+
 
         // If user already exists as a webShopUser, don't allow duplicate registration
         return res

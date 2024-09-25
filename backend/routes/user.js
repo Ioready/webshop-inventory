@@ -20,7 +20,7 @@ userRout.patch("/editBlog/undefined", editBlog);
 userRout.patch("/editReview/undefined", editReview);
 userRout.post("/addCategory", addCategory);
 userRout.patch("/editCategory/undefined", editCategory);
-userRout.post("/deleteCategory/undefined",deleteCategory);
+userRout.post("/deleteCategory",deleteCategory);
 userRout.get("/getCategory", getCategory);
 userRout.post("/webshopLogin", webshopLogin);
 userRout.post("/webshopRegister", webshopRegister);
