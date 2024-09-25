@@ -188,69 +188,138 @@ editCategory: async (req, res) => {
 },
 
 
+// deleteCategory: async (req, res) => {
+//   try {
+//     const { selectedCategory, selectedSubCategory, selectedSubSubCategory, id,removeImageOnly } = req.body;
+
+//     // Prepare the update object dynamically to remove the category or subcategories
+//     const updateObject = {};
+
+//     // If only the image of the main category needs to be deleted
+//     if (removeImageOnly && selectedCategory !== undefined && selectedSubCategory === undefined && selectedSubSubCategory === undefined) {
+//       updateObject[`categories.${selectedCategory}.image`] = 1; // Marks the image for removal
+//     }
+
+//     // If only the image of a subcategory needs to be deleted
+//     if (removeImageOnly && selectedCategory !== undefined && selectedSubCategory !== undefined && selectedSubSubCategory === undefined) {
+//       updateObject[`categories.${selectedCategory}.subCategories.${selectedSubCategory}.image`] = 1; // Marks the image for removal
+//     }
+
+//     // If only the image of a sub-subcategory needs to be deleted
+//     if (removeImageOnly && selectedCategory !== undefined && selectedSubCategory !== undefined && selectedSubSubCategory !== undefined) {
+//       updateObject[`categories.${selectedCategory}.subCategories.${selectedSubCategory}.subSubCategories.${selectedSubSubCategory}.image`] = 1; // Marks the image for removal
+//     }
+
+//     // If the entire category, subcategory, or sub-subcategory needs to be deleted
+//     if (!removeImageOnly) {
+//       // If only the main category needs to be deleted
+//       if (selectedCategory !== undefined && selectedSubCategory === undefined && selectedSubSubCategory === undefined) {
+//         updateObject[`categories.${selectedCategory}`] = 1; // Marks the category for removal
+//         updateObject[`categories.${selectedCategory}.image`] = 1; // Marks the image for removal
+//       }
+
+//       // If only a subcategory needs to be deleted
+//       if (selectedCategory !== undefined && selectedSubCategory !== undefined && selectedSubSubCategory === undefined) {
+//         updateObject[`categories.${selectedCategory}.subCategories.${selectedSubCategory}`] = 1; // Marks the subcategory for removal
+//         updateObject[`categories.${selectedCategory}.subCategories.${selectedSubCategory}.image`] = 1; // Marks the image for removal
+//       }
+
+//       // If a sub-subcategory needs to be deleted
+//       if (selectedCategory !== undefined && selectedSubCategory !== undefined && selectedSubSubCategory !== undefined) {
+//         updateObject[`categories.${selectedCategory}.subCategories.${selectedSubCategory}.subSubCategories.${selectedSubSubCategory}`] = 1; // Marks the sub-subcategory for removal
+//         updateObject[`categories.${selectedCategory}.subCategories.${selectedSubCategory}.subSubCategories.${selectedSubSubCategory}.image`] = 1; // Marks the image for removal
+//       }
+//     }
+
+//     const result = await Category.findOneAndUpdate(
+//       { _id: id }, // Look for the document by ID
+//       {
+//         $unset: updateObject, // Use the $unset operator to remove the image or category
+//       },
+//       { new: true }
+//     );
+
+//     if (!result) {
+//       return res.status(404).json({ message: 'Category or subcategory not found' });
+//     }
+
+//     res.status(200).json({ message: 'Category updated successfully', result });
+//   } catch (error) {
+//     res.status(500).json({ message: 'Server error', error });
+//     console.error('Error in deleteCategory function:', error);
+//   }
+// },
+
 deleteCategory: async (req, res) => {
   try {
-    const { selectedCategory, selectedSubCategory, selectedSubSubCategory, id,removeImageOnly } = req.body;
+    const { id, categoryId, removeImageOnly } = req.body;
 
-    // Prepare the update object dynamically to remove the category or subcategories
-    const updateObject = {};
-
-    // If only the image of the main category needs to be deleted
-    if (removeImageOnly && selectedCategory !== undefined && selectedSubCategory === undefined && selectedSubSubCategory === undefined) {
-      updateObject[`categories.${selectedCategory}.image`] = 1; // Marks the image for removal
+    if (!id || !categoryId) {
+      return res.status(400).json({ message: "Category document ID and category ID are required" });
     }
 
-    // If only the image of a subcategory needs to be deleted
-    if (removeImageOnly && selectedCategory !== undefined && selectedSubCategory !== undefined && selectedSubSubCategory === undefined) {
-      updateObject[`categories.${selectedCategory}.subCategories.${selectedSubCategory}.image`] = 1; // Marks the image for removal
-    }
+    // Remove only the image
+    if (removeImageOnly) {
+      const updateResult = await Category.updateOne(
+        { _id: id, "categories._id": categoryId },
+        { $set: { "categories.$.image": "" } }
+      );
 
-    // If only the image of a sub-subcategory needs to be deleted
-    if (removeImageOnly && selectedCategory !== undefined && selectedSubCategory !== undefined && selectedSubSubCategory !== undefined) {
-      updateObject[`categories.${selectedCategory}.subCategories.${selectedSubCategory}.subSubCategories.${selectedSubSubCategory}.image`] = 1; // Marks the image for removal
-    }
-
-    // If the entire category, subcategory, or sub-subcategory needs to be deleted
-    if (!removeImageOnly) {
-      // If only the main category needs to be deleted
-      if (selectedCategory !== undefined && selectedSubCategory === undefined && selectedSubSubCategory === undefined) {
-        updateObject[`categories.${selectedCategory}`] = 1; // Marks the category for removal
-        updateObject[`categories.${selectedCategory}.image`] = 1; // Marks the image for removal
+      if (updateResult.modifiedCount === 0) {
+        return res.status(404).json({ message: "Category or image not found" });
       }
 
-      // If only a subcategory needs to be deleted
-      if (selectedCategory !== undefined && selectedSubCategory !== undefined && selectedSubSubCategory === undefined) {
-        updateObject[`categories.${selectedCategory}.subCategories.${selectedSubCategory}`] = 1; // Marks the subcategory for removal
-        updateObject[`categories.${selectedCategory}.subCategories.${selectedSubCategory}.image`] = 1; // Marks the image for removal
-      }
-
-      // If a sub-subcategory needs to be deleted
-      if (selectedCategory !== undefined && selectedSubCategory !== undefined && selectedSubSubCategory !== undefined) {
-        updateObject[`categories.${selectedCategory}.subCategories.${selectedSubCategory}.subSubCategories.${selectedSubSubCategory}`] = 1; // Marks the sub-subcategory for removal
-        updateObject[`categories.${selectedCategory}.subCategories.${selectedSubCategory}.subSubCategories.${selectedSubSubCategory}.image`] = 1; // Marks the image for removal
-      }
+      return res.status(200).json({ message: "Image removed successfully" });
     }
 
-    const result = await Category.findOneAndUpdate(
-      { _id: id }, // Look for the document by ID
-      {
-        $unset: updateObject, // Use the $unset operator to remove the image or category
-      },
-      { new: true }
+    // Find the document first to identify where the categoryId exists (category, subcategory, or sub-subcategory)
+    const categoryDocument = await Category.findById(id);
+    if (!categoryDocument) {
+      return res.status(404).json({ message: "Category document not found" });
+    }
+
+    let updated = false;
+
+    // First, try to remove the category
+    const categoryUpdateResult = await Category.updateOne(
+      { _id: id },
+      { $pull: { categories: { _id: categoryId } } }
     );
 
-    if (!result) {
-      return res.status(404).json({ message: 'Category or subcategory not found' });
+    if (categoryUpdateResult.modifiedCount > 0) {
+      updated = true;
+    } else {
+      // If not a main category, check and remove from subcategories
+      const subcategoryUpdateResult = await Category.updateOne(
+        { _id: id, "categories.subCategories._id": categoryId },
+        { $pull: { "categories.$[].subCategories": { _id: categoryId } } }
+      );
+
+      if (subcategoryUpdateResult.modifiedCount > 0) {
+        updated = true;
+      } else {
+        // If not a subcategory, check and remove from sub-subcategories
+        const subSubcategoryUpdateResult = await Category.updateOne(
+          { _id: id, "categories.subCategories.subSubCategories._id": categoryId },
+          { $pull: { "categories.$[].subCategories.$[].subSubCategories": { _id: categoryId } } }
+        );
+
+        if (subSubcategoryUpdateResult.modifiedCount > 0) {
+          updated = true;
+        }
+      }
     }
 
-    res.status(200).json({ message: 'Category updated successfully', result });
+    if (!updated) {
+      return res.status(404).json({ message: "Category, subcategory, or sub-subcategory not found" });
+    }
+
+    res.status(200).json({ message: "Category deleted successfully" });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
-    console.error('Error in deleteCategory function:', error);
+    console.error("Error deleting category:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 },
-
-
   
 
   getCategory: async (req, res) => {
@@ -367,9 +436,16 @@ deleteCategory: async (req, res) => {
       const uniqueColors = [...new Set(allColors.map(color => color.toLowerCase()))];
   
       // Filter colors that match the query (case-insensitive)
-      const filteredColors = uniqueColors.filter(color => 
-        color.startsWith(query.toLowerCase())
-      );
+      // const filteredColors = uniqueColors.filter(color => 
+      //   color.startsWith(query.toLowerCase())
+      // );
+      const filteredColors = uniqueColors.filter(color => {
+        if (query) {
+          return color.startsWith(query.toLowerCase());
+        } else {
+          return true; // Return all colors if no query is provided
+        }
+      });
   
       res.json(filteredColors); // Return filtered colors
     } catch (error) {
@@ -378,26 +454,168 @@ deleteCategory: async (req, res) => {
     }
   },
   
+  // getProducts: async (req, res) => {
+  //   try {
+  //     let { 
+  //       skip, 
+  //       take, 
+  //       search, 
+  //       filterKey, 
+  //       filterValue, 
+  //       isWebshopProduct, 
+  //       bestProduct, 
+  //       topProduct, 
+  //       popularProduct,
+  //       colors,
+  //       price,
+  //       categories,
+  //       subCategories,
+  //       subSubCategories
+  //     } = req.query;
+  
+     
+  //     // Convert skip and take to integers
+  //     skip = parseInt(skip);
+  //     take = parseInt(take);
+  
+  //     // Initialize the query object
+  //     const query = {};
+  //     console.log('Final Query:', req.query);
+  //     // Handle search functionality
+  //     if (search) {
+  //       const searchNumber = parseInt(search);
+  //       if (!isNaN(searchNumber)) {
+  //         query.$or = [
+  //           { title: { $regex: new RegExp(search, "i") } },
+  //           { barcode: { $regex: new RegExp(search, "i") } },
+  //           { scanCode: { $regex: new RegExp(search, "i") } },
+  //           { supplierRef: { $regex: new RegExp(search, "i") } },
+  //           { brand: { $regex: new RegExp(search, "i") } },
+  //           { supplier: { $regex: new RegExp(search, "i") } },
+  //           { ean: { $regex: new RegExp(search, "i") } },
+  //           { sku: searchNumber },
+  //           { 'stores.location': { $regex: new RegExp(search, "i") } }
+  //         ];
+  //       } else {
+  //         query.$or = [
+  //           { title: { $regex: new RegExp(search, "i") } },
+  //           { barcode: { $regex: new RegExp(search, "i") } },
+  //           { scanCode: { $regex: new RegExp(search, "i") } },
+  //           { supplierRef: { $regex: new RegExp(search, "i") } },
+  //           { brand: { $regex: new RegExp(search, "i") } },
+  //           { supplier: { $regex: new RegExp(search, "i") } },
+  //           { ean: { $regex: new RegExp(search, "i") } },
+  //           { 'stores.location': { $regex: new RegExp(search, "i") } }
+  //         ];
+  //       }
+  //     }
+  
+  //     // Handle filterKey and filterValue
+  //     if (filterKey && !filterValue) {
+  //       query[filterKey] = { $exists: false };
+  //     }
+  
+  //     if (filterKey === "categories" && filterValue) {
+  //       query[filterKey] = { $in: filterValue };
+  //     }
+  
+  //     // Filter by Webshop product, Best product, Top product, and Popular product
+  //     if (isWebshopProduct === 'true' || isWebshopProduct === 'false') {
+  //       query.isWebshopProduct = (isWebshopProduct === 'true');
+  //     }
+  //     if (bestProduct === 'true' || bestProduct === 'false') {
+  //       query.bestProduct = (bestProduct === 'true');
+  //     }
+  //     if (topProduct === 'true' || topProduct === 'false') {
+  //       query.topProduct = (topProduct === 'true');
+  //     }
+  //     if (popularProduct === 'true' || popularProduct === 'false') {
+  //       query.popularProduct = (popularProduct === 'true');
+  //     }
+  
+  //     // Handle color and size filters
+  //     if (colors) {
+  //       // query.colors = { $regex: new RegExp(colors, "i") };
+  //       query.colors =colors;
+  //     }
+
+  //     if (price) {
+  //       const [minPrice, maxPrice] = price.split(','); // Assuming `size` is a string like "0,100"
+  //       query.price = { $gte: Number(minPrice), $lte: Number(maxPrice) };
+  //     }
+  
+  //     // Handle category, subCategory, and subSubCategory filtering
+  //     if (categories || subCategories || subSubCategories) {
+  //       query.$and = [];
+  //       if (categories) {
+  //         query.$and.push({ categories: { $in: categories.split(",") } });
+  //       }
+  //       if (subCategories) {
+  //         query.$and.push({ subCategories: { $in: subCategories.split(",") } });
+  //       }
+  //       if (subSubCategories) {
+  //         query.$and.push({ subSubCategories: { $in: subSubCategories.split(",") } });
+  //       }
+  //     }
+  
+  //     // Fetch the products based on the query
+  //     const products = await Product.find(query).skip(skip).limit(take);
+  
+  //     // Get product counts grouped by platform (e.g., Amazon, bol.com)
+  //     const platformCount = await Product.aggregate([
+  //       {
+  //         $match: {
+  //           platform: { $in: ["amazon", "bol.com"] }
+  //         }
+  //       },
+  //       {
+  //         $group: {
+  //           _id: "$platform",
+  //           count: { $sum: 1 }
+  //         }
+  //       }
+  //     ]);
+  
+  //     // Get total count of products based on the query
+  //     const totalCount = await Product.countDocuments(query);
+  
+  //     // Send the response
+  //     res.status(200).send({
+  //       success: true,
+  //       data: products,
+  //       count: totalCount,
+  //       platformCount
+  //     });
+  
+  //   } catch (error) {
+  //     console.error(error);
+  //     res.status(500).send({
+  //       success: false,
+  //       message: "Server error",
+  //       error: error.message,
+  //     });
+  //   }
+  // },
+
   getProducts: async (req, res) => {
     try {
-      let { 
-        skip, 
-        take, 
-        search, 
-        filterKey, 
-        filterValue, 
-        isWebshopProduct, 
-        bestProduct, 
-        topProduct, 
+      let {
+        skip = 0,
+        take = 10,
+        search,
+        filterKey,
+        filterValue,
+        isWebshopProduct,
+        bestProduct,
+        topProduct,
         popularProduct,
         colors,
         price,
         categories,
         subCategories,
-        subSubCategories
+        subSubCategories,
       } = req.query;
   
-     
       // Convert skip and take to integers
       skip = parseInt(skip);
       take = parseInt(take);
@@ -405,81 +623,76 @@ deleteCategory: async (req, res) => {
       // Initialize the query object
       const query = {};
       console.log('Final Query:', req.query);
+  
       // Handle search functionality
       if (search) {
         const searchNumber = parseInt(search);
+        const searchRegex = { $regex: new RegExp(search, "i") };
+        query.$or = [
+          { title: searchRegex },
+          { barcode: searchRegex },
+          { scanCode: searchRegex },
+          { supplierRef: searchRegex },
+          { brand: searchRegex },
+          { supplier: searchRegex },
+          { ean: searchRegex },
+          { 'stores.location': searchRegex },
+        ];
+  
         if (!isNaN(searchNumber)) {
-          query.$or = [
-            { title: { $regex: new RegExp(search, "i") } },
-            { barcode: { $regex: new RegExp(search, "i") } },
-            { scanCode: { $regex: new RegExp(search, "i") } },
-            { supplierRef: { $regex: new RegExp(search, "i") } },
-            { brand: { $regex: new RegExp(search, "i") } },
-            { supplier: { $regex: new RegExp(search, "i") } },
-            { ean: { $regex: new RegExp(search, "i") } },
-            { sku: searchNumber },
-            { 'stores.location': { $regex: new RegExp(search, "i") } }
-          ];
-        } else {
-          query.$or = [
-            { title: { $regex: new RegExp(search, "i") } },
-            { barcode: { $regex: new RegExp(search, "i") } },
-            { scanCode: { $regex: new RegExp(search, "i") } },
-            { supplierRef: { $regex: new RegExp(search, "i") } },
-            { brand: { $regex: new RegExp(search, "i") } },
-            { supplier: { $regex: new RegExp(search, "i") } },
-            { ean: { $regex: new RegExp(search, "i") } },
-            { 'stores.location': { $regex: new RegExp(search, "i") } }
-          ];
+          query.$or.push({ sku: searchNumber });
         }
       }
   
-      // Handle filterKey and filterValue
-      if (filterKey && !filterValue) {
-        query[filterKey] = { $exists: false };
+      // Handle filtering by key and value
+      if (filterKey) {
+        if (filterValue) {
+          query[filterKey] = { $in: filterValue };
+        } else {
+          query[filterKey] = { $exists: false };
+        }
       }
   
-      if (filterKey === "categories" && filterValue) {
-        query[filterKey] = { $in: filterValue };
+      // Webshop product, best product, top product, and popular product filters
+      if (isWebshopProduct !== undefined) {
+        query.isWebshopProduct = isWebshopProduct === 'true';
+      }
+      if (bestProduct !== undefined) {
+        query.bestProduct = bestProduct === 'true';
+      }
+      if (topProduct !== undefined) {
+        query.topProduct = topProduct === 'true';
+      }
+      if (popularProduct !== undefined) {
+        query.popularProduct = popularProduct === 'true';
       }
   
-      // Filter by Webshop product, Best product, Top product, and Popular product
-      if (isWebshopProduct === 'true' || isWebshopProduct === 'false') {
-        query.isWebshopProduct = (isWebshopProduct === 'true');
-      }
-      if (bestProduct === 'true' || bestProduct === 'false') {
-        query.bestProduct = (bestProduct === 'true');
-      }
-      if (topProduct === 'true' || topProduct === 'false') {
-        query.topProduct = (topProduct === 'true');
-      }
-      if (popularProduct === 'true' || popularProduct === 'false') {
-        query.popularProduct = (popularProduct === 'true');
-      }
-  
-      // Handle color and size filters
+      // Handle color filtering - case insensitive
       if (colors) {
-        // query.colors = { $regex: new RegExp(colors, "i") };
-        query.colors =colors;
+        const colorArray = colors.split(",").map(color => new RegExp(color, "i")); // Create case-insensitive regex for each color
+        query.colors = { $in: colorArray };
       }
-
+  
+      // Handle price range filter
       if (price) {
-        const [minPrice, maxPrice] = price.split(','); // Assuming `size` is a string like "0,100"
+        const [minPrice, maxPrice] = price.split(',');
         query.price = { $gte: Number(minPrice), $lte: Number(maxPrice) };
       }
   
       // Handle category, subCategory, and subSubCategory filtering
-      if (categories || subCategories || subSubCategories) {
-        query.$and = [];
-        if (categories) {
-          query.$and.push({ categories: { $in: categories.split(",") } });
-        }
-        if (subCategories) {
-          query.$and.push({ subCategories: { $in: subCategories.split(",") } });
-        }
-        if (subSubCategories) {
-          query.$and.push({ subSubCategories: { $in: subSubCategories.split(",") } });
-        }
+      const categoryFilters = [];
+      if (categories) {
+        categoryFilters.push({ categories: { $in: categories.split(",") } });
+      }
+      if (subCategories) {
+        categoryFilters.push({ subCategories: { $in: subCategories.split(",") } });
+      }
+      if (subSubCategories) {
+        categoryFilters.push({ subSubCategories: { $in: subSubCategories.split(",") } });
+      }
+  
+      if (categoryFilters.length > 0) {
+        query.$and = categoryFilters;
       }
   
       // Fetch the products based on the query
@@ -489,37 +702,37 @@ deleteCategory: async (req, res) => {
       const platformCount = await Product.aggregate([
         {
           $match: {
-            platform: { $in: ["amazon", "bol.com"] }
-          }
+            platform: { $in: ["amazon", "bol.com"] },
+          },
         },
         {
           $group: {
             _id: "$platform",
-            count: { $sum: 1 }
-          }
-        }
+            count: { $sum: 1 },
+          },
+        },
       ]);
   
       // Get total count of products based on the query
       const totalCount = await Product.countDocuments(query);
   
       // Send the response
-      res.status(200).send({
+      return res.status(200).json({
         success: true,
         data: products,
         count: totalCount,
-        platformCount
+        platformCount,
       });
-  
     } catch (error) {
       console.error(error);
-      res.status(500).send({
+      return res.status(500).json({
         success: false,
         message: "Server error",
         error: error.message,
       });
     }
   },
+  
   
 
   getAllProduct:async(req,res)=>{
