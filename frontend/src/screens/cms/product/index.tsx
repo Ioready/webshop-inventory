@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { message } from 'antd';
+import { message, Table } from 'antd';
 import { usePostToWebshop } from '../../../contexts/usePostToWebshop';
 import { useFetchByLoad } from '../../../contexts';
 import { useNavigate } from 'react-router-dom';
@@ -16,19 +16,20 @@ interface Category {
 }
 
 const TopProducts: React.FC = () => {
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [ean, setEan] = useState<string | undefined>(undefined);
   const [groupedData, setGroupedData] = useState<Category[]>([]);
-  const [query, setQuery] = useState({ skip: 0, take: 10, search: "", filterKey: "Filter Options", topProduct: "true",isWebshopProduct:"true" });
+  const [query, setQuery] = useState({ skip: 0, take: 10, search: "", filterKey: "Filter Options", topProduct: "true", isWebshopProduct: "true" });
+  const [pagination, setPagination] = useState({ current: 1, pageSize: 5, total: 0 });
 
   const { update } = usePostToWebshop();
   const { fetch, data } = useFetchByLoad();
-  const { fetch:fetchCategories, data:categoryData } = useFetchByLoad();
+  const { fetch: fetchCategories, data: categoryData } = useFetchByLoad();
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch({ url: 'products', query: JSON.stringify(query) });
-  }, [query]);
+    const newQuery = { ...query, skip: (pagination.current - 1) * pagination.pageSize, take: pagination.pageSize };
+    fetch({ url: 'products', query: JSON.stringify(newQuery) });
+  }, [query, pagination.current, pagination.pageSize]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -37,18 +38,15 @@ const TopProducts: React.FC = () => {
     fetchData();
   }, []);
 
-  console.log('categoryData',categoryData)
   useEffect(() => {
     if (data?.data && categoryData?.categories?.length) {
       const grouped = data.data.reduce((acc: any, product: any) => {
         const { categories, title, ean } = product;
-  
-        // Find the matching category in the categoryData
+
         const matchingCategory = categoryData.categories[0].categories.find((cat: any) => cat.name === categories);
-  
         const existingCategory = acc.find((item: any) => item.name === categories);
-        const categoryImage = matchingCategory ? matchingCategory.image : '';  // Get category image
-  
+        const categoryImage = matchingCategory ? matchingCategory.image : '';  
+
         if (existingCategory) {
           existingCategory.products.push({ name: title, ean });
         } else {
@@ -56,11 +54,14 @@ const TopProducts: React.FC = () => {
         }
         return acc;
       }, []);
-  
+
       setGroupedData(grouped);
     }
   }, [data, categoryData]);
-  
+
+  const refreshData = () => {
+    fetch({ url: 'products', query: JSON.stringify(query) });
+  };
 
   const handleTopProductToggle = async (topProduct: boolean, categoryIndex: number, productIndex: number) => {
     try {
@@ -82,8 +83,8 @@ const TopProducts: React.FC = () => {
 
   const handleAddProduct = async () => {
     try {
-      await update(`products/update-webshop-status`, { ean, topProduct: true,isWebshopProduct:true });
-      fetch({ url: 'products', query: JSON.stringify(query) });
+      await update(`products/update-webshop-status`, { ean, topProduct: true, isWebshopProduct: true });
+      refreshData();
       message.success('Product added to Top Products');
     } catch (error) {
       console.error("Error adding product:", error);
@@ -91,78 +92,86 @@ const TopProducts: React.FC = () => {
     }
   };
 
+  const handleTableChange = (page: number, pageSize: number) => {
+    setPagination((prev) => ({ ...prev, current: page, pageSize }));
+  };
+
+  const columns = [
+    {
+      title: 'Category Image',
+      dataIndex: 'image',
+      key: 'image',
+      render: (text: string) => <img src={text} alt="Category" className='img-fluid' style={{ height: "5rem", objectFit: 'contain' }} />,
+    },
+    {
+      title: 'Category Name',
+      dataIndex: 'name',
+      key: 'name',
+    },
+    {
+      title: 'Product Name',
+      dataIndex: 'products',
+      key: 'products',
+      render: (_: any, record: any, index: number) => (
+        <>
+          {record.products.map((product: any, productIndex: any) => (
+            <div key={`${index}-${productIndex}`}>
+              {product.name}
+            </div>
+          ))}
+        </>
+      ),
+    },
+    {
+      title: 'Action',
+      key: 'action',
+      render: (_: any, record: any, categoryIndex: number) => (
+        <>
+          {record.products.map((_: any, productIndex: any) => (
+            <div key={`${categoryIndex}-${productIndex}`}>
+              <button
+                className="btn btn-danger btn-sm ml-2"
+                onClick={() => handleTopProductToggle(false, categoryIndex, productIndex)}
+              >
+                Remove
+              </button>
+            </div>
+          ))}
+        </>
+      ),
+    },
+  ];
+
   return (
     <div className="container mt-5">
       <button className="btn  mb-3" onClick={() => navigate(-1)}>
-      ← Back
+        ← Back
       </button>
-      <h3 className='my-2'>Top Product</h3>
-      <div className='d-flex' style={{ gap: "1rem" }}>
+      <h3 className='my-2'>Top Products</h3>
+      <div className='d-flex mb-4' style={{ gap: "1rem" }}>
         <input
           type="text"
-          className="form-control w-25 h-50"
+          className="form-control w-25"
           placeholder='EAN Code'
-          onChange={(e) => { setEan(e.target.value); }}
+          onChange={(e) => setEan(e.target.value)}
         />
-        <button className='btn btn-info text-white' onClick={handleAddProduct}>Add Product</button>
+        <button className='btn btn-info text-white' onClick={handleAddProduct}>
+          Add Product
+        </button>
       </div>
-      <div className="table-responsive"> 
-      <table className="table table-striped table-bordered table-hover mt-3">
-        <thead className="thead-dark">
-          <tr>
-            <th>Category Image</th>
-            <th>Category Name</th>
-            <th>Product Name</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {groupedData?.map((category: any, categoryIndex: any) =>
-            category.products.map((product: any, productIndex: any) => (
-              <tr key={`${categoryIndex}-${productIndex}`}>
-                {productIndex === 0 && (
-                  <>
-                    <td rowSpan={category.products.length}>
-                      <img src={category.image} alt={category.name} style={{ height: "5rem", objectFit: "contain" }} />
-                    </td>
-                    <td rowSpan={category.products.length}>{category.name}</td>
-                  </>
-                )}
-                <td>{product.name}</td>
-                <td className='d-flex' style={{ gap: "1rem" }}>
-                  <button
-                    className="btn btn-danger btn-sm ml-2"
-                    onClick={() => handleTopProductToggle(false, categoryIndex, productIndex)}
-                  >
-                    Remove
-                  </button>
-                </td>
-              </tr>
-            ))
-          )}
-        </tbody>
-      </table>
-      </div>
-      <nav aria-label="Page navigation example" className="d-flex justify-content-between align-items-center">
-        <ul className="pagination">
-          <li className="page-item">
-            <a className="page-link" href="#" aria-label="Previous">
-              <span aria-hidden="true">&laquo;</span>
-            </a>
-          </li>
-          <li className="page-item">
-            <a className="page-link" href="#">
-              1
-            </a>
-          </li>
-          <li className="page-item">
-            <a className="page-link" href="#" aria-label="Next">
-              <span aria-hidden="true">&raquo;</span>
-            </a>
-          </li>
-        </ul>
-        <p>Showing 1 to 1 of 1 entries</p>
-      </nav>
+
+      <Table
+        columns={columns}
+        dataSource={groupedData}
+        rowKey="name"
+        pagination={{
+          current: pagination.current,
+          pageSize: pagination.pageSize,
+          total: data?.count ?? 0,
+          onChange: handleTableChange,
+        }}
+      />
+
     </div>
   );
 };

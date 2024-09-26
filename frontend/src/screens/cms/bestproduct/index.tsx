@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { usePostToWebshop } from '../../../contexts/usePostToWebshop';
-import { message } from 'antd';
+import { message, Table } from 'antd';
 import { useFetchByLoad } from '../../../contexts';
 import { useNavigate } from 'react-router-dom';
 
@@ -10,21 +10,30 @@ const resource = "products";
 const BestProduct: React.FC = () => {
   const [ean, setEan] = useState<string | undefined>(undefined);
   const [query, setQuery] = useState({ skip: 0, take: 10, search: "", filterKey: "Filter Options", bestProduct: "true" });
+  const [pagination, setPagination] = useState({ current: 1, pageSize: 5, total: 0 });
 
   const { update } = usePostToWebshop();
   const { fetch, data } = useFetchByLoad();
-  const navigate = useNavigate(); // useNavigate hook for navigation
+  const navigate = useNavigate();
+
+  // Fetch data based on query and pagination
+  useEffect(() => {
+    const newQuery = { ...query, skip: (pagination.current - 1) * pagination.pageSize, take: pagination.pageSize };
+    fetch({ url: resource, query: JSON.stringify(newQuery) });
+  }, [query, pagination.current, pagination.pageSize]);
 
   useEffect(() => {
-    fetch({ url: resource, query: JSON.stringify(query) });
-    console.log(data);
-
-  }, [query]);
+    if (data?.total) {
+      setPagination((prev) => ({
+        ...prev,
+        total: data.total, // Update total pages from API
+      }));
+    }
+  }, [data?.total]);
 
   const refreshData = () => {
     fetch({ url: resource, query: JSON.stringify(query) });
   };
-
 
   const handleBestProductToggle = async (bestProduct: boolean, eanCode?: string) => {
     if (!eanCode && !ean) {
@@ -41,13 +50,40 @@ const BestProduct: React.FC = () => {
     }
   };
 
+  const handleTableChange = (page: number, pageSize: number) => {
+    setPagination((prev) => ({ ...prev, current: page, pageSize }));
+  };
+
+  const columns = [
+    {
+      title: 'Image',
+      dataIndex: 'images',
+      key: 'images',
+      render: (text: string) => <img src={text} alt="Product" className='img-fluid' style={{ height: "5rem", objectFit: 'contain' }} />
+    },
+    {
+      title: 'Product',
+      dataIndex: 'title',
+      key: 'title',
+    },
+    {
+      title: 'Action',
+      key: 'action',
+      render: (record: any) => (
+        <div style={{ gap: "1rem", display: 'flex' }}>
+          <button onClick={() => { setEan(record.ean); handleBestProductToggle(false, record.ean); }} className="btn btn-danger btn-sm">
+            Remove
+          </button>
+        </div>
+      ),
+    },
+  ];
+
   return (
     <div className="container mt-4">
-      {/* Back Button */}
       <button className="btn  mb-3" onClick={() => navigate(-1)}>
-      ← Back
+        ← Back
       </button>
-
       <div className='w-100 d-flex justify-content-between align-items-center my-2'>
         <h3>Best Selling Products</h3>
       </div>
@@ -57,75 +93,22 @@ const BestProduct: React.FC = () => {
           type="text"
           className="form-control w-25 h-50"
           placeholder='EAN Code'
-          onChange={(e) => { setEan(e.target.value) }}
+          onChange={(e) => { setEan(e.target.value); }}
         />
         <button className='btn btn-info text-white' onClick={() => handleBestProductToggle(true)}>Add Product</button>
-
       </div>
 
-      <div className="table-responsive">
-        <table className="table table-striped table-bordered table-hover">
-          <thead className="thead-dark">
-            <tr>
-              <th className="text-center">Image</th>
-              <th className="text-center">Product</th>
-              <th className="text-center">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data?.data?.map((order: any) => (
-              <tr key={order.id}>
-                <td className="text-center text-nowrap" style={{ cursor: "pointer" }}>
-
-                  <img
-                    src={order.images}
-                    alt={order.category}
-                    className="img-fluid"
-                    style={{ height: "5rem", objectFit: "contain" }}
-                  />
-                </td>
-                <td className="text-center text-nowrap" style={{ cursor: "pointer" }}>
-                  {order?.title}
-                </td>
-                <td className="d-flex" style={{ gap: "1rem" }}>
-                  <button
-                    onClick={() => {
-                      setEan(order.ean);
-                      handleBestProductToggle(false, order.ean);
-                    }}
-                    className="btn btn-danger btn-sm ml-2"
-                  >
-                    Remove
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      <nav aria-label="Page navigation example" className="d-flex justify-content-between align-items-center">
-
-        <ul className="pagination">
-          <li className="page-item">
-            <a className="page-link" href="#" aria-label="Previous">
-              <span aria-hidden="true">&laquo;</span>
-            </a>
-          </li>
-          <li className="page-item">
-            <a className="page-link" href="#">
-              1
-            </a>
-          </li>
-          <li className="page-item">
-            <a className="page-link" href="#" aria-label="Next">
-              <span aria-hidden="true">&raquo;</span>
-            </a>
-          </li>
-        </ul>
-        <p>Showing 1 to 1 of 1 entries</p>
-
-      </nav>
+      <Table
+        columns={columns}
+        dataSource={data?.data}
+        rowKey="id"
+        pagination={{
+          current: pagination.current,
+          pageSize: pagination.pageSize,
+          total: data?.count ?? 0,
+          onChange: handleTableChange,
+        }}
+      />
     </div>
   );
 };
