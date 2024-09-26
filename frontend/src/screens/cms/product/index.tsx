@@ -22,26 +22,43 @@ const TopProducts: React.FC = () => {
 
   const { update } = usePostToWebshop();
   const { fetch, data } = useFetchByLoad();
+  const { fetch:fetchCategories, data:categoryData } = useFetchByLoad();
 
   useEffect(() => {
     fetch({ url: 'products', query: JSON.stringify(query) });
   }, [query]);
 
   useEffect(() => {
-    if (data?.data) {
+    const fetchData = async () => {
+      await fetchCategories({ url: "getCategory" });
+    };
+    fetchData();
+  }, []);
+
+  console.log('categoryData',categoryData)
+  useEffect(() => {
+    if (data?.data && categoryData?.categories?.length) {
       const grouped = data.data.reduce((acc: any, product: any) => {
         const { categories, title, ean } = product;
+  
+        // Find the matching category in the categoryData
+        const matchingCategory = categoryData.categories[0].categories.find((cat: any) => cat.name === categories);
+  
         const existingCategory = acc.find((item: any) => item.name === categories);
+        const categoryImage = matchingCategory ? matchingCategory.image : '';  // Get category image
+  
         if (existingCategory) {
           existingCategory.products.push({ name: title, ean });
         } else {
-          acc.push({ name: categories, products: [{ name: title, ean }] });
+          acc.push({ name: categories, image: categoryImage, products: [{ name: title, ean }] });
         }
         return acc;
       }, []);
+  
       setGroupedData(grouped);
     }
-  }, [data]);
+  }, [data, categoryData]);
+  
 
   const handleTopProductToggle = async (topProduct: boolean, categoryIndex: number, productIndex: number) => {
     try {
