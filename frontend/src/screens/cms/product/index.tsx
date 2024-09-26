@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { message } from 'antd';
 import { usePostToWebshop } from '../../../contexts/usePostToWebshop';
 import { useFetchByLoad } from '../../../contexts';
+import { useNavigate } from 'react-router-dom';
 
 interface Product {
   name: string;
@@ -23,6 +24,7 @@ const TopProducts: React.FC = () => {
   const { update } = usePostToWebshop();
   const { fetch, data } = useFetchByLoad();
   const { fetch:fetchCategories, data:categoryData } = useFetchByLoad();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetch({ url: 'products', query: JSON.stringify(query) });
@@ -91,6 +93,9 @@ const TopProducts: React.FC = () => {
 
   return (
     <div className="container mt-5">
+      <button className="btn  mb-3" onClick={() => navigate(-1)}>
+      ← Back
+      </button>
       <h3 className='my-2'>Top Product</h3>
       <div className='d-flex' style={{ gap: "1rem" }}>
         <input
@@ -101,7 +106,7 @@ const TopProducts: React.FC = () => {
         />
         <button className='btn btn-info text-white' onClick={handleAddProduct}>Add Product</button>
       </div>
-
+      <div className="table-responsive"> 
       <table className="table table-striped table-bordered table-hover mt-3">
         <thead className="thead-dark">
           <tr>
@@ -118,7 +123,7 @@ const TopProducts: React.FC = () => {
                 {productIndex === 0 && (
                   <>
                     <td rowSpan={category.products.length}>
-                      <img src={category.image} alt={category.name} style={{ height: "5rem", objectFit: 'cover' }} />
+                      <img src={category.image} alt={category.name} style={{ height: "5rem", objectFit: "contain" }} />
                     </td>
                     <td rowSpan={category.products.length}>{category.name}</td>
                   </>
@@ -137,6 +142,27 @@ const TopProducts: React.FC = () => {
           )}
         </tbody>
       </table>
+      </div>
+      <nav aria-label="Page navigation example" className="d-flex justify-content-between align-items-center">
+        <ul className="pagination">
+          <li className="page-item">
+            <a className="page-link" href="#" aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+          <li className="page-item">
+            <a className="page-link" href="#">
+              1
+            </a>
+          </li>
+          <li className="page-item">
+            <a className="page-link" href="#" aria-label="Next">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+        </ul>
+        <p>Showing 1 to 1 of 1 entries</p>
+      </nav>
     </div>
   );
 };

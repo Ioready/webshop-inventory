@@ -3,6 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { usePostToWebshop } from '../../../contexts/usePostToWebshop';
 import { message } from 'antd';
 import { useFetchByLoad } from '../../../contexts';
+import { useNavigate } from 'react-router-dom';
 
 const resource = "products";
 
@@ -10,8 +11,10 @@ const PopularProduct: React.FC = () => {
   const [ean, setEan] = useState<string | undefined>(undefined);
   const [query, setQuery] = useState({ skip: 0, take: 10, search: "", filterKey: "Filter Options", popularProduct: "true" });
 
-  const { update } = usePostToWebshop();
-  const { fetch, data } = useFetchByLoad();
+  const { update} = usePostToWebshop();
+  const { fetch, data} = useFetchByLoad();
+  const navigate = useNavigate();
+
 
   useEffect(() => {
     fetch({ url: resource, query: JSON.stringify(query) });
@@ -39,8 +42,12 @@ const PopularProduct: React.FC = () => {
 
   return (
     <div className="container mt-4">
-      <div className='w-100 d-flex justify-content-between align-items-center my-2'>
-        <h3>Popular Products</h3>
+      <button className="btn  mb-3" onClick={() => navigate(-1)}>
+      ← Back
+      </button>
+      <div className=' w-100 d-flex justify-content-between align-items-center my-2'>
+      <h3>Popular Products</h3>
+
       </div>
 
       <div className='d-flex mb-4' style={{ gap: "1rem" }}>
@@ -53,7 +60,7 @@ const PopularProduct: React.FC = () => {
         <button className='btn btn-info text-white' onClick={() => handleBestProductToggle(true)}>Add Product</button>
       </div>
 
-      <div className="table-responsive">
+      <div className="table-responsive"> 
         <table className="table table-striped table-bordered table-hover">
           <thead className="thead-dark">
             <tr>
@@ -65,8 +72,9 @@ const PopularProduct: React.FC = () => {
           <tbody>
             {data?.data?.map((order: any) => (
               <tr key={order.id}>
-                <td className="text-center text-nowrap" style={{ cursor: "pointer" }}>
-                  <img src={order.images} alt={order.category} className='img-fluid' style={{ height: "5rem", objectFit: 'cover' }} />
+                <td className="text-center text-nowrap" style={{cursor:"pointer"}}>
+                  <img src={order.images} alt={order.category} className='img-fluid' style={{height:"5rem", objectFit: 'contain'}} />
+
                 </td>
                 <td className="text-center text-nowrap" style={{ cursor: "pointer" }}>{order?.title}</td>
                 <td className='d-flex' style={{ gap: "1rem" }}>
@@ -78,7 +86,24 @@ const PopularProduct: React.FC = () => {
         </table>
       </div>
       <nav aria-label="Page navigation example" className="d-flex justify-content-between align-items-center">
-        <p>Showing 1 to {data?.data?.length} of {data?.data?.length} entries</p>
+        <ul className="pagination">
+          <li className="page-item">
+            <a className="page-link" href="#" aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+          <li className="page-item">
+            <a className="page-link" href="#">
+              1
+            </a>
+          </li>
+          <li className="page-item">
+            <a className="page-link" href="#" aria-label="Next">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+        </ul>
+        <p>Showing 1 to 1 of 1 entries</p>
       </nav>
     </div>
   );

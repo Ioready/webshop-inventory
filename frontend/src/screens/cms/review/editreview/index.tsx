@@ -42,6 +42,9 @@ const ReviewForm: React.FC = () => {
 
   return (
     <div className="container mt-4">
+      <button className="btn  mb-3" onClick={() => navigate(-1)}>
+      ← Back
+      </button>
       <h3>{reviewToEdit ? 'Edit Review' : 'Add Review'}</h3>
       <form onSubmit={handleSubmit} className="row">
         <div className="col-12 mb-3">

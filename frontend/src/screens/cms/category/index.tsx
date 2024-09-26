@@ -4,6 +4,7 @@ import Delete from './delete';
 import Select from 'react-select';
 import { useFetchByLoad, usePatch } from '../../../contexts';
 import { message } from 'antd';
+import { useNavigate } from 'react-router-dom';
 
 interface Customers {
   id: string;
@@ -18,6 +19,7 @@ const TopCategory: React.FC = () => {
   const { fetch, data } = useFetchByLoad();
   const [selectedCategory, setSelectedCategory] = useState<{ value: string, label: string } | null>(null);
   const topCategories = data?.categories[0]?.categories.filter((category: any) => category.topCategory === true);
+  const navigate = useNavigate();
 
   const {edit} = usePatch();
   
@@ -87,6 +89,9 @@ const TopCategory: React.FC = () => {
 
   return (
     <div className="container mt-4">
+      <button className="btn  mb-3" onClick={() => navigate(-1)}>
+      ← Back
+      </button>
       <div className=' w-100 d-flex justify-content-between align-items-center my-2'>
       <h3>Top Category</h3>
       </div>
@@ -129,7 +134,7 @@ const TopCategory: React.FC = () => {
             {topCategories?.map((order:any, index: number) => (
               <tr key={order.id}>
                 <td className="text-center text-nowrap" style={{cursor:"pointer"}}>
-                  <img src={order.image} alt={order.name} className='img-fluid' style={{height:"5rem", objectFit: 'cover'}} />
+                  <img src={order.image} alt={order.name} className='img-fluid' style={{height:"5rem", objectFit: 'contain'}} />
                 </td>
                 <td className="text-center text-nowrap" style={{cursor:"pointer"}}>{order.name}</td>
                 <td className=' d-flex' style={{ gap:"1rem"}}>

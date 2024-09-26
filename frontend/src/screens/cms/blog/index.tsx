@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { MdEdit } from "react-icons/md";
 import { MdDelete } from "react-icons/md";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useDelete, useFetchByLoad } from '../../../contexts';
 import Delete from './delete';
 import { message } from 'antd';
@@ -17,6 +17,7 @@ const resource='deleteCms';
 const Blog: React.FC = () => {
 
   const [popupCustomer, setPopupCustomer] = useState(false);
+  const navigate = useNavigate();
 
   const closePopup = () => {
     setPopupCustomer(false);
@@ -53,6 +54,9 @@ const Blog: React.FC = () => {
 
   return (
     <div className="container mt-4">
+      <button className="btn  mb-3" onClick={() => navigate(-1)}>
+      ← Back
+      </button>
       <div className='w-100 d-flex justify-content-between align-items-center my-2'>
         <h3>All Blog</h3>
         <Link to='/add-blog' className='px-2 py-1 rounded-2 bg-black text-white' style={{ cursor: "pointer" }}>

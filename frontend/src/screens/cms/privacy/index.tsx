@@ -5,11 +5,13 @@ import 'react-quill/dist/quill.snow.css';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useFetchByLoad, usePost } from '../../../contexts'; // Assuming you have custom hooks for posting data and fetching data
+import { useNavigate } from 'react-router-dom';
 
 const Privacy: React.FC = () => {
   const [content, setContent] = useState<string>('');
   const { fetch, data } = useFetchByLoad();
   const { create } = usePost();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -45,6 +47,9 @@ const Privacy: React.FC = () => {
 
   return (
     <div className="container mt-4">
+      <button className="btn  mb-3" onClick={() => navigate(-1)}>
+      ← Back
+      </button>
       <h3>Privacy Policy</h3>
       <form onSubmit={handleSubmit}>
         <div className="form-group">
