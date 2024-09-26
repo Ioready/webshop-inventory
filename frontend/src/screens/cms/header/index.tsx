@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { storage } from '../../firebase/firebase';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
+import { useNavigate } from 'react-router-dom';
 
 const Header: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -15,6 +16,7 @@ const Header: React.FC = () => {
 
   const { create} = usePost();
   const { fetch, data } = useFetchByLoad();
+  const navigate = useNavigate();
 
   const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -74,6 +76,9 @@ const Header: React.FC = () => {
 
   return (
     <div className="container mt-4">
+      <button className="btn  mb-3" onClick={() => navigate(-1)}>
+      ← Back
+      </button>
       <h3 className='my-2'>Header</h3>
       <form onSubmit={handleSubmit} className="row">
         <div className="col-12 mb-3">

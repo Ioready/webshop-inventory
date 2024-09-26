@@ -5,11 +5,13 @@ import 'react-quill/dist/quill.snow.css';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useFetchByLoad, usePost } from '../../../contexts'; // Assuming you have a custom hook for posting data and fetching data
+import { useNavigate } from 'react-router-dom';
 
 const Terms: React.FC = () => {
   const [content, setContent] = useState<string>('');
   const { fetch, data } = useFetchByLoad();
   const { create } = usePost();
+  const navigate  = useNavigate();
 
   useEffect(() => {
     if (data?.termAndConditions) {
@@ -46,6 +48,9 @@ const Terms: React.FC = () => {
 
   return (
     <div className="container mt-4">
+      <button className="btn  mb-3" onClick={() => navigate(-1)}>
+      ← Back
+      </button>
       <h3>Terms and Conditions</h3>
       <form onSubmit={handleSubmit}>
         <div className="form-group">

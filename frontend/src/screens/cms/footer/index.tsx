@@ -7,6 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from '../../firebase/firebase';
 import ReactQuill from 'react-quill';
+import { useNavigate } from 'react-router-dom';
 
 const Footer: React.FC = () => {
   const [logo, setLogo] = useState<string>(''); // Single logo image URL
@@ -14,6 +15,7 @@ const Footer: React.FC = () => {
   const [address, setAddress] = useState('');
   const [taxInformation, setTaxInformation] = useState('');
   const [newsletterContent, setNewsletterContent] = useState('');
+  const navigate = useNavigate();
 
   const { create } = usePost();
   const { fetch, data } = useFetchByLoad();
@@ -78,6 +80,9 @@ const Footer: React.FC = () => {
 
   return (
     <div className="container mt-4">
+      <button className="btn  mb-3" onClick={() => navigate(-1)}>
+      ← Back
+      </button>
       <h3 className='my-2'>Footer</h3>
       <form onSubmit={handleSubmit} className="row">
         <div className="col-12 mb-3">

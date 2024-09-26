@@ -18,6 +18,7 @@ interface Review {
 
 const resource = 'deleteCms';
 
+
 const Review: React.FC = () => {
   const [review, setReview] = useState<Review[]>([]);
   const [popupCustomer, setPopupCustomer] = useState<{ isOpen: boolean; reviewId?: string }>({ isOpen: false });
@@ -55,6 +56,9 @@ const Review: React.FC = () => {
 
   return (
     <div className="container mt-4">
+      <button className="btn  mb-3" onClick={() => navigate(-1)}>
+      ← Back
+      </button>
       <div className='w-100 d-flex justify-content-between align-items-center my-2'>
         <h3>All Reviews</h3>
       </div>

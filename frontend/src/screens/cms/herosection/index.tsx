@@ -8,6 +8,7 @@ import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { storage } from '../../firebase/firebase';
 import { toast } from 'react-toastify';
 import { message } from 'antd';
+import { useNavigate } from 'react-router-dom';
 
 interface Section {
   _id: number;
@@ -21,6 +22,7 @@ const Herosection: React.FC = () => {
   const { create } = usePost();
   const { fetch, data } = useFetchByLoad();
   const { remove} = useDelete();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetch({ url: 'getCms' });
@@ -98,6 +100,9 @@ const Herosection: React.FC = () => {
 
   return (
     <div className="container mt-4">
+      <button className="btn  mb-3" onClick={() => navigate(-1)}>
+      ← Back
+      </button>
       <h3 className='my-2'>Herosection</h3>
       <form onSubmit={handleSubmit}>
         {data?.herosection?.map((section:any) => (
