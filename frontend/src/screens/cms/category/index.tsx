@@ -30,6 +30,7 @@ const TopCategory: React.FC = () => {
   }, []);
 
   const handleClick = async (selectedIndex: number, topCategory: boolean) => {
+    console.log('selectedIndex',selectedIndex)
     const url = `/${"editCategory"}`;
     const categoryId = data?.categories[0]?._id;
 
@@ -39,14 +40,13 @@ const TopCategory: React.FC = () => {
     }  
     
     try {
-      const payload = {
-        id: categoryId,
-        updatedFields: {
-          selectedCategory: selectedIndex,
-          topCategory: topCategory
-        }
+      const updatedFields = {
+        id: categoryId,  // Pass the actual category ID here
+        selectedCategory: selectedIndex,  // Keep selected index for backend reference if needed
+        topCategory: topCategory  // Pass the topCategory flag
       };
-      await edit(url, payload);
+      
+      await edit(url, {updatedFields});
       fetch({ url: "getCategory" })
     } catch (error) {
       console.error("Error updating product:", error);
@@ -71,14 +71,12 @@ const TopCategory: React.FC = () => {
     const categoryId = data?.categories[0]?._id;
     
     try {
-      const payload = {
-        id: categoryId,
-        updatedFields: {
+      const updatedFields = {
+          id: categoryId,
           selectedCategory: index,
           topCategory: false
-        }
       };
-      await edit(url, payload);
+      await edit(url, {updatedFields});
       fetch({ url: "getCategory" });
     } catch (error) {
       console.error("Error updating product:", error);
@@ -115,7 +113,7 @@ const TopCategory: React.FC = () => {
 
       <button className=' btn btn-info text-white'
       //@ts-ignore
-       onClick={()=>handleClick(selectedCategory!, true)}>Add Category</button>
+       onClick={()=>handleClick(selectedCategory, true)}>Add Category</button>
       </div>
 
       <div className="table-responsive">

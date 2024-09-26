@@ -4,26 +4,31 @@ import { usePostToWebshop } from '../../../contexts/usePostToWebshop';
 import { message } from 'antd';
 import { useFetchByLoad } from '../../../contexts';
 
-
 const resource = "products";
+
 const PopularProduct: React.FC = () => {
   const [ean, setEan] = useState<string | undefined>(undefined);
-  const [query, setQuery] = useState({skip: 0, take: 10, search: "", filterKey: "Filter Options", popularProduct:"true"});
+  const [query, setQuery] = useState({ skip: 0, take: 10, search: "", filterKey: "Filter Options", popularProduct: "true" });
 
-  const { update} = usePostToWebshop();
-  const { fetch, data} = useFetchByLoad();
+  const { update } = usePostToWebshop();
+  const { fetch, data } = useFetchByLoad();
 
   useEffect(() => {
-    fetch({ url: resource, query: JSON.stringify(query) })
+    fetch({ url: resource, query: JSON.stringify(query) });
     console.log(data);
   }, [query]);
 
   const refreshData = () => {
-    fetch({ url: resource, query: JSON.stringify(query) })
+    fetch({ url: resource, query: JSON.stringify(query) });
   };
-  const handleBestProductToggle = async (popularProduct:any) => {
+
+  const handleBestProductToggle = async (popularProduct: boolean, eanCode?: string) => {
+    if (!eanCode && !ean) {
+      message.error("EAN code is missing.");
+      return;
+    }
     try {
-      await update(`${resource}/update-webshop-status`, { ean, popularProduct });
+      await update(`${resource}/update-webshop-status`, { ean: eanCode || ean, popularProduct });
       refreshData();
       message.success(`Product ${popularProduct ? 'marked as' : 'removed from'} Popular Product`);
     } catch (error) {
@@ -34,19 +39,18 @@ const PopularProduct: React.FC = () => {
 
   return (
     <div className="container mt-4">
-      <div className=' w-100 d-flex justify-content-between align-items-center my-2'>
-      <h3>Popular Products</h3>
+      <div className='w-100 d-flex justify-content-between align-items-center my-2'>
+        <h3>Popular Products</h3>
       </div>
 
-      <div className=' d-flex mb-4' style={{gap:"1rem"}}>
-      
-      <input
-            type="text"
-            className="form-control w-25 h-50"
-            placeholder='EAN Code'
-            onChange={(e)=>{setEan(e.target.value)}}
-          />
-      <button className=' btn btn-info text-white' onClick={()=>handleBestProductToggle(true)}>Add Product</button>
+      <div className='d-flex mb-4' style={{ gap: "1rem" }}>
+        <input
+          type="text"
+          className="form-control w-25 h-50"
+          placeholder='EAN Code'
+          onChange={(e) => { setEan(e.target.value); }}
+        />
+        <button className='btn btn-info text-white' onClick={() => handleBestProductToggle(true)}>Add Product</button>
       </div>
 
       <div className="table-responsive">
@@ -59,14 +63,14 @@ const PopularProduct: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {data?.data?.map((order:any) => (
+            {data?.data?.map((order: any) => (
               <tr key={order.id}>
-                <td className="text-center text-nowrap" style={{cursor:"pointer"}}>
-                  <img src={order.images} alt={order.category} className='img-fluid' style={{height:"5rem", objectFit: 'cover'}} />
+                <td className="text-center text-nowrap" style={{ cursor: "pointer" }}>
+                  <img src={order.images} alt={order.category} className='img-fluid' style={{ height: "5rem", objectFit: 'cover' }} />
                 </td>
-                <td className="text-center text-nowrap" style={{cursor:"pointer"}}>{order?.title}</td>
-                <td className=' d-flex' style={{ gap:"1rem"}}>
-                  <button onClick={()=>handleBestProductToggle(false)}  className="btn btn-danger btn-sm ml-2">Remove</button>
+                <td className="text-center text-nowrap" style={{ cursor: "pointer" }}>{order?.title}</td>
+                <td className='d-flex' style={{ gap: "1rem" }}>
+                  <button onClick={() => { setEan(order.ean); handleBestProductToggle(false, order.ean); }} className="btn btn-danger btn-sm ml-2">Remove</button>
                 </td>
               </tr>
             ))}

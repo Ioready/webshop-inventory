@@ -39,6 +39,8 @@ export const products = {
       res.status(500).json({ message: 'Server error', error });
     }
   },
+
+  
   addCategory: async (req, res) => {
     try {
         const { categories, subCategories, subSubCategories, selectedCategory, selectedSubCategory } = req.body;
@@ -166,6 +168,14 @@ editCategory: async (req, res) => {
       updateObject[`categories.${updatedFields.selectedCategory}.image`] = updatedFields.image;
     }
 
+    // Check if topCategory is being updated (only for main category)
+    if (updatedFields.topCategory !== undefined) {
+      updateObject[`categories.${updatedFields.selectedCategory}.topCategory`] = updatedFields.topCategory;
+    }
+
+    // Log the updateObject to see what's being sent to MongoDB
+    console.log('Update object:', updateObject);
+
     // Perform the update in the database
     const result = await Category.findOneAndUpdate(
       { _id: updatedFields.id },  // Document lookup by ID
@@ -186,6 +196,7 @@ editCategory: async (req, res) => {
     console.error('Error in editCategory function:', error);
   }
 },
+
 
 
 // deleteCategory: async (req, res) => {
