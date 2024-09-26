@@ -6,6 +6,7 @@ import { useFetchByLoad } from '../../../contexts';
 import { useNavigate } from 'react-router-dom';
 
 const resource = "products";
+
 const BestProduct: React.FC = () => {
   const [ean, setEan] = useState<string | undefined>(undefined);
   const [query, setQuery] = useState({ skip: 0, take: 10, search: "", filterKey: "Filter Options", bestProduct: "true" });
@@ -17,15 +18,21 @@ const BestProduct: React.FC = () => {
   useEffect(() => {
     fetch({ url: resource, query: JSON.stringify(query) });
     console.log(data);
+
   }, [query]);
 
   const refreshData = () => {
     fetch({ url: resource, query: JSON.stringify(query) });
   };
 
-  const handleBestProductToggle = async (bestProduct: any) => {
+
+  const handleBestProductToggle = async (bestProduct: boolean, eanCode?: string) => {
+    if (!eanCode && !ean) {
+      message.error("EAN code is missing.");
+      return;
+    }
     try {
-      await update(`${resource}/update-webshop-status`, { ean, bestProduct });
+      await update(`${resource}/update-webshop-status`, { ean: eanCode || ean, bestProduct });
       refreshData();
       message.success(`Product ${bestProduct ? 'marked as' : 'removed from'} Best Product`);
     } catch (error) {
@@ -53,6 +60,7 @@ const BestProduct: React.FC = () => {
           onChange={(e) => { setEan(e.target.value) }}
         />
         <button className='btn btn-info text-white' onClick={() => handleBestProductToggle(true)}>Add Product</button>
+
       </div>
 
       <div className="table-responsive">
@@ -68,11 +76,27 @@ const BestProduct: React.FC = () => {
             {data?.data?.map((order: any) => (
               <tr key={order.id}>
                 <td className="text-center text-nowrap" style={{ cursor: "pointer" }}>
-                  <img src={order.images} alt={order.category} className='img-fluid' style={{ height: "5rem", objectFit: 'contain' }} />
+
+                  <img
+                    src={order.images}
+                    alt={order.category}
+                    className="img-fluid"
+                    style={{ height: "5rem", objectFit: "contain" }}
+                  />
                 </td>
-                <td className="text-center text-nowrap" style={{ cursor: "pointer" }}>{order?.title}</td>
-                <td className='d-flex' style={{ gap: "1rem" }}>
-                  <button onClick={() => handleBestProductToggle(false)} className="btn btn-danger btn-sm ml-2">Remove</button>
+                <td className="text-center text-nowrap" style={{ cursor: "pointer" }}>
+                  {order?.title}
+                </td>
+                <td className="d-flex" style={{ gap: "1rem" }}>
+                  <button
+                    onClick={() => {
+                      setEan(order.ean);
+                      handleBestProductToggle(false, order.ean);
+                    }}
+                    className="btn btn-danger btn-sm ml-2"
+                  >
+                    Remove
+                  </button>
                 </td>
               </tr>
             ))}
@@ -81,6 +105,7 @@ const BestProduct: React.FC = () => {
       </div>
 
       <nav aria-label="Page navigation example" className="d-flex justify-content-between align-items-center">
+
         <ul className="pagination">
           <li className="page-item">
             <a className="page-link" href="#" aria-label="Previous">
@@ -99,6 +124,7 @@ const BestProduct: React.FC = () => {
           </li>
         </ul>
         <p>Showing 1 to 1 of 1 entries</p>
+
       </nav>
     </div>
   );

@@ -38,7 +38,7 @@ const AddCategoryPopup: React.FC<AddCategoryProps> = ({ onClose, item }) => {
   const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
       const file = event.target.files[0];
-      const storageRef = ref(storage, `images/${file.name}`);
+      const storageRef = ref(storage, `images/${file?.name}`);
       await uploadBytes(storageRef, file);
       const url = await getDownloadURL(storageRef);
       setImage(url);
