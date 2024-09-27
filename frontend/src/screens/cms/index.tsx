@@ -30,6 +30,11 @@ const CMS: React.FC = () => {
               <p className=' m-0 p-l10'>Herosection</p>
             </Link>
 
+            <Link to="/cms/ad" className=' d-flex align-items-center text-white px-3 py-1  rounded-4 bg-secondary cms_cards' style={{fontSize:"xxx-large", cursor:"pointer"}}>
+              <IoIosMenu/>
+              <p className=' m-0 p-l10'>Ad</p>
+            </Link>
+
             <Link to="/cms/footer" className=' d-flex align-items-center text-white px-3 py-1  rounded-4 bg-success cms_cards' style={{fontSize:"xxx-large", cursor:"pointer"}}>
               <BsMenuButtonWideFill/>
               <p className=' m-0 p-l10'>Footer</p>

@@ -23,6 +23,14 @@ const cmsSchema = new mongoose.Schema({
       type: String,
     }
   }],
+  ad:[{
+    image: {
+      type: String,
+    },
+    description: {
+      type: String,
+    }
+  }],
   footer: {
     logo: {
       type: String,

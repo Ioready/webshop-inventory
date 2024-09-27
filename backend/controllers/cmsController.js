@@ -13,6 +13,10 @@ export const cms = {
             updates.$push = { herosection: req.body.herosection };
         }
 
+        if (req.body.ad) {
+            updates.$push = { ad: req.body.ad };
+        }
+
         if (req.body.footer) {
             updates.footer = req.body.footer;
         }
@@ -86,9 +90,11 @@ export const cms = {
             let updateQuery;
             if (type === 'herosection') {
                 updateQuery = { $pull: { herosection: { _id } } };
+            } else if (type === 'ad') {
+                updateQuery = { $pull: { ad: { _id } } };
             } else if (type === 'blogs') {
                 updateQuery = { $pull: { blogs: { _id } } };
-            } else if (type === 'reviews') {
+            }else if (type === 'reviews') {
                 updateQuery = { $pull: { reviews: { _id } } };
             }
         

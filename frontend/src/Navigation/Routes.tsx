@@ -35,6 +35,7 @@ import AddSubCategory from '../screens/products/add/addsubcategorie';
 import AddSubSubCategory from '../screens/products/add/addsubsubcategorie';
 import ManageCategories from '../screens/category';
 import CustomerDetail from '../screens/customer/customerDetails';
+import Ad from '../screens/cms/ad';
 
 const Scanner = lazy(() => import('../screens/scanner'));
 const SalesReport = lazy(() => import('../screens/sales-report'));
@@ -73,6 +74,7 @@ export const Navigation = () => {
           <Route path="/cms/blog-list" element={<Blog />} />
           <Route path="/add-blog" element={<BlogForm />} />
           <Route path="/cms/herosection" element={<Herosection />} />
+          <Route path="/cms/ad" element={<Ad />} />
           <Route path="/cms/about-us" element={<Aboutus />} />
           <Route path="/cms/return-policy" element={<Return />} />
           <Route path="/cms/privacy-policy" element={<Privacy />} />
