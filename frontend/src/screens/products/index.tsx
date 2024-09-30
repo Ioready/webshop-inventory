@@ -139,53 +139,77 @@ export default function Lists() {
 
   const [csvData, setCsvData] = useState([]);
 
+  // const downloadCsv = () => {
+  //   fetch({ url: "allproduct", query: JSON.stringify("") })
+  //     .then(() => {
+  //       const stockData = data?.data?.filter((item: any) => item.stores.length > 0);
+  //       if (data?.data?.length > 10 && stockData?.length > 0) {
+  //         const csvDataFormatted = stockData.map((item: any) => {
+  //           const storeInfo = item.stores.map((store: any) => {
+  //             return `Location: ${store.location}, Quantity: ${store.qty}, Laps: ${store.laps}`;
+  //           }).join('\n');
+  //           return {
+  //             Title: item.title || "",
+  //             EanBarcode: item.ean || "",
+  //             Price: item.price || "", 
+  //             TotalStock: calculateTotalQuantity(item.stores) || "",
+  //             SellingPrice: item.minSellingPrice || "",
+  //             SupplierRef: item.supplierRef || "",
+  //             Platform: item.platform || "",
+  //             StoreInfo: storeInfo,
+  //             Image: item.images || "",
+  //             Sku: item.sku || "",
+  //             Language: item.language || "",
+  //             Categories: item.categories || "",
+  //             SubCategories: item.subCategories || "",
+  //             SubSubCategories: item.subSubCategories || "",
+  //             Tags: item.tags || "",
+  //             Weight: item.weight || "",
+  //             TaxValue: item.taxValue || "",
+  //             Brand: item.brand || "",
+  //             Supplier: item.supplier || "",
+  //             ScanCode: item.scanCode || "",
+  //             PurchasePrice: item.purchasePrice || "",
+  //             Colors: item.colors || "",
+  //             Size: item.size || "",
+  //           };
+  //         });
+  //         setCsvData(csvDataFormatted);
+  //       } else {
+  //         console.log("No data to export");
+  //       }
+  //     });
+  // };
+
+
   const downloadCsv = () => {
     fetch({ url: "allproduct", query: JSON.stringify("") })
-      .then(() => {
-        if (data?.data) {
-          console.log("Fetched Product Data for CSV Download:", data.data);
-          data.data.forEach((item: any) => {
-            console.log("Product ID for CSV Download:", item.id);
-          });
+      .then(response => {
+        console.log("Network response:", response);
+        //@ts-ignore
+        if (!response?.ok) {
+          throw new Error('Network response was not ok');
         }
-        const stockData = data?.data?.filter((item: any) => item.stores.length > 0);
-        if (data?.data?.length > 10 && stockData?.length > 0) {
-          const csvDataFormatted = stockData.map((item: any) => {
-            const storeInfo = item.stores.map((store: any) => {
-              return `Location: ${store.location}, Quantity: ${store.qty}, Laps: ${store.laps}`;
-            }).join('\n');
-            return {
-              Title: item.title || "",
-              EanBarcode: item.ean || "",
-              Price: item.price || "", 
-              TotalStock: calculateTotalQuantity(item.stores) || "",
-              SellingPrice: item.minSellingPrice || "",
-              SupplierRef: item.supplierRef || "",
-              Platform: item.platform || "",
-              StoreInfo: storeInfo,
-              Image: item.images || "",
-              Sku: item.sku || "",
-              Language: item.language || "",
-              Categories: item.categories || "",
-              SubCategories: item.subCategories || "",
-              SubSubCategories: item.subSubCategories || "",
-              Tags: item.tags || "",
-              Weight: item.weight || "",
-              TaxValue: item.taxValue || "",
-              Brand: item.brand || "",
-              Supplier: item.supplier || "",
-              ScanCode: item.scanCode || "",
-              PurchasePrice: item.purchasePrice || "",
-              Colors: item.colors || "",
-              Size: item.size || "",
-            };
-          });
-          setCsvData(csvDataFormatted);
-        } else {
-          console.log("No data to export");
-        }
+        //@ts-ignore
+        return response?.blob(); // Convert the response to a blob
+      })
+      .then(blob => {
+        const url = window.URL.createObjectURL(new Blob([blob]));
+        console.log('url',url)
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'products.csv'); // Specify the file name
+        document.body.appendChild(link);
+        link.click();
+        //@ts-ignore
+        link.parentNode.removeChild(link); // Remove the link element after the download
+      })
+      .catch(error => {
+        console.error('Error downloading CSV:', error);
       });
   };
+  
+  // const downloadCsv=()=>{}
 
   const handleDeleteSelected = () => {
     Modal.confirm({
@@ -226,6 +250,8 @@ export default function Lists() {
       },
     });
   }
+
+
   const rowSelection = {
     selectedRowKeys,
     onChange: (selectedKeys: any[]) => { setSelectedRowKeys(selectedKeys) },
@@ -390,8 +416,10 @@ export default function Lists() {
             onClick={handlePostToWebshop}
             style={{backgroundColor:"#1677ff",  color:"white"}}
             >
-             Post To Webshop
+             Allow Webshop
             </Button>
+
+
             </>
           )}
         </Space>
@@ -420,7 +448,7 @@ export default function Lists() {
         rowSelection={rowSelection}
         className="mainTable"
         loading={loading}
-        dataSource={data?.data.map((item: any) => ({
+        dataSource={data?.data?.map((item: any) => ({
           ...item,
           key: item._id, // Ensure each item has a unique key
         })) ?? []}

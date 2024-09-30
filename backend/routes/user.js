@@ -8,7 +8,7 @@ import { cms } from "../controllers/cmsController.js";
 const upload = multer({ dest: 'uploads/' });
 
 const {addCms,getCms,deleteCms,editBlog,editReview} = cms;
-const { userLogin,webshopLogin,webshopRegister,getWebShopUsers,getUserDetailsById } = user;
+const { userLogin,webshopLogin,webshopRegister,getWebShopUsers,getUserDetailsById,deleteWebShopUsers } = user;
 const { createProduct, getProducts, editProduct, setStores,setCsvData, deleteProduct, csvFileUpload, getAllProduct,markWebshopProduct,addCategory,getCategory,editCategory,deleteCategory,getProductById, getProductColors} = products;
 const { verifyToken } = auth
 const userRout = express.Router();
@@ -24,6 +24,7 @@ userRout.post("/deleteCategory",deleteCategory);
 userRout.get("/getCategory", getCategory);
 userRout.post("/webshopLogin", webshopLogin);
 userRout.post("/webshopRegister", webshopRegister);
+userRout.post('/deleteWebShopUsers/:id',verifyToken, deleteWebShopUsers);
 userRout.post("/login", userLogin);
 userRout.post("/products", verifyToken , createProduct);
 userRout.post("/products/import", verifyToken , upload.single('file'), csvFileUpload);

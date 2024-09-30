@@ -475,6 +475,27 @@ export const user = {
       console.error("Error fetching user details:", error);
       res.status(500).json({ error: "Failed to fetch user details" });
     }
-  }
+  },
+  deleteWebShopUsers: async (req, res) => {
+    // const { orderId } = req.body;
+    const idsArray = req.body.body._id;
+    try {
+      // Find and delete the order by its ID
+      const deleteUser = await webshopUser.deleteMany({ _id: { $in: idsArray } });
+
+      if (!deleteUser) {
+        return res.status(404).json({ message: "user not found" });
+      }
+
+      // Send a success response
+      res.status(200).json({
+        message: "user deleted successfully",
+        order: deleteUser,
+      });
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      res.status(500).json({ message: "Error deleting user" });
+    }
+  },
 
 };

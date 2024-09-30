@@ -26,6 +26,7 @@ import {
   ViewDataDrawer,
 } from "../../components/Forms";
 import { CSVLink } from "react-csv";
+import { usePostToWebshop } from "../../contexts/usePostToWebshop";
 
 
 const resource = "products";
@@ -42,6 +43,7 @@ export default function Lists() {
   const { remove, loading: deleteLoading } = useDelete();
   const { fetch: fetchCategories, data: categoryData, loading: loadingCategories } = useFetchByLoad();
   const [selectedRowKeys, setSelectedRowKeys] = useState<any[]>([]);
+  const { update, data:webShopData, loading:webShopLoading } = usePostToWebshop();
 
   const dotStyle = (status: any) => ({
     height: '8px',
@@ -192,6 +194,26 @@ export default function Lists() {
     });
   };
 
+
+  const handleRemoveToWebshop =()=>{
+    Modal.confirm({
+      title: "Confirm To Remove Webshop",
+      icon: <ExclamationCircleOutlined />,
+      content: "Are you sure you want to remove the selected products?",
+      okText: "Yes",
+      cancelText: "No",
+      onOk: async () => {
+        try {
+          update(`${resource}/update-webshop-status`, { productIds: selectedRowKeys ,isWebshopProduct:false})
+          message.success("Selected products remove successfully");
+          refreshData();
+        } catch (error) {
+          console.error("Error removing products:", error);
+          message.error("Error removing products");
+        }
+      },
+    });
+  }
   // const handleStatusChange = (record: any, key: string) => {
   //   setProducts(products.map(product =>
   //     product.id === record.id ? { ...product, status: key } : product
@@ -367,6 +389,13 @@ export default function Lists() {
               >
                 Delete Selected
               </Button>
+
+              <Button
+            onClick={handleRemoveToWebshop}
+            style={{backgroundColor:"#1677ff",  color:"white"}}
+            >
+            Not Allow Webshop
+            </Button>
             </>
           )}
         </Space>

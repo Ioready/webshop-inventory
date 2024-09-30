@@ -448,7 +448,7 @@ const CustomerPage: React.FC = () => {
   // Handle delete selected customers
   const handleDeleteSelected = async () => {
     try {
-      await remove('/deleteWebShopUsers', { _ids: selectedCustomers });
+      await remove('/deleteWebShopUsers', { _id: selectedCustomers });
       message.success("Selected customers deleted successfully");
       fetch({ url: '/getAllWebShopUsers' });
     } catch (error) {

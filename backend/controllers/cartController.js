@@ -304,10 +304,9 @@ export const cart = {
   deleteOrder: async (req, res) => {
     // const { orderId } = req.body;
     const idsArray = req.body.body._id;
-
     try {
       // Find and delete the order by its ID
-      const deletedOrder = await Orders.deleteMany({ _id: { $in: idsArray } });
+      const deletedOrder = await Orders.deleteMany({ order_unique_id: { $in: idsArray } });
 
       if (!deletedOrder) {
         return res.status(404).json({ message: "Order not found" });
