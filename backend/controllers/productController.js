@@ -1,9 +1,13 @@
 import csvtojson from "csvtojson";
 import Product from "../models/product.js";
 import Category from "../models/category.js";
-import fs from 'fs';
-import * as fastcsv from 'fast-csv';
-
+// import * as fs from 'fs';
+// import * as fastcsv from 'fast-csv';
+// import * as path from 'path';
+import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+    
+const __dirname = dirname(fileURLToPath(import.meta.url));
 export const products = {
   markWebshopProduct :async (req, res) => {
     try {
@@ -748,55 +752,84 @@ deleteCategory: async (req, res) => {
   
   
 
-  getAllProduct: async (req, res) => {
+  // getAllProduct: async (req, res) => {
+  //   try {
+  //     const allProducts = await Product.find({ 'stores.0': { $exists: true } });
+  //     const stockedProduct = allProducts.filter(product => {
+  //       const totalQty = product.stores.reduce((acc, curr) => acc + parseInt(curr.qty), 0);
+  //       return totalQty > 0;
+  //     });
+  
+  //     // Format the product data for CSV
+  //     const csvData = stockedProduct.map(item => {
+  //       const storeInfo = item.stores.map(store => {
+  //         return `Location: ${store.location}, Quantity: ${store.qty}, Laps: ${store.laps}`;
+  //       }).join('\n');
+  //       return {
+  //         Title: item.title || "",
+  //         EanBarcode: item.ean || "",
+  //         Price: item.price || "", 
+  //         TotalStock: item.stores.reduce((total, store) => total + parseInt(store.qty), 0) || "",
+  //         SellingPrice: item.minSellingPrice || "",
+  //         SupplierRef: item.supplierRef || "",
+  //         Platform: item.platform || "",
+  //         StoreInfo: storeInfo,
+  //         Image: item.images || "",
+  //         Sku: item.sku || "",
+  //         Language: item.language || "",
+  //         Categories: item.categories || "",
+  //         SubCategories: item.subCategories || "",
+  //         SubSubCategories: item.subSubCategories || "",
+  //         Tags: item.tags || "",
+  //         Weight: item.weight || "",
+  //         TaxValue: item.taxValue || "",
+  //         Brand: item.brand || "",
+  //         Supplier: item.supplier || "",
+  //         ScanCode: item.scanCode || "",
+  //         PurchasePrice: item.purchasePrice || "",
+  //         Colors: item.colors || "",
+  //         Size: item.size || "",
+  //       };
+  //     });
+  // // console.log('csvData',csvData)
+  //     // Set CSV headers
+  //     res.setHeader('Content-Disposition', 'attachment; filename=products.csv');
+  //     res.setHeader('Content-Type', 'text/csv');
+  
+  //     // Create a writable stream and write the CSV data
+  //   //  await fastcsv
+  //   //     .write(csvData, { headers: true })
+  //   //     .pipe(res); // Stream the CSV directly to the response
+  //   const csvFile = path.resolve(__dirname, 'products.csv');
+  //   const csvStream = fastcsv.format({ headers: true });
+    
+  //   csvStream.write(csvData);
+  //   csvStream.pipe(fs.createWriteStream(csvFile, { encoding: 'utf8' } ))
+  //   csvStream.end();
+  //   return `Finished writing data to: ${csvFile}`;
+  //   // fast_csv.end()
+
+  //   } catch (error) {
+  //     console.error(error);
+  //     res.status(500).send({
+  //       success: false,
+  //       message: "Server error",
+  //       error: error.message,
+  //     });
+  //   }
+  // },
+
+  getAllProduct:async(req,res)=>{
     try {
-      const allProducts = await Product.find({ 'stores.0': { $exists: true } });
+      const allProducts = await Product.find({ 'stores.0': { $exists: true }});
       const stockedProduct = allProducts.filter(product => {
         const totalQty = product.stores.reduce((acc, curr) => acc + parseInt(curr.qty), 0);
         return totalQty > 0;
       });
-  
-      // Format the product data for CSV
-      const csvData = stockedProduct.map(item => {
-        const storeInfo = item.stores.map(store => {
-          return `Location: ${store.location}, Quantity: ${store.qty}, Laps: ${store.laps}`;
-        }).join('\n');
-        return {
-          Title: item.title || "",
-          EanBarcode: item.ean || "",
-          Price: item.price || "", 
-          TotalStock: item.stores.reduce((total, store) => total + parseInt(store.qty), 0) || "",
-          SellingPrice: item.minSellingPrice || "",
-          SupplierRef: item.supplierRef || "",
-          Platform: item.platform || "",
-          StoreInfo: storeInfo,
-          Image: item.images || "",
-          Sku: item.sku || "",
-          Language: item.language || "",
-          Categories: item.categories || "",
-          SubCategories: item.subCategories || "",
-          SubSubCategories: item.subSubCategories || "",
-          Tags: item.tags || "",
-          Weight: item.weight || "",
-          TaxValue: item.taxValue || "",
-          Brand: item.brand || "",
-          Supplier: item.supplier || "",
-          ScanCode: item.scanCode || "",
-          PurchasePrice: item.purchasePrice || "",
-          Colors: item.colors || "",
-          Size: item.size || "",
-        };
+      res.status(200).send({
+        success: true,
+        data: stockedProduct,
       });
-  
-      // Set CSV headers
-      res.setHeader('Content-Disposition', 'attachment; filename=products.csv');
-      res.setHeader('Content-Type', 'text/csv');
-  
-      // Create a writable stream and write the CSV data
-      fastcsv
-        .write(csvData, { headers: true })
-        .pipe(res); // Stream the CSV directly to the response
-  
     } catch (error) {
       console.error(error);
       res.status(500).send({

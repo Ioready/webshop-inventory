@@ -31,7 +31,8 @@ import { CSVLink } from "react-csv";
 import axios from "axios";
 import Papa from 'papaparse';
 import { usePostToWebshop } from "../../contexts/usePostToWebshop";
-
+import {saveAs} from 'file-saver';
+// import { unparse } from 'papaparse';
 const resource = "products";
 const resource2 = "getCategory";
 
@@ -41,7 +42,8 @@ export default function Lists() {
   const [search, setSearch] = useState<any>(null);
   const { create, data: file, loading: loadingFile } = usePostFile();
   const [query, setQuery] = useState({ skip: 0, take: 10, search: "", filterKey: "Filter Options"});
-  const { fetch, data, loading } = useFetchByLoad();
+  const { fetch:customFetch, data, loading } = useFetchByLoad();
+  const { fetch:productFetch, data:productData } = useFetchByLoad();
   const { edit, data: patchData, loading: patchLoading } = usePatch();
   const { remove, loading: deleteLoading } = useDelete(); // Updated this line
   const { update, data:webShopData, loading:webShopLoading } = usePostToWebshop();
@@ -49,7 +51,7 @@ export default function Lists() {
   const { fetch: fetchCategories, data: categoryData, loading: loadingCategories } = useFetchByLoad();
 
   useEffect(() => {
-    fetch({ url: resource, query: JSON.stringify(query) })
+    customFetch({ url: resource, query: JSON.stringify(query) })
   }, [query, file]);
 
 
@@ -58,7 +60,7 @@ export default function Lists() {
   }, []);
 
   const refreshData = () => {
-    fetch({ url: resource, query: JSON.stringify(query) })
+    customFetch({ url: resource, query: JSON.stringify(query) })
     setDetail(null);
     setSelectedRowKeys([]);
   };
@@ -137,7 +139,7 @@ export default function Lists() {
     }
   };
 
-  const [csvData, setCsvData] = useState([]);
+  // const [csvData, setCsvData] = useState([]);
 
   // const downloadCsv = () => {
   //   fetch({ url: "allproduct", query: JSON.stringify("") })
@@ -182,34 +184,57 @@ export default function Lists() {
   // };
 
 
+  // const downloadCsv = () => {
+  //   // setTimeout(
+  //     customFetch({ url: "allproduct"})
+  //     //@ts-ignore
+  //     ?.then(response => {
+  //       console.log("Network response:", response);
+  //       //@ts-ignore
+  //       if (!response?.ok) {
+  //         throw new Error('Network response was not ok');
+  //       }
+  //       //@ts-ignore
+  //       return response?.blob(); // Convert the response to a blob
+  //     })
+  //     //@ts-ignore
+  //     .then(blob => {
+  //       const url = window.URL.createObjectURL(new Blob([blob]));
+  //       console.log('url',url)
+  //       const link = document.createElement('a');
+  //       link.href = url;
+  //       link.setAttribute('download', 'products.csv'); // Specify the file name
+  //       document.body.appendChild(link);
+  //       link.click();
+  //       //@ts-ignore
+  //       link.parentNode.removeChild(link); // Remove the link element after the download
+  //     })
+  //     //@ts-ignore
+  //     .catch(error => {
+  //       console.error('Error downloading CSV:', error);
+  //     });
+    
+  // };
+  
   const downloadCsv = () => {
-    fetch({ url: "allproduct", query: JSON.stringify("") })
-      .then(response => {
-        console.log("Network response:", response);
-        //@ts-ignore
-        if (!response?.ok) {
-          throw new Error('Network response was not ok');
-        }
-        //@ts-ignore
-        return response?.blob(); // Convert the response to a blob
-      })
-      .then(blob => {
-        const url = window.URL.createObjectURL(new Blob([blob]));
-        console.log('url',url)
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', 'products.csv'); // Specify the file name
-        document.body.appendChild(link);
-        link.click();
-        //@ts-ignore
-        link.parentNode.removeChild(link); // Remove the link element after the download
-      })
-      .catch(error => {
-        console.error('Error downloading CSV:', error);
-      });
+    // Trigger the fetch on button click
+    productFetch({ url: "allproduct", query: JSON.stringify("") });
   };
   
-  // const downloadCsv=()=>{}
+  // Use useEffect to detect when the product data is available and trigger the CSV download
+  useEffect(() => {
+    if (productData?.data && productData?.data.length > 0) {
+      console.log('Product data fetched:', productData?.data);
+  
+      // Convert data to CSV format
+      //@ts-ignore
+      const csvData = Papa.unparse(productData?.data);
+      const blob = new Blob([csvData], { type: 'text/csv' });
+  
+      // Trigger file download
+      saveAs(blob, 'products.csv');
+    }
+  }, [productData]);
 
   const handleDeleteSelected = () => {
     Modal.confirm({
@@ -386,9 +411,9 @@ export default function Lists() {
             </Button>
           </Dropdown>
           <Button onClick={downloadCsv} type="primary">
-            <CSVLink data={csvData} filename={"stock_product.csv"}>
+            {/* <CSVLink data={csvData} filename={"stock_product.csv"}> */}
               Download Stock CSV
-            </CSVLink>
+            {/* </CSVLink> */}
           </Button>
           <Upload
             showUploadList={false}
