@@ -600,14 +600,21 @@ export function FormData({
   const handleAddImageField = () => {
     const newId = imageFields.length + 1;
     setImageFields([...imageFields, { id: newId, value: "" }]);
+    console.log('handleDeleteImageField',imageFields)
   };
 
-  const handleDeleteImageField = (idToRemove: any) => {
+  const handleDeleteImageField = (idToRemove: any, setFieldValue: any) => {
     const updatedImageFields = imageFields.filter(
       (field: any) => field.id !== idToRemove
     );
-    setImageFields(updatedImageFields);
+    
+    setImageFields([...updatedImageFields]);
+  
+    // Update Formik form values for the images
+    const updatedImageValues = updatedImageFields.map((field: any) => field.value);
+    setFieldValue("images", updatedImageValues);
   };
+  
 
   const handlePlatformChange = (platform: string) => {
     if (selectedPlatform.includes(platform)) {
@@ -917,7 +924,7 @@ export function FormData({
                   <button
                     type="button"
                     className="btn btn-danger mx-3"
-                    onClick={() => handleDeleteImageField(field.id)}
+                    onClick={() => handleDeleteImageField(field.id, setFieldValue)}
                   >
                     Delete
                   </button>
