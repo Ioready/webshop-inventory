@@ -36,7 +36,6 @@
 
 //   useEffect(() => {
 //     if (data?.orders) {
-//       console.log(data.orders,"data")
 //       const apiOrders = data.orders.map((order: any) => ({
 //         id: order.order_unique_id,
 //         date: new Date(order.orderDate).toLocaleString(),
@@ -44,12 +43,12 @@
 //         customerDetail: order,
 //         channel: 'Online Store',  // Static since API doesn't provide it
 //         total: `$${order.orderItems.reduce((sum: number, detail: any) => sum + detail.totalAmount, 0).toFixed(2)}`,
-//         paymentStatus:order.paymentDetails.paymentStatus, // Static, assuming paid; adjust based on actual logic
+//         paymentStatus: order.paymentDetails.paymentStatus,
 //         fulfillmentStatus: 'Unfulfilled', // Static, adjust as needed
 //         items: `${order.orderItems.length} item${order.orderItems.length > 1 ? 's' : ''}`,
-//         deliveryStatus: order.orderStatus,  // Static or derived
-//         deliveryMethod:order.shippingDetails.shipmentProvider || 'Free Shipping', // Static, adjust as needed
-//         tags: '',  // Static or derived
+//         deliveryStatus: order.orderStatus || 'Pending', // Default to Pending if not provided
+//         deliveryMethod: order.shippingDetails.shipmentProvider || 'Free Shipping',
+//         tags: '', // Static or derived
 //       }));
 
 //       setOrders(apiOrders);
@@ -73,9 +72,8 @@
 //   };
 
 //   const handleDeleteSelected = async () => {
-//     console.log('selectedOrders',selectedOrders)
 //     try {
-//       await remove('/cart/deleteOrder', { _id: selectedOrders }); 
+//       await remove('/cart/deleteOrder', { _id: selectedOrders });
 //       message.success("Selected orders deleted successfully");
 //       fetch({ url: '/cart/getOrder' });
 //     } catch (error) {
@@ -86,7 +84,6 @@
 //   };
 
 //   const handleCustomerClick = (customer: string) => {
-//     console.log(customer,"cust")
 //     setPopupCustomer(customer);
 //   };
 
@@ -98,6 +95,14 @@
 
 //   const handleViewAllPage = () => {
 //     navigate("/all-orders");
+//   };
+
+//   const handleDeliveryStatusChange = (id: string, status: string) => {
+//     setOrders((prevOrders) =>
+//       prevOrders.map((order) =>
+//         order.id === id ? { ...order, deliveryStatus: status } : order
+//       )
+//     );
 //   };
 
 //   return (
@@ -150,7 +155,8 @@
 //                 <th>Payment Status</th>
 //                 <th>Fulfillment Status</th>
 //                 <th>Items</th>
-//                 <th>Delivery Status</th>
+//                 <th className=" d-inline-block" style={{ width: "120px", }}> Delivery Status</th>
+
 //                 <th>Delivery Method</th>
 //                 <th>Tags</th>
 //               </tr>
@@ -177,7 +183,19 @@
 //                   <td className="text-nowrap" onClick={handleViewAllPage} style={{ cursor: "pointer" }}>{order.paymentStatus}</td>
 //                   <td className="text-nowrap" onClick={handleViewAllPage} style={{ cursor: "pointer" }}>{order.fulfillmentStatus}</td>
 //                   <td className="text-nowrap" onClick={handleViewAllPage} style={{ cursor: "pointer" }}>{order.items}</td>
-//                   <td className="text-nowrap" onClick={handleViewAllPage} style={{ cursor: "pointer" }}>{order.deliveryStatus}</td>
+//                   <td className="text-nowrap">
+//                   <p>Status: {order.deliveryStatus}</p>
+//   <select
+//     className="h-25 form-select form-select-sm" // Bootstrap's form-select for smaller size
+//     value={order.deliveryStatus}
+//     onChange={(e) => handleDeliveryStatusChange(order.id, e.target.value)}
+//   >
+//     <option value="Placed">Placed</option>
+//     <option value="Pending">Pending</option>
+//     <option value="Delivered">Delivered</option>
+//   </select>
+// </td>
+
 //                   <td className="text-nowrap" onClick={handleViewAllPage} style={{ cursor: "pointer" }}>{order.deliveryMethod}</td>
 //                   <td className="text-nowrap" onClick={handleViewAllPage} style={{ cursor: "pointer" }}>{order.tags}</td>
 //                 </tr>
@@ -217,14 +235,13 @@
 
 
 
-
 import React, { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Popup from './popup';  // Import the Popup component
 import { useNavigate } from 'react-router-dom';
 import Breadcrumbs from '../../components/Breadcrumbs';
 import { CiSearch } from "react-icons/ci";
-import { useDelete, useFetchByLoad } from '../../contexts';
+import { useDelete, useFetchByLoad, usePatch } from '../../contexts';
 import { message } from 'antd';
 
 interface Order {
@@ -246,9 +263,13 @@ const OrderTable: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
   const [popupCustomer, setPopupCustomer] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState<string>(''); // State for search input
+  const [currentPage, setCurrentPage] = useState<number>(1); // Current page state
+  const [ordersPerPage] = useState<number>(5); // Number of orders per page
 
   const { fetch, data } = useFetchByLoad();
   const { remove } = useDelete();
+  const { edit } = usePatch();
 
   useEffect(() => {
     fetch({ url: '/cart/getOrder' });
@@ -275,9 +296,25 @@ const OrderTable: React.FC = () => {
     }
   }, [data]);
 
+  // Handle search term change
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1); // Reset to first page on search
+  };
+
+  // Get filtered orders based on the search term
+  const filteredOrders = orders.filter(order =>
+    order.id.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Calculate the orders to display based on the current page
+  const indexOfLastOrder = currentPage * ordersPerPage;
+  const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
+  const currentOrders = filteredOrders.slice(indexOfFirstOrder, indexOfLastOrder);
+
   const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
-      setSelectedOrders(orders.map(order => order.id));
+      setSelectedOrders(currentOrders.map(order => order.id));
     } else {
       setSelectedOrders([]);
     }
@@ -317,13 +354,18 @@ const OrderTable: React.FC = () => {
     navigate("/all-orders");
   };
 
-  const handleDeliveryStatusChange = (id: string, status: string) => {
-    setOrders((prevOrders) =>
-      prevOrders.map((order) =>
-        order.id === id ? { ...order, deliveryStatus: status } : order
-      )
-    );
+  const handleDeliveryStatusChange = async(id: string, status: string) => {
+    // setOrders((prevOrders) =>
+    //   prevOrders.map((order) =>
+    //     order.id === id ? { ...order, deliveryStatus: status } : order
+    //   )
+    // );
+    await edit('/cart/updateOrderStatus', { orderId:id, newStatus:status});
+     await  fetch({ url: '/cart/getOrder' });
+    message.success("Selected order status updated successfully");
   };
+
+  const totalPages = Math.ceil(filteredOrders.length / ordersPerPage); // Calculate total pages
 
   return (
     <div className='d-flex flex-column'>
@@ -342,15 +384,24 @@ const OrderTable: React.FC = () => {
         )}
 
         <div className='d-flex justify-content-between align-items-center mb-4 order_upper_block'>
-          <div className='d-flex p-2 bg-white' style={{ gap: "0.5rem", border: "1px solid gray", borderRadius: "1rem" }}>
+          {/* <div className='d-flex p-2 bg-white' style={{ gap: "0.5rem", border: "1px solid gray", borderRadius: "1rem" }}>
             <p className='text-black m-0 order_page_text' style={{ cursor: "pointer" }}>All</p>
             <p className='text-black m-0 order_page_text' style={{ cursor: "pointer" }}>Unpaid</p>
             <p className='text-black m-0 order_page_text' style={{ cursor: "pointer" }}>Open</p>
             <p className='text-black m-0 order_page_text' style={{ cursor: "pointer" }}>Newest</p>
-          </div>
+          </div> */}
 
           <div className="input-group p-1 rounded w-50" style={{ position: "relative" }}>
-            <input type="search" className="form-control rounded-5" placeholder="Search" aria-label="Search" aria-describedby="search-addon" style={{ border: "1px solid gray" }} />
+            <input
+              type="search"
+              className="form-control rounded-5"
+              placeholder="Search by Order ID"
+              aria-label="Search"
+              aria-describedby="search-addon"
+              style={{ border: "1px solid gray" }}
+              value={searchTerm}
+              onChange={handleSearchChange}
+            />
             <span className="input-group-text border-0" id="search-addon" style={{ position: "absolute", right: "1rem", top: "0.7rem" }}>
               <CiSearch style={{ fontSize: "1.5rem" }} />
             </span>
@@ -363,7 +414,7 @@ const OrderTable: React.FC = () => {
                 <th>
                   <input
                     type="checkbox"
-                    checked={selectedOrders.length === orders.length}
+                    checked={selectedOrders.length === currentOrders.length}
                     onChange={handleSelectAll}
                   />
                 </th>
@@ -382,7 +433,7 @@ const OrderTable: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {orders.map(order => (
+              {currentOrders.map(order => (
                 <tr key={order.id}>
                   <td>
                     <input
@@ -404,17 +455,20 @@ const OrderTable: React.FC = () => {
                   <td className="text-nowrap" onClick={handleViewAllPage} style={{ cursor: "pointer" }}>{order.fulfillmentStatus}</td>
                   <td className="text-nowrap" onClick={handleViewAllPage} style={{ cursor: "pointer" }}>{order.items}</td>
                   <td className="text-nowrap">
-  <select
-    className="h-25 form-select form-select-sm" // Bootstrap's form-select for smaller size
-    value={order.deliveryStatus}
-    onChange={(e) => handleDeliveryStatusChange(order.id, e.target.value)}
-  >
-    <option value="Pending">Pending</option>
-    <option value="In process">In process</option>
-    <option value="Delivered">Delivered</option>
-  </select>
-</td>
-
+                    <select
+                      className="h-25 form-select form-select-sm" // Bootstrap's form-select for smaller size
+                      value={order.deliveryStatus}
+                      onChange={(e) => handleDeliveryStatusChange(order.id, e.target.value)}
+                    >
+                      <option value="Pending">Pending</option>
+                      <option value="Placed">Placed</option>
+                      <option value="Confirmed">Confirmed</option>
+                      <option value="Delivered">Delivered</option>
+                      <option value="Shipped">Shipped</option>
+                      <option value="Cancelled">Cancelled</option>
+                      <option value="Returned">Returned</option>
+                    </select>
+                  </td>
                   <td className="text-nowrap" onClick={handleViewAllPage} style={{ cursor: "pointer" }}>{order.deliveryMethod}</td>
                   <td className="text-nowrap" onClick={handleViewAllPage} style={{ cursor: "pointer" }}>{order.tags}</td>
                 </tr>
@@ -422,29 +476,28 @@ const OrderTable: React.FC = () => {
             </tbody>
           </table>
         </div>
-        {popupCustomer && (
-          <Popup customer={popupCustomer} onClose={closePopup} />
-        )}
-        <nav aria-label="Page navigation example" className="d-flex justify-content-between align-items-center">
-          <ul className="pagination">
-            <li className="page-item">
-              <a className="page-link" href="#" aria-label="Previous">
-                <span aria-hidden="true">&laquo;</span>
-              </a>
+
+        {/* Pagination Controls */}
+        <nav>
+          <ul className="pagination justify-content-center">
+            <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+              <button className="page-link" onClick={() => setCurrentPage(currentPage - 1)}>Previous</button>
             </li>
-            <li className="page-item">
-              <a className="page-link" href="#">
-                1
-              </a>
-            </li>
-            <li className="page-item">
-              <a className="page-link" href="#" aria-label="Next">
-                <span aria-hidden="true">&raquo;</span>
-              </a>
+            {Array.from({ length: totalPages }, (_, index) => (
+              <li key={index} className={`page-item ${currentPage === index + 1 ? 'active' : ''}`}>
+                <button className="page-link" onClick={() => setCurrentPage(index + 1)}>
+                  {index + 1}
+                </button>
+              </li>
+            ))}
+            <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+              <button className="page-link" onClick={() => setCurrentPage(currentPage + 1)}>Next</button>
             </li>
           </ul>
-          <p>Showing 1 to {orders.length} of {orders.length} entries</p>
         </nav>
+
+        {/* Popup Component */}
+        {popupCustomer && <Popup onClose={closePopup} customer={popupCustomer} />}
       </div>
     </div>
   );

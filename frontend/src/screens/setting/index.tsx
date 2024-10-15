@@ -6,7 +6,7 @@ import JournalSetting from "./journalSetting/JournalSetting";
 
 // Dummy components for EmailSetting and JournalSetting
 // const EmailSetting: React.FC = () => <div>Email Settings Content</div>;
-// const JournalSetting: React.FC = () => <div>Journal Settings Content</div>;
+// const JournalSetting: React.FC = () => <div>General Settings Content</div>;
 
 const Setting: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>("email"); // Default tab
@@ -42,14 +42,14 @@ const Setting: React.FC = () => {
           </li>
           <li className="nav-item">
             <button
-              className={`nav-link ${activeTab === "journal" ? "active" : ""}`}
-              onClick={() => setActiveTab("journal")}
+              className={`nav-link ${activeTab === "General" ? "active" : ""}`}
+              onClick={() => setActiveTab("General")}
               style={{
-                borderBottom: activeTab === "journal" ? "3px solid #007bff" : "",
-                fontWeight: activeTab === "journal" ? "bold" : "normal",
+                borderBottom: activeTab === "General" ? "3px solid #007bff" : "",
+                fontWeight: activeTab === "General" ? "bold" : "normal",
               }}
             >
-              Journal Setting
+              General Setting
             </button>
           </li>
         </ul>
@@ -57,7 +57,7 @@ const Setting: React.FC = () => {
         {/* Tab content */}
         <div>
           {activeTab === "email" && <EmailSetting />}
-          {activeTab === "journal" && <JournalSetting />}
+          {activeTab === "General" && <JournalSetting />}
         </div>
       </div>
     </div>

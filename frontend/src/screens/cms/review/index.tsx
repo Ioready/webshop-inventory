@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import { Table, Button, Pagination, message, Modal } from 'antd';
 import { RxCross1 } from "react-icons/rx";
 import { HiPencil } from "react-icons/hi2";
 import { Link, useNavigate } from 'react-router-dom';
-import Delete from './delete';
 import { useDelete, useFetchByLoad } from '../../../contexts';
-import { message } from 'antd';
 
 interface Review {
-  id: string;
+  _id: string;
   user: string;
   rating: string;
   comment: string;
@@ -18,10 +16,9 @@ interface Review {
 
 const resource = 'deleteCms';
 
-
 const Review: React.FC = () => {
-  const [review, setReview] = useState<Review[]>([]);
-  const [popupCustomer, setPopupCustomer] = useState<{ isOpen: boolean; reviewId?: string }>({ isOpen: false });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
   const [selectedReviewId, setSelectedReviewId] = useState<string | null>(null);
   const { fetch, data } = useFetchByLoad();
   const { remove } = useDelete();
@@ -31,22 +28,20 @@ const Review: React.FC = () => {
     fetch({ url: 'getCms' });
   }, []);
 
-  const closePopup = () => {
-    setPopupCustomer({ isOpen: false });
-  };
-
   const handleDeleteClick = (reviewId: string) => {
     setSelectedReviewId(reviewId);
-    setPopupCustomer({ isOpen: true });
+    Modal.confirm({
+      title: "Are you sure you want to delete this review?",
+      onOk: handleConfirmDelete,
+    });
   };
 
   const handleConfirmDelete = async () => {
     try {
       if (selectedReviewId) {
-        await remove(resource, { _id: selectedReviewId});
+        await remove(resource, { _id: selectedReviewId });
         message.success("Review deleted successfully");
         fetch({ url: 'getCms' });
-        closePopup();
       }
     } catch (error) {
       console.error("Error deleting review:", error);
@@ -54,65 +49,81 @@ const Review: React.FC = () => {
     }
   };
 
+  const handlePageChange = (page: number, pageSize: number) => {
+    setCurrentPage(page);
+    setPageSize(pageSize);
+  };
+
+  const columns = [
+    {
+      title: 'User',
+      dataIndex: 'user',
+      key: 'user',
+      render: (text: string) => <span>{text}</span>,
+      width: '20%',
+    },
+    {
+      title: 'Rating',
+      dataIndex: 'rating',
+      key: 'rating',
+      width: '15%',
+    },
+    {
+      title: 'Comment',
+      dataIndex: 'comment',
+      key: 'comment',
+      width: '30%',
+    },
+    {
+      title: 'Date',
+      dataIndex: 'date',
+      key: 'date',
+      render: (date: string) => new Date(date).toLocaleDateString(),
+      width: '15%',
+    },
+    {
+      title: 'Actions',
+      key: 'action',
+      render: (text: any, record: Review) => (
+        <span className="d-flex justify-content-center align-items-center gap-2">
+          <Link to="/cms/edit-review" state={{ review: record }}>
+            <HiPencil />
+          </Link>
+          <RxCross1 onClick={() => handleDeleteClick(record._id)} style={{ cursor: "pointer" }} />
+        </span>
+      ),
+      width: '20%',
+    },
+  ];
+
+  const paginatedData = data?.review?.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
   return (
     <div className="container mt-4">
-      <button className="btn  mb-3" onClick={() => navigate(-1)}>
-      ← Back
-      </button>
+      <Button className="btn mb-3" onClick={() => navigate(-1)}>
+        ← Back
+      </Button>
+
       <div className='w-100 d-flex justify-content-between align-items-center my-2'>
         <h3>All Reviews</h3>
       </div>
 
-      <div className="table-responsive">
-        <table className="table table-striped table-bordered table-hover">
-          <thead className="thead-dark">
-            <tr>
-              <th className="text-center">User</th>
-              <th className="text-center">Rating</th>
-              <th className="text-center">Comment</th>
-              <th className="text-center">Modified Date</th>
-              <th className="text-center">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data?.review?.map((order: Review) => (
-              <tr key={order.id}>
-                <td className="text-center">{order.user}</td>
-                <td className="text-center">{order.rating}</td>
-                <td className="text-center">{order.comment}</td>
-                <td className="text-center">{order.date}</td>
-                <td className="text-center d-flex justify-content-center align-items-center gap-2">
-                  <Link to="/cms/edit-review" state={{ review: order }}><HiPencil /></Link>
-                  <RxCross1 onClick={() => handleDeleteClick(order.id)} style={{ cursor: "pointer" }} />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      {popupCustomer.isOpen && (
-        <Delete onClose={closePopup} onConfirm={handleConfirmDelete} />
-      )}
-      <nav aria-label="Page navigation example" className="d-flex justify-content-between align-items-center">
-        <ul className="pagination">
-          <li className="page-item">
-            <a className="page-link" href="#" aria-label="Previous">
-              <span aria-hidden="true">&laquo;</span>
-            </a>
-          </li>
-          <li className="page-item">
-            <a className="page-link" href="#">
-              1
-            </a>
-          </li>
-          <li className="page-item">
-            <a className="page-link" href="#" aria-label="Next">
-              <span aria-hidden="true">&raquo;</span>
-            </a>
-          </li>
-        </ul>
-        <p>Showing 1 to {review.length} of {review.length} entries</p>
-      </nav>
+      <Table
+        columns={columns}
+        dataSource={paginatedData}
+        rowKey={(record) => record._id}
+        pagination={false}
+      />
+
+      <Pagination
+        current={currentPage}
+        pageSize={pageSize}
+        total={data?.review?.length || 0}
+        onChange={handlePageChange}
+        showSizeChanger
+        pageSizeOptions={['5', '10', '20']}
+        style={{ marginTop: '20px', textAlign: 'right' }}
+      />
     </div>
   );
 };

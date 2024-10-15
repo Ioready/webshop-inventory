@@ -4,7 +4,7 @@ import { auth } from "../middlewares/auth.js";
 
 const { verifyToken } = auth
 
-const { addToCart,removeFromCart,updateCartQuantity,getCartItems,createOrder,getOrder,deleteOrder } = cart;
+const { addToCart,removeFromCart,updateCartQuantity,getCartItems,createOrder,getOrder,deleteOrder,updateOrderStatus } = cart;
 const cartRout = express.Router();
 
 cartRout.post("/",verifyToken, addToCart);
@@ -12,7 +12,8 @@ cartRout.delete("/removeFromCart",verifyToken, removeFromCart);
 cartRout.put("/updateCartQuantity",verifyToken, updateCartQuantity);
 cartRout.get("/getCartItems",verifyToken, getCartItems);
 cartRout.post("/createOrder",verifyToken, createOrder);
-//  cartRout.post("/createOrder", createOrder);
 cartRout.get("/getOrder",verifyToken, getOrder);
 cartRout.post('/deleteOrder/:id',verifyToken, deleteOrder);
+cartRout.patch('/updateOrderStatus/undefined',verifyToken, updateOrderStatus);
+
 export default cartRout;

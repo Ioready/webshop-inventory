@@ -27,8 +27,8 @@ import {
 } from "../../components/Forms";
 import { CSVLink } from "react-csv";
 import { usePostToWebshop } from "../../contexts/usePostToWebshop";
-
-
+import {saveAs} from 'file-saver';
+import Papa from 'papaparse';
 const resource = "products";
 const resource2 = "getCategory";
 
@@ -42,6 +42,7 @@ export default function Lists() {
   const { edit, data: patchData, loading: patchLoading } = usePatch();
   const { remove, loading: deleteLoading } = useDelete();
   const { fetch: fetchCategories, data: categoryData, loading: loadingCategories } = useFetchByLoad();
+  const { fetch:productFetch, data:productData } = useFetchByLoad();
   const [selectedRowKeys, setSelectedRowKeys] = useState<any[]>([]);
   const { update, data:webShopData, loading:webShopLoading } = usePostToWebshop();
 
@@ -133,46 +134,26 @@ export default function Lists() {
     }
   };
 
-  const [csvData, setCsvData] = useState([]);
+
 
   const downloadCsv = () => {
-    const stockData = data?.data.filter((item: any) => item.stores.length > 0);
-    if (stockData.length > 0) {
-      const csvDataFormatted = stockData.map((item: any) => {
-        const storeInfo = item.stores.map((store: any) => {
-          return `Location: ${store.location}, Quantity: ${store.qty}, Laps: ${store.laps}`;
-        }).join('\n');
-        return {
-          Title: item.title || "",
-          EanBarcode: item.ean || "",
-          Price: item.price || "",
-          TotalStock: calculateTotalQuantity(item.stores) || "",
-          SellingPrice: item.minSellingPrice || "",
-          SupplierRef: item.supplierRef || "",
-          Platform: item.platform || "",
-          StoreInfo: storeInfo,
-          Image: item.images || "",
-          Sku: item.sku || "",
-          Language: item.language || "",
-          Categories: item.categories || "",
-          SubCategories: item.subCategories || "",
-          SubSubCategories: item.subSubCategories || "",
-          Tags: item.tags || "",
-          Weight: item.weight || "",
-          TaxValue: item.taxValue || "",
-          Brand: item.brand || "",
-          Supplier: item.supplier || "",
-          ScanCode: item.scanCode || "",
-          PurchasePrice: item.purchasePrice || "",
-          Colors: item.colors || "",
-          Size: item.size || "",
-        };
-      });
-    //   setCsvData(csvDataFormatted);
-    } else {
-      console.log("No data to export");
-    }
+    // Trigger the fetch on button click with a static query for webshop products
+    productFetch({ url: "allproduct", query: JSON.stringify({ isWebshopProduct: true }) });
   };
+  
+  useEffect(() => {
+    if (productData?.data && productData?.data.length > 0) {
+      console.log('Product data fetched:', productData?.data);
+  
+      // Convert data to CSV format
+      //@ts-ignore
+      const csvData = Papa?.unparse(productData?.data);
+      const blob = new Blob([csvData], { type: 'text/csv' });
+  
+      // Trigger file download
+      saveAs(blob, 'products.csv');
+    }
+  }, [productData]);
 
   const handleDeleteSelected = () => {
     Modal.confirm({
@@ -375,9 +356,9 @@ export default function Lists() {
             </Button>
           </Dropdown>
           <Button onClick={downloadCsv} type="primary">
-            <CSVLink data={csvData} filename={"stock_product.csv"}>
+            {/* <CSVLink data={csvData} filename={"stock_product.csv"}> */}
               Download Stock CSV
-            </CSVLink>
+            {/* </CSVLink> */}
           </Button>
           {selectedRowKeys.length > 0 && (
             <>

@@ -182,39 +182,6 @@ export default function Lists() {
   //       }
   //     });
   // };
-
-
-  // const downloadCsv = () => {
-  //   // setTimeout(
-  //     customFetch({ url: "allproduct"})
-  //     //@ts-ignore
-  //     ?.then(response => {
-  //       console.log("Network response:", response);
-  //       //@ts-ignore
-  //       if (!response?.ok) {
-  //         throw new Error('Network response was not ok');
-  //       }
-  //       //@ts-ignore
-  //       return response?.blob(); // Convert the response to a blob
-  //     })
-  //     //@ts-ignore
-  //     .then(blob => {
-  //       const url = window.URL.createObjectURL(new Blob([blob]));
-  //       console.log('url',url)
-  //       const link = document.createElement('a');
-  //       link.href = url;
-  //       link.setAttribute('download', 'products.csv'); // Specify the file name
-  //       document.body.appendChild(link);
-  //       link.click();
-  //       //@ts-ignore
-  //       link.parentNode.removeChild(link); // Remove the link element after the download
-  //     })
-  //     //@ts-ignore
-  //     .catch(error => {
-  //       console.error('Error downloading CSV:', error);
-  //     });
-    
-  // };
   
   const downloadCsv = () => {
     // Trigger the fetch on button click

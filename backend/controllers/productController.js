@@ -819,13 +819,29 @@ deleteCategory: async (req, res) => {
   //   }
   // },
 
-  getAllProduct:async(req,res)=>{
+  getAllProduct: async (req, res) => {
     try {
-      const allProducts = await Product.find({ 'stores.0': { $exists: true }});
+      // Extract the query from the request
+      const { isWebshopProduct } = req.query;
+  
+      // Build the query object dynamically based on the presence of isWebshopProduct
+      const query = { 'stores.0': { $exists: true } };
+      
+      // If isWebshopProduct is provided, add it to the query
+      if (isWebshopProduct) {
+        query.isWebshopProduct = isWebshopProduct === 'true'; // Convert string to boolean
+      }
+  
+      // Fetch products based on the query
+      const allProducts = await Product.find(query);
+  
+      // Filter out products with total quantity > 0
       const stockedProduct = allProducts.filter(product => {
         const totalQty = product.stores.reduce((acc, curr) => acc + parseInt(curr.qty), 0);
         return totalQty > 0;
       });
+  
+      // Send the response
       res.status(200).send({
         success: true,
         data: stockedProduct,
@@ -839,7 +855,8 @@ deleteCategory: async (req, res) => {
       });
     }
   },
-
+  
+  
   editProduct: async (req, res) => {
     try {
       const editProductData = req.body;

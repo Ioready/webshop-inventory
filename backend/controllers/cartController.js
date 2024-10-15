@@ -322,4 +322,47 @@ export const cart = {
       res.status(500).json({ message: "Error deleting order" });
     }
   },
+
+  updateOrderStatus : async (req, res) => {
+    try {
+      const { orderId, newStatus } = req.body; // Get orderId and newStatus from the request body
+  console.log(orderId, newStatus);
+      // Basic validation
+      if (!orderId || !newStatus) {
+        return res.status(400).json({ error: "Missing orderId or newStatus." });
+      }
+  
+      // Check if the newStatus is valid
+      const validStatuses = [
+        "Pending",
+        "Confirmed",
+        "Shipped",
+        "Delivered",
+        "Cancelled",
+        "Returned",
+        "Placed",
+      ];
+      if (!validStatuses.includes(newStatus)) {
+        return res.status(400).json({ error: "Invalid order status." });
+      }
+  
+      // Find the order by its ID and update the status
+      const order = await Orders.findOne({ order_unique_id: orderId });
+      if (!order) {
+        return res.status(404).json({ error: "Order not found." });
+      }
+  
+      // Update the order status
+      order.orderStatus = newStatus;
+      await order.save();
+  
+      res.status(200).json({
+        message: `Order status updated to '${newStatus}' successfully.`,
+        order,
+      });
+    } catch (error) {
+      console.error("Failed to update order status:", error);
+      res.status(500).json({ error: "Failed to update order status." });
+    }
+  },
 };

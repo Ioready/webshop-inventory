@@ -84,7 +84,7 @@ const CustomerDetailsPage: React.FC = () => {
                   <div>
                     <p>
                       <a href="#">#{//@ts-ignore
-                      latestOrder.productId._id}</a>
+                      latestOrder?.productId?._id}</a>
                       <span className="badge bg-success">{latestOrder.orderStatus}</span>
                       <span className="badge bg-warning">{latestOrder.fulfillmentStatus}</span>
                     </p>
@@ -97,14 +97,14 @@ const CustomerDetailsPage: React.FC = () => {
                 </div>
                 <div className="d-flex align-items-center">
                   <img src={//@ts-ignore
-                    latestOrder.productId.images} alt="Product" className="img-thumbnail me-3" style={{ width: '100px' }} />
+                    latestOrder?.productId?.images} alt="Product" className="img-thumbnail me-3" style={{ width: '100px' }} />
                   <div className="d-flex justify-content-between w-100">
                     <p>{//@ts-ignore
-                    latestOrder.productId.title}</p>
+                    latestOrder?.productId?.title}</p>
                     <p>x{//@ts-ignore
-                  latestOrder.quantity}</p>
+                  latestOrder?.quantity}</p>
                     <p>${//@ts-ignore
-                  latestOrder.totalAmount}</p>
+                  latestOrder?.totalAmount}</p>
                   </div>
                 </div>
                 {/* <button className="btn btn-primary mt-3" onClick={handleViewAllOrders}>View all orders</button> */}
