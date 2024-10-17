@@ -43,7 +43,7 @@ export default function Lists() {
   const { create, data: file, loading: loadingFile } = usePostFile();
   const [query, setQuery] = useState({ skip: 0, take: 10, search: "", filterKey: "Filter Options"});
   const { fetch:customFetch, data, loading } = useFetchByLoad();
-  const { fetch:productFetch, data:productData } = useFetchByLoad();
+  const { fetch:productFetch, data:productData,loading:csvLoading } = useFetchByLoad();
   const { edit, data: patchData, loading: patchLoading } = usePatch();
   const { remove, loading: deleteLoading } = useDelete(); // Updated this line
   const { update, data:webShopData, loading:webShopLoading } = usePostToWebshop();
@@ -377,11 +377,12 @@ export default function Lists() {
               {query.filterKey !== "Filter Options" ? query.filterKey : "Select Filter"} <DownOutlined />
             </Button>
           </Dropdown>
-          <Button onClick={downloadCsv} type="primary">
+          <Button onClick={downloadCsv} type="primary" loading={csvLoading}>
             {/* <CSVLink data={csvData} filename={"stock_product.csv"}> */}
               Download Stock CSV
             {/* </CSVLink> */}
           </Button>
+
           <Upload
             showUploadList={false}
             customRequest={handleFileUpload}

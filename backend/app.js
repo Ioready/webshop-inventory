@@ -285,7 +285,11 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 // Parse application/json (if needed)
 app.use(bodyParser.json());
-
+app.use((req, res, next) => {
+    res.removeHeader('Content-Length');
+    next();
+  });
+  
 // app.use(morgan("dev"))
 app.use('/',userRout);
 app.use("/cart",cartRout);

@@ -42,7 +42,7 @@ export default function Lists() {
   const { edit, data: patchData, loading: patchLoading } = usePatch();
   const { remove, loading: deleteLoading } = useDelete();
   const { fetch: fetchCategories, data: categoryData, loading: loadingCategories } = useFetchByLoad();
-  const { fetch:productFetch, data:productData } = useFetchByLoad();
+  const { fetch:productFetch, data:productData,loading:csvLoading } = useFetchByLoad();
   const [selectedRowKeys, setSelectedRowKeys] = useState<any[]>([]);
   const { update, data:webShopData, loading:webShopLoading } = usePostToWebshop();
 
@@ -355,7 +355,7 @@ export default function Lists() {
               {query.filterKey !== "Filter Options" ? query.filterKey : "Select Filter"} <DownOutlined />
             </Button>
           </Dropdown>
-          <Button onClick={downloadCsv} type="primary">
+          <Button onClick={downloadCsv} type="primary" loading={csvLoading}>
             {/* <CSVLink data={csvData} filename={"stock_product.csv"}> */}
               Download Stock CSV
             {/* </CSVLink> */}

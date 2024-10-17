@@ -16,9 +16,14 @@ const resource = "products";
 
 export default function Lists() {
 
-    const { fetch, data, loading } = useFetchByLoad();
+    const { fetch, data} = useFetchByLoad();
+    const { fetch:fetchOrder, data:orderData} = useFetchByLoad();
+    const { fetch:fetchCustomer, data:customerData} = useFetchByLoad();
+
     useEffect(() => {
         fetch({ url: resource });
+        fetchOrder({ url: '/cart/getOrder' });
+        fetchCustomer({ url: '/getAllWebShopUsers' });
     }, []);
     console.log(data, " data");
     const datas = [
@@ -35,13 +40,14 @@ export default function Lists() {
             "value": 150
         },
     ]
+    const totalWebshopProducts = data?.data?.filter((product:any) => product.isWebshopProduct === true).length;
 
     return (
         <>
             <div className="main_caed_block" style={{ gap: "2rem", padding: "2rem" }}>
                 <div className=" d-flex align-items-center justify-content-between rounded-3 shadow-lg blocks_cards" style={{ padding: "1rem", gap: "3rem" }}>
                     <div>
-                        <p className="h1">17</p>
+                        <p className="h1">{data?.count}</p>
                         <p className="h5"> Total Inventory Stock</p>
                     </div>
                     <div>
@@ -50,8 +56,8 @@ export default function Lists() {
                 </div>
                 <div className=" d-flex align-items-center justify-content-between rounded-3 shadow-lg blocks_cards" style={{ padding: "1rem", gap: "3rem" }}>
                     <div>
-                        <p className=" h1">32</p>
-                        <p className=" h5">Amazon</p>
+                    <p className=" h1">{data?.platformCount[0].count}</p>
+                    <p className=" h5">{data?.platformCount[0]._id}</p>
                     </div>
                     <div>
                         <FaAmazon style={{ fontSize: "3rem" }} />
@@ -59,8 +65,8 @@ export default function Lists() {
                 </div>
                 <div className=" d-flex align-items-center justify-content-between rounded-3 shadow-lg blocks_cards" style={{ padding: "1rem", gap: "3rem" }}>
                     <div>
-                        <p className=" h1">23</p>
-                        <p className=" h5">Bol.com</p>
+                    <p className=" h1">{data?.platformCount[1].count}</p>
+                    <p className=" h5">{data?.platformCount[1]._id}</p>
                     </div>
                     <div>
                         <CiTrophy style={{ fontSize: "3rem" }} />
@@ -68,7 +74,7 @@ export default function Lists() {
                 </div>
                 <div className=" d-flex align-items-center justify-content-between rounded-3 shadow-lg blocks_cards" style={{ padding: "1rem", gap: "3rem" }}>
                     <div>
-                        <p className=" h1">17</p>
+                        <p className=" h1">{totalWebshopProducts}</p>
                         <p className=" h5">Total Product Webshop</p>
                     </div>
                     <div>
@@ -77,7 +83,7 @@ export default function Lists() {
                 </div>
                 <div className=" d-flex align-items-center justify-content-between rounded-3 shadow-lg blocks_cards" style={{ padding: "1rem", gap: "1rem" }}>
                     <div>
-                        <p className=" h1">17</p>
+                        <p className=" h1">{orderData?.orders?.length}</p>
                         <p className=" h5">Total Order</p>
                     </div>
                     <div>
@@ -86,14 +92,14 @@ export default function Lists() {
                 </div>
                 <div className=" d-flex align-items-center justify-content-between rounded-3 shadow-lg blocks_cards" style={{ padding: "1rem", gap: "1rem" }}>
                     <div>
-                        <p className=" h1">17</p>
+                        <p className=" h1">{customerData?.length}</p>
                         <p className=" h5">Total Customers</p>
                     </div>
                     <div>
                         <LuUsers2 style={{ fontSize: "3rem" }} />
                     </div>
                 </div>
-                <div className=" d-flex align-items-center justify-content-between rounded-3 shadow-lg blocks_cards" style={{ padding: "1rem", gap: "1rem" }}>
+                {/* <div className=" d-flex align-items-center justify-content-between rounded-3 shadow-lg blocks_cards" style={{ padding: "1rem", gap: "1rem" }}>
                     <div>
                         <p className=" h1">17</p>
                         <p className=" h5">Total Earning</p>
@@ -101,8 +107,8 @@ export default function Lists() {
                     <div>
                         <LuUsers2 style={{ fontSize: "3rem" }} />
                     </div>
-                </div>
-                <div className=" d-flex align-items-center justify-content-between rounded-3 shadow-lg blocks_cards" style={{ padding: "1rem", gap: "1rem" }}>
+                </div> */}
+                {/* <div className=" d-flex align-items-center justify-content-between rounded-3 shadow-lg blocks_cards" style={{ padding: "1rem", gap: "1rem" }}>
                     <div>
                         <p className=" h1">17</p>
                         <p className=" h5">Demo</p>
@@ -110,7 +116,7 @@ export default function Lists() {
                     <div>
                         <LuUsers2 style={{ fontSize: "3rem" }} />
                     </div>
-                </div>
+                </div> */}
 
             </div>
 
