@@ -1109,7 +1109,8 @@ const TopCategories: React.FC = () => {
   };
 
   const handleDeleteClick = (categoryId: string, categoryIndex: number, subCategoryIndex?: number, subSubCategoryIndex?: number,removeImageOnly?:boolean) => {
-    setPopup({ type: 'delete', item: categoryId });
+    //@ts-ignore
+    setPopup({ type: 'delete', item: showIconsFor });
     setSelectedCategory({ categoryId, categoryIndex, subCategoryIndex, subSubCategoryIndex,removeImageOnly });
   };
 
