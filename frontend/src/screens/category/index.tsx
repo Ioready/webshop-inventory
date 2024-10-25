@@ -1084,7 +1084,7 @@ const TopCategories: React.FC = () => {
   const [editedName, setEditedName] = useState<string>(''); // For editing category names
   const [imageUpload, setImageUpload] = useState<File | null>(null); // For image uploads
 
-  const { fetch, data } = useFetchByLoad();
+  const { fetch, data,loading } = useFetchByLoad();
   const { edit } = usePatch();
 
   useEffect(() => {
@@ -1231,6 +1231,13 @@ const TopCategories: React.FC = () => {
             <th>Sub-Sub Categories</th>
           </tr>
         </thead>
+        {loading ? (
+                <tr>
+                  <td colSpan={4} className="text-center">
+                    Loading...
+                  </td>
+                </tr>
+              ) : (
         <tbody>
           {data?.categories[0]?.categories?.map((category: any, categoryIndex: any) => {
             const hasSubCategories = category.subCategories && category.subCategories.length > 0;
@@ -1338,6 +1345,7 @@ const TopCategories: React.FC = () => {
             ));
           })}
         </tbody>
+              )}
       </table>
 
       {/* Edit Popup */}

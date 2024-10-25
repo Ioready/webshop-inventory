@@ -191,7 +191,7 @@ const CustomerPage: React.FC = () => {
   const [Customers, setCustomers] = useState<Customers[]>([]);
   const [selectedCustomers, setSelectedCustomers] = useState<string[]>([]);
   const [pagination, setPagination] = useState({ current: 1, pageSize: 5, total: 0 });
-  const { fetch, data } = useFetchByLoad();
+  const { fetch, data ,loading} = useFetchByLoad();
   const { remove } = useDelete();
   const navigate = useNavigate();
 
@@ -276,6 +276,7 @@ const CustomerPage: React.FC = () => {
         <Table
           columns={columns}
           dataSource={Customers}
+          loading={loading}
           rowKey="id"
           pagination={{
             current: pagination.current,

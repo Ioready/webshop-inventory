@@ -267,7 +267,7 @@ const OrderTable: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1); // Current page state
   const [ordersPerPage] = useState<number>(5); // Number of orders per page
 
-  const { fetch, data } = useFetchByLoad();
+  const { fetch, data ,loading} = useFetchByLoad();
   const { remove } = useDelete();
   const { edit } = usePatch();
 
@@ -432,6 +432,13 @@ const OrderTable: React.FC = () => {
                 <th>Tags</th>
               </tr>
             </thead>
+            {loading ? (
+                <tr>
+                  <td colSpan={4} className="text-center">
+                    Loading...
+                  </td>
+                </tr>
+              ) : (
             <tbody>
               {currentOrders.map(order => (
                 <tr key={order.id}>
@@ -474,6 +481,7 @@ const OrderTable: React.FC = () => {
                 </tr>
               ))}
             </tbody>
+              )}
           </table>
         </div>
 

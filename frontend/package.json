@@ -31,6 +31,7 @@
     "react": "^18.2.0",
     "react-bootstrap": "^2.10.4",
     "react-chartjs-2": "^5.2.0",
+    "react-csv": "^2.2.2",
     "react-date-picker": "^10.5.0",
     "react-device-detect": "^2.2.3",
     "react-dom": "^18.2.0",
