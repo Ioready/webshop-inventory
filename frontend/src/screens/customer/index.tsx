@@ -269,7 +269,7 @@ const CustomerDetailsPage: React.FC = () => {
                     <div className="img-thumbnail me-3" style={{ width: '100px', height: '100px', backgroundColor: '#e9ecef' }}>No Image</div>
                   )}
                   <div className="d-flex justify-content-between w-100">
-                    <p>{order.productId ? order.productId.title : "No Title"}</p>
+                    <p>{order.name ? order.name : "No Title"}</p>
                     <p>x{order.quantity}</p>
                     <p>${order.totalAmount}</p>
                   </div>
