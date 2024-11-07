@@ -180,6 +180,8 @@ interface OrderDetail {
   totalAmount: string;
   quantity: number;
   productId?: Product | null;
+  images:string;
+  name:string;
 }
 
 interface Customer {
@@ -200,6 +202,7 @@ const CustomerDetailsPage: React.FC = () => {
   const location = useLocation();
   const customer = location.state?.customer as Customer;
 
+  console.log('customer',customer)
   if (!customer) {
     return <div>No customer data available</div>;
   }
@@ -238,7 +241,8 @@ const CustomerDetailsPage: React.FC = () => {
                     <div>
                       <p>
                         <a href="#">
-                          {order.productId ? `#${order.productId._id}` : "N/A"}
+                          {//@ts-ignore
+                          order?.shipmentId ? `#${order?.shipmentId}` : "N/A"}
                         </a>
                         <span className="badge bg-success">{order.orderStatus}</span>
                         <span className="badge bg-warning">{order.fulfillmentStatus}</span>
@@ -249,9 +253,9 @@ const CustomerDetailsPage: React.FC = () => {
                   </div>
                 </div>
                 <div className="d-flex align-items-center">
-                  {order.productId && order.productId.images.length > 0 ? (
+                  {order.images[0]  ? (
                     <img
-                      src={order.productId.images[0]}
+                      src={order?.images[0]}
                       alt="Product"
                       className="img-thumbnail me-3"
                       style={{ width: '100px' }}
@@ -260,7 +264,8 @@ const CustomerDetailsPage: React.FC = () => {
                     <div className="img-thumbnail me-3" style={{ width: '100px', height: '100px', backgroundColor: '#e9ecef' }}>No Image</div>
                   )}
                   <div className="d-flex justify-content-between w-100">
-                    <p>{order.productId?.title || "No Title"}</p>
+                    
+                    <p>{order?.name || "No Title"}</p>
                     <p>x{order.quantity}</p>
                     <p>${order.totalAmount}</p>
                   </div>

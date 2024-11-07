@@ -287,6 +287,9 @@ const orderItemSchema = new mongoose.Schema({
     type: ObjectId, // Reference to shipment for tracking purposes
     auto: true,
   },
+  images:{
+    type:[String]
+  }
   // _id: {
   //   type: ObjectId,
   //   auto: true, // Automatically generated _id, acts as the shipment_id

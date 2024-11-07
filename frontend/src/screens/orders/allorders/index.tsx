@@ -27,7 +27,7 @@ const AllOrdersPage: React.FC = () => {
                 </div>
               </div>
               <div className=' d-flex justify-content-end'>
-          <button className="btn btn-primary">Fulfill item</button>
+          {/* <button className="btn btn-primary">Fulfill item</button> */}
           </div>
             </div>
           </div>

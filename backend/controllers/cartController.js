@@ -215,6 +215,7 @@ export const cart = {
         price: item.price, // Assuming each item has price
         name: item.title,
         totalAmount: parseFloat(item.quantity * item.price),
+        images:item.images,
       }));
 
       // Step 1: Store the order in the database with a "Pending Payment" status
