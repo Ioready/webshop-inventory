@@ -44,7 +44,7 @@ const Popup: React.FC<PopupProps> = ({ customer, onClose }) => {
       <div className="popup-content" ref={popupRef}>
         <div className=' d-flex justify-content-between align-items-center' style={{ gap:"1rem"}}>
           <h3>{//@ts-ignore 
-          customer?.userId?.firstName} {customer?.userId?.lastName}</h3>
+          customer?.shippingAddress?.firstName} {customer?.shippingAddress?.lastName}</h3>
         </div>
         
         <p>{//@ts-ignore
