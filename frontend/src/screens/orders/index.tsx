@@ -344,6 +344,15 @@ const OrderTable: React.FC = () => {
     setPopupCustomer(customer);
   };
 
+  // const handleOrderClick = (orderId: string) => {
+  //   navigate(`/all-orders/${orderId}`);
+  // };
+
+  const handleOrderClick = (order: Order) => {
+    navigate(`/all-orders/${order.id}`, { state: { customerDetail: order.customerDetail } });
+  };
+  
+
   const closePopup = () => {
     setPopupCustomer(null);
   };
@@ -449,7 +458,8 @@ const OrderTable: React.FC = () => {
                       onChange={() => handleCheckboxChange(order.id)}
                     />
                   </td>
-                  <td className="text-nowrap" onClick={handleViewAllPage} style={{ cursor: "pointer" }}>{order.id}</td>
+               
+                  <td className="text-nowrap" onClick={() => handleOrderClick(order)}style={{ cursor: "pointer" }}>{order.id}</td>
                   <td className="text-nowrap" onClick={handleViewAllPage} style={{ cursor: "pointer" }}>{order.date}</td>
                   <td className="text-nowrap">
                     <span onClick={() => handleCustomerClick(order.customerDetail)} style={{ cursor: 'pointer', color: 'blue' }}>
@@ -512,3 +522,5 @@ const OrderTable: React.FC = () => {
 };
 
 export default OrderTable;
+
+

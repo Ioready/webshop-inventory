@@ -10,6 +10,7 @@ import Webshopproduct from '../screens/webshopproduct';
 import AllOrdersPage from '../screens/orders/allorders';
 import CustomerDetailsPage from '../screens/customer';
 import CustomerPage from '../screens/customerspage';
+import CustomerViewPage from '../screens/customerspage/customerview';
 import CMS from '../screens/cms';
 import Blog from '../screens/cms/blog';
 import BlogForm from '../screens/cms/blog/addblog';
@@ -51,10 +52,11 @@ export const Navigation = () => {
           <Route path="/dashboard" element={<Home />} />
           <Route path="/*" element={<Products />} />
           <Route path="/order" element={<Order />} />
-          <Route path="/all-orders" element={<AllOrdersPage />} />
+          <Route path="/all-orders/:orderId" element={<AllOrdersPage />} />
           <Route path="/customer-details" element={<CustomerDetailsPage />} />
           <Route path="/webshop-product" element={<Webshopproduct />} />
           <Route path="/customer" element={<CustomerPage />} />
+          <Route path="/customer-view/:customerId" element={<CustomerViewPage />} />
           <Route path="/enqury" element={<Enqury />} />
           <Route path="/manage-category" element={<ManageCategories />} />
           <Route path="/addcategory" element={<AddCategory />} />

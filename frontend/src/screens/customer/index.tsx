@@ -148,10 +148,10 @@
 
 // export default CustomerDetailsPage;
 
-
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { Button } from 'antd';
 
 interface Product {
   _id: string;
@@ -210,6 +210,10 @@ const CustomerDetailsPage: React.FC = () => {
 
   return (
     <div className="container mt-4">
+        <Button className="btn mb-3" onClick={() => navigate(-1)}>
+        ← Back
+      </Button>
+
       <div className="d-flex justify-content-between align-items-center mb-3">
         <div>
           <h2>{`${customer.userId.firstName} ${customer.userId.lastName}`}</h2>
@@ -248,6 +252,7 @@ const CustomerDetailsPage: React.FC = () => {
                     <p>${order.totalAmount}</p>
                   </div>
                 </div>
+                
                 <div className="d-flex align-items-center">
                   {order.productId && order.productId.images.length > 0 ? (
                     <img
@@ -260,7 +265,7 @@ const CustomerDetailsPage: React.FC = () => {
                     <div className="img-thumbnail me-3" style={{ width: '100px', height: '100px', backgroundColor: '#e9ecef' }}>No Image</div>
                   )}
                   <div className="d-flex justify-content-between w-100">
-                    <p>{order.productId?.title || "No Title"}</p>
+                    <p>{order.productId ? order.productId.title : "No Title"}</p>
                     <p>x{order.quantity}</p>
                     <p>${order.totalAmount}</p>
                   </div>
