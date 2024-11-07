@@ -119,18 +119,22 @@ const CustomerPage: React.FC = () => {
             Delete Selected
           </button>
         )}
-        <Table
-          columns={columns}
-          dataSource={Customers}
-          loading={loading}
-          rowKey="id"
-          pagination={{
-            current: pagination.current,
-            pageSize: pagination.pageSize,
-            total: pagination.total,
-          }}
-          onChange={handleTableChange}
-        />
+        <div className="table-responsive" style={{ overflowX: 'auto' }}>
+          <Table
+           className='table-responsive'
+            columns={columns}
+            dataSource={Customers}
+            loading={loading}
+            rowKey="id"
+            pagination={{
+              current: pagination.current,
+              pageSize: pagination.pageSize,
+              total: pagination.total,
+            }}
+            onChange={handleTableChange}
+            scroll={{ x: 800 }} // Minimum width for horizontal scrolling
+          />
+        </div>
       </div>
     </div>
   );

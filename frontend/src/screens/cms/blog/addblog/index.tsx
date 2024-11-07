@@ -145,6 +145,7 @@ import { useNavigate, useLocation } from 'react-router-dom'; // Import useLocati
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from '../../../firebase/firebase';
 import ReactQuill from 'react-quill';
+import { Button } from 'antd';
 
 const BlogForm: React.FC = () => {
   const [title, setTitle] = useState('');
@@ -219,6 +220,9 @@ const BlogForm: React.FC = () => {
 
   return (
     <div className="m-3">
+      <Button className="btn mb-3" onClick={() => navigate(-1)}>
+        ← Back
+      </Button>
       <h3 className="my-2">{blogToEdit ? 'Edit Blog' : 'Add Blog'}</h3>
       <form onSubmit={handleSubmit} className="bg-white p-2 rounded-2">
         <div className="form-group">
