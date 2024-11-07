@@ -1136,16 +1136,71 @@ const TopCategories: React.FC = () => {
     closePopup();
   };
 
+  // const handleEdit = async () => {
+  //   if (!showIconsFor || !selectedCategory) return;
+
+  //   const isImageEdit = showIconsFor.startsWith('image-');
+  //   const updatedFields: any = {
+  //     id: data?.categories[0]?._id, // Document ID
+  //     selectedCategory: selectedCategory.categoryIndex, // Send the selected category index
+  //   };
+
+  //   if (isImageEdit && imageUpload) {
+  //     try {
+  //       const storageRef = ref(storage, `images/${imageUpload.name}`);
+  //       await uploadBytes(storageRef, imageUpload);
+  //       const imageUrl = await getDownloadURL(storageRef);
+
+  //       updatedFields.image = imageUrl;
+
+  //       await edit('/editCategory', { updatedFields });
+  //       message.success('Category image updated successfully');
+  //       fetch({ url: 'getCategory' });
+  //       closePopup();
+  //     } catch (error) {
+  //       console.error('Error uploading image:', error);
+  //       message.error('Error uploading image');
+  //     }
+  //   } else {
+  //     if (selectedCategory.subCategoryIndex === undefined && selectedCategory.subSubCategoryIndex === undefined) {
+  //       updatedFields.name = editedName;
+  //     } else if (selectedCategory.subCategoryIndex !== undefined && selectedCategory.subSubCategoryIndex === undefined) {
+  //       updatedFields.name = editedName;
+  //       updatedFields.selectedSubCategory = selectedCategory.subCategoryIndex;
+  //     } else if (selectedCategory.subSubCategoryIndex !== undefined) {
+  //       updatedFields.name = editedName;
+  //       updatedFields.selectedSubCategory = selectedCategory.subCategoryIndex;
+  //       updatedFields.selectedSubSubCategory = selectedCategory.subSubCategoryIndex;
+  //     }
+
+  //     try {
+  //       await edit('/editCategory', { updatedFields });
+  //       message.success('Category updated successfully');
+  //       fetch({ url: 'getCategory' });
+  //       closePopup();
+  //     } catch (error) {
+  //       console.error('Error updating category:', error);
+  //       message.error('Error updating category');
+  //     }
+  //   }
+  // };
+
   const handleEdit = async () => {
     if (!showIconsFor || !selectedCategory) return;
 
-    const isImageEdit = showIconsFor.startsWith('image-');
+    const isImageEdit = showIconsFor.startsWith("image-");
     const updatedFields: any = {
       id: data?.categories[0]?._id, // Document ID
       selectedCategory: selectedCategory.categoryIndex, // Send the selected category index
     };
 
-    if (isImageEdit && imageUpload) {
+    // Check if it's an image edit and image is required
+    if (isImageEdit) {
+      if (!imageUpload) {
+        message.error("Please select an image");
+        return;
+      }
+
       try {
         const storageRef = ref(storage, `images/${imageUpload.name}`);
         await uploadBytes(storageRef, imageUpload);
@@ -1153,37 +1208,51 @@ const TopCategories: React.FC = () => {
 
         updatedFields.image = imageUrl;
 
-        await edit('/editCategory', { updatedFields });
-        message.success('Category image updated successfully');
-        fetch({ url: 'getCategory' });
+        await edit("/editCategory", { updatedFields });
+        message.success("Category image updated successfully");
+        fetch({ url: "getCategory" });
         closePopup();
       } catch (error) {
-        console.error('Error uploading image:', error);
-        message.error('Error uploading image');
+        console.error("Error uploading image:", error);
+        message.error("Error uploading image");
       }
     } else {
-      if (selectedCategory.subCategoryIndex === undefined && selectedCategory.subSubCategoryIndex === undefined) {
+      // Check if name is required and validate
+      if (!editedName || editedName.trim() === "") {
+        message.error("Please enter the name");
+        return;
+      }
+
+      // Set name based on selected category level
+      if (
+        selectedCategory.subCategoryIndex === undefined &&
+        selectedCategory.subSubCategoryIndex === undefined
+      ) {
         updatedFields.name = editedName;
-      } else if (selectedCategory.subCategoryIndex !== undefined && selectedCategory.subSubCategoryIndex === undefined) {
+      } else if (
+        selectedCategory.subCategoryIndex !== undefined &&
+        selectedCategory.subSubCategoryIndex === undefined
+      ) {
         updatedFields.name = editedName;
         updatedFields.selectedSubCategory = selectedCategory.subCategoryIndex;
       } else if (selectedCategory.subSubCategoryIndex !== undefined) {
         updatedFields.name = editedName;
         updatedFields.selectedSubCategory = selectedCategory.subCategoryIndex;
-        updatedFields.selectedSubSubCategory = selectedCategory.subSubCategoryIndex;
+        updatedFields.selectedSubSubCategory =
+          selectedCategory.subSubCategoryIndex;
       }
 
       try {
-        await edit('/editCategory', { updatedFields });
-        message.success('Category updated successfully');
-        fetch({ url: 'getCategory' });
+        await edit("/editCategory", { updatedFields });
+        message.success("Category updated successfully");
+        fetch({ url: "getCategory" });
         closePopup();
       } catch (error) {
-        console.error('Error updating category:', error);
-        message.error('Error updating category');
-      }
-    }
-  };
+        console.error("Error updating category:", error);
+        message.error("Error updating category");
+      }
+    }
+  };
 
   const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>, categoryIndex: number) => {
     if (event.target.files) {
@@ -1264,7 +1333,7 @@ const TopCategories: React.FC = () => {
                     {showIconsFor === `image-${categoryIndex}` && (
                       <div className='ms-1 shadow-lg' style={{ display: 'inline-flex', gap: '0.5rem', backgroundColor: 'white', padding: '3px', borderRadius: '5px' }}>
                         <FaEdit onClick={handleEditClick} style={{ cursor: 'pointer' }} />
-                        <FaTrash onClick={() => handleDeleteClick(category._id, categoryIndex,undefined, undefined, true)} style={{ cursor: 'pointer' }} />
+                        {/* <FaTrash onClick={() => handleDeleteClick(category._id, categoryIndex,undefined, undefined, true)} style={{ cursor: 'pointer' }} /> */}
                       </div>
                     )}
                   </td>
@@ -1273,7 +1342,7 @@ const TopCategories: React.FC = () => {
                     {showIconsFor === category.name && (
                       <div className='ms-1 shadow-lg' style={{ display: 'inline-flex', gap: '0.5rem', backgroundColor: 'white', padding: '3px', borderRadius: '5px' }}>
                         <FaEdit onClick={handleEditClick} style={{ cursor: 'pointer' }} />
-                        <FaTrash onClick={() => handleDeleteClick(category._id, categoryIndex)} style={{ cursor: 'pointer' }} />
+                        {/* <FaTrash onClick={() => handleDeleteClick(category._id, categoryIndex)} style={{ cursor: 'pointer' }} /> */}
                       </div>
                     )}
                   </td>
@@ -1304,7 +1373,7 @@ const TopCategories: React.FC = () => {
                       {showIconsFor === `image-${categoryIndex}` && (
                         <div className='ms-1 shadow-lg' style={{ display: 'inline-flex', gap: '0.5rem', backgroundColor: 'white', padding: '3px', borderRadius: '5px' }}>
                           <FaEdit onClick={handleEditClick} style={{ cursor: 'pointer' }} />
-                          <FaTrash onClick={() => handleDeleteClick(category._id, categoryIndex)} style={{ cursor: 'pointer' }} />
+                          {/* <FaTrash onClick={() => handleDeleteClick(category._id, categoryIndex)} style={{ cursor: 'pointer' }} /> */}
                         </div>
                       )}
                     </td>
@@ -1313,7 +1382,7 @@ const TopCategories: React.FC = () => {
                       {showIconsFor === category.name && (
                         <div className='ms-1 shadow-lg' style={{ display: 'inline-flex', gap: '0.5rem', backgroundColor: 'white', padding: '3px', borderRadius: '5px' }}>
                           <FaEdit onClick={handleEditClick} style={{ cursor: 'pointer' }} />
-                          <FaTrash onClick={() => handleDeleteClick(category._id, categoryIndex)} style={{ cursor: 'pointer' }} />
+                          {/* <FaTrash onClick={() => handleDeleteClick(category._id, categoryIndex)} style={{ cursor: 'pointer' }} /> */}
                         </div>
                       )}
                     </td>
@@ -1324,7 +1393,7 @@ const TopCategories: React.FC = () => {
                   {showIconsFor === subCategory.name && (
                     <div className='ms-1 shadow-lg' style={{ display: 'inline-flex', gap: '0.5rem', backgroundColor: 'white', padding: '3px', borderRadius: '5px' }}>
                       <FaEdit onClick={handleEditClick} style={{ cursor: 'pointer' }} />
-                      <FaTrash onClick={() => handleDeleteClick(subCategory._id, categoryIndex, subCategoryIndex)} style={{ cursor: 'pointer' }} />
+                      {/* <FaTrash onClick={() => handleDeleteClick(subCategory._id, categoryIndex, subCategoryIndex)} style={{ cursor: 'pointer' }} /> */}
                     </div>
                   )}
                 </td>
