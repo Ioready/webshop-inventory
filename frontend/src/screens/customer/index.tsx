@@ -149,8 +149,6 @@
 // export default CustomerDetailsPage;
 
 
-
-
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -181,7 +179,7 @@ interface OrderDetail {
   orderDate: string;
   totalAmount: string;
   quantity: number;
-  productId?: Product | null; // Make productId optional and nullable
+  productId?: Product | null;
 }
 
 interface Customer {
@@ -206,80 +204,70 @@ const CustomerDetailsPage: React.FC = () => {
     return <div>No customer data available</div>;
   }
 
-  // const { userId, address, orderItems } = customer;
-  const latestOrder = customer.orderItems[0]; // Assuming orderDetails has at least one item
-
-  // const handleViewAllOrders = () => {
-  //   navigate('/customer-details');
-  // };
-
-  // Format the date and time of creation
   const createdAtDate = new Date(customer.createdAt);
   const formattedDate = createdAtDate.toLocaleDateString();
   const formattedTime = createdAtDate.toLocaleTimeString();
+
   return (
     <div className="container mt-4">
-            <div className="d-flex justify-content-between align-items-center mb-3">
+      <div className="d-flex justify-content-between align-items-center mb-3">
         <div>
           <h2>{`${customer.userId.firstName} ${customer.userId.lastName}`}</h2>
           <p>{`${customer.shippingAddress.addressLine1}, ${customer.shippingAddress.addressLine2}, ${customer.shippingAddress.city}, ${customer.shippingAddress.state}`}</p>
           <p>Customer since: {formattedDate} at {formattedTime}</p>
         </div>
       </div>
+      
       <div className="row">
         {/* Left Side: Order Details */}
         <div className="col-md-8">
-          <div className="card mb-4">
-            <div className="card-body">
-              <div className="d-flex justify-content-between">
-                <div>
-                  <h5>Amount spent</h5>
-                  <p>${latestOrder.totalAmount}</p>
-                </div>
-                <div>
-                  <h5>Order</h5>
-                  <p>{latestOrder.quantity}</p>
-                </div>
-              </div>
-              <div>
-                <h5>Last order placed</h5>
-                <hr />
-                <div className="d-flex justify-content-between align-items-center">
+          {customer.orderItems.map((order, index) => (
+            <div key={order.orderId} className="card mb-4">
+              <div className="card-body">
+                <div className="d-flex justify-content-between">
                   <div>
-                    <p>
-                      <a href="#">
-                        {latestOrder.productId ? `#${latestOrder.productId._id}` : "N/A"}
-                      </a>
-                      <span className="badge bg-success">{latestOrder.orderStatus}</span>
-                      <span className="badge bg-warning">{latestOrder.fulfillmentStatus}</span>
-                    </p>
-                    <p>{customer.date}</p>
-                    
+                    <h5>Order {index + 1}</h5>
+                    <p>Amount spent: ${order.totalAmount}</p>
+                    <p>Quantity: {order.quantity}</p>
                   </div>
-                  <p>${latestOrder.totalAmount}</p>
                 </div>
-              </div>
-             
-              <div className="d-flex align-items-center">
-                
-              {latestOrder.productId && latestOrder.productId.images.length > 0 ? (
-      <img
-        src={latestOrder.productId.images[0]}
-        alt="Product"
-        className="img-thumbnail me-3"
-        style={{ width: '100px' }}
-      />
-                ) : (
-                  <div className="img-thumbnail me-3" style={{ width: '100px', height: '100px', backgroundColor: '#e9ecef' }}>No Image</div>
-                )}
-                <div className="d-flex justify-content-between w-100">
-                  <p>{latestOrder?.productId?.title || "No Title"}</p>
-                  <p>x{latestOrder.quantity}</p>
-                  <p>${latestOrder.totalAmount}</p>
+                <div>
+                  <h5>Last order placed</h5>
+                  <hr />
+                  <div className="d-flex justify-content-between align-items-center">
+                    <div>
+                      <p>
+                        <a href="#">
+                          {order.productId ? `#${order.productId._id}` : "N/A"}
+                        </a>
+                        <span className="badge bg-success">{order.orderStatus}</span>
+                        <span className="badge bg-warning">{order.fulfillmentStatus}</span>
+                      </p>
+                      <p>{order.orderDate}</p>
+                    </div>
+                    <p>${order.totalAmount}</p>
+                  </div>
+                </div>
+                <div className="d-flex align-items-center">
+                  {order.productId && order.productId.images.length > 0 ? (
+                    <img
+                      src={order.productId.images[0]}
+                      alt="Product"
+                      className="img-thumbnail me-3"
+                      style={{ width: '100px' }}
+                    />
+                  ) : (
+                    <div className="img-thumbnail me-3" style={{ width: '100px', height: '100px', backgroundColor: '#e9ecef' }}>No Image</div>
+                  )}
+                  <div className="d-flex justify-content-between w-100">
+                    <p>{order.productId?.title || "No Title"}</p>
+                    <p>x{order.quantity}</p>
+                    <p>${order.totalAmount}</p>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          ))}
         </div>
 
         {/* Right Side: Customer Information */}
