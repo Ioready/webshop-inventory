@@ -180,6 +180,8 @@ interface OrderDetail {
   totalAmount: string;
   quantity: number;
   productId?: Product | null;
+  images:string;
+  name:string;
 }
 
 interface Customer {
@@ -200,6 +202,7 @@ const CustomerDetailsPage: React.FC = () => {
   const location = useLocation();
   const customer = location.state?.customer as Customer;
 
+  console.log('customer',customer)
   if (!customer) {
     return <div>No customer data available</div>;
   }
@@ -242,7 +245,8 @@ const CustomerDetailsPage: React.FC = () => {
                     <div>
                       <p>
                         <a href="#">
-                          {order.productId ? `#${order.productId._id}` : "N/A"}
+                          {//@ts-ignore
+                          order?.shipmentId ? `#${order?.shipmentId}` : "N/A"}
                         </a>
                         <span className="badge bg-success">{order.orderStatus}</span>
                         <span className="badge bg-warning">{order.fulfillmentStatus}</span>
@@ -254,9 +258,9 @@ const CustomerDetailsPage: React.FC = () => {
                 </div>
                 
                 <div className="d-flex align-items-center">
-                  {order.productId && order.productId.images.length > 0 ? (
+                  {order.images[0]  ? (
                     <img
-                      src={order.productId.images[0]}
+                      src={order?.images[0]}
                       alt="Product"
                       className="img-thumbnail me-3"
                       style={{ width: '100px' }}
