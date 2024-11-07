@@ -72,7 +72,7 @@ export default function Lists() {
                         <CiTrophy style={{ fontSize: "3rem" }} />
                     </div>
                 </div>
-                <div className=" d-flex align-items-center justify-content-between rounded-3 shadow-lg blocks_cards" style={{ padding: "1rem", gap: "3rem" }}>
+                {/* <div className=" d-flex align-items-center justify-content-between rounded-3 shadow-lg blocks_cards" style={{ padding: "1rem", gap: "3rem" }}>
                     <div>
                         <p className=" h1">{totalWebshopProducts}</p>
                         <p className=" h5">Total Product Webshop</p>
@@ -98,7 +98,7 @@ export default function Lists() {
                     <div>
                         <LuUsers2 style={{ fontSize: "3rem" }} />
                     </div>
-                </div>
+                </div> */}
                 {/* <div className=" d-flex align-items-center justify-content-between rounded-3 shadow-lg blocks_cards" style={{ padding: "1rem", gap: "1rem" }}>
                     <div>
                         <p className=" h1">17</p>
